@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.1] - 2026-08-30
+
+### Changed
+- Menu backdrop now shows all eight planets, orbiting moons, and extra drifting moon sprites.
+
 ## [0.12.0] - 2026-08-30
 
 ### Changed

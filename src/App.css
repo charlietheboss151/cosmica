@@ -32,22 +32,30 @@
   inset: 0;
   display: grid;
   place-items: center;
-  opacity: 0.42;
+  opacity: 0.52;
 }
 
 .menu-orbits-svg {
-  width: min(92vw, 560px);
-  height: min(92vw, 560px);
+  width: min(98vw, 680px);
+  height: min(98vw, 680px);
 }
 
 .menu-orbit-ring {
   stroke: #7aa2ff;
-  stroke-opacity: 0.12;
+  stroke-opacity: 0.09;
   stroke-width: 1;
 }
 
 .menu-orbit-sun {
-  filter: drop-shadow(0 0 18px #ffcc4d88);
+  filter: drop-shadow(0 0 22px #ffcc4d99);
+}
+
+.menu-orbit-moon {
+  opacity: 0.88;
+}
+
+.menu-orbit-drift {
+  opacity: 0.55;
 }
 
 .menu-panel {
