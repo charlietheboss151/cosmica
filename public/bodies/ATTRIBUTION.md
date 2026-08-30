@@ -45,10 +45,15 @@ Planet sticker art is original to Cosmica. Moon and celestial-body photos are pu
 | Ceres | Ceres - RC3 - Haulani Crater (22381131691) (cropped).jpg |
 | Pluto | Pluto in True Color - High-Res.jpg |
 | Eris | Hubble ACS image of Eris.jpg |
-| Haumea | Haumea Hubble.png |
+| Haumea | 2003EL61art.jpg |
 | Makemake | Dwarf Planet Makemake and Its Moon.jpg |
 | Sedna | Sedna PRC2004-14d.png |
 | Quaoar | Quaoar-weywot hst.jpg |
+| Orcus | 90482 Orcus.jpg |
+| Gonggong | 225088 Gonggong by Hubble (2009, colorized).png |
+| Varuna | Varuna artistic.png |
+| Ixion | Ixion planetoid nasa.jpg |
+| Hygiea | SPHERE image of Hygiea.jpg |
 | Vesta | Vesta as seen with the Dawn spacecraft (ann14003b).jpg |
 | Pallas | Potw1749a Pallas crop.png |
 | Psyche | Psyche VLT.png |
@@ -57,11 +62,11 @@ Planet sticker art is original to Cosmica. Moon and celestial-body photos are pu
 | Ida | 243 ida.jpg |
 | Gaspra | 951 Gaspra.jpg |
 | Mathilde | (253) mathilde.jpg |
-| Eros | PIA02475 Eros' Bland Butterscotch Colors.jpg |
+| Eros | Eros - PIA02923 (color).jpg |
 | Itokawa | Itokawa06 hayabusa.jpg |
 | Lutetia | An image of the strange asteroid Lutetia from the ESA Rosetta probe.jpg |
 | Halley's Comet | Comet Halley close up.jpg |
-| Hale-Bopp | Comet Hale-Bopp (opo9708a).jpg |
+| Hale-Bopp | The near-nucleus region of comet Hale-Bopp - Eso9624a.jpg |
 | 67P | A Rosetta colour image of the surface of Comet 67P-Churyumov-Gerasimenko (49948151618).png |
 | Tempel 1 | Deep Impact HRI - PIA02137.png |
 | Wild 2 | Comet Wild2.jpg |

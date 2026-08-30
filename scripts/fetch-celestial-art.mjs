@@ -9,10 +9,15 @@ const CELESTIAL_FILES = {
   ceres: "Ceres - RC3 - Haulani Crater (22381131691) (cropped).jpg",
   pluto: "Pluto in True Color - High-Res.jpg",
   eris: "Hubble ACS image of Eris.jpg",
-  haumea: "Haumea Hubble.png",
+  haumea: "2003EL61art.jpg",
   makemake: "Dwarf Planet Makemake and Its Moon.jpg",
   sedna: "Sedna PRC2004-14d.png",
   quaoar: "Quaoar-weywot hst.jpg",
+  orcus: "90482 Orcus.jpg",
+  gonggong: "225088 Gonggong by Hubble (2009, colorized).png",
+  varuna: "Varuna artistic.png",
+  ixion: "Ixion planetoid nasa.jpg",
+  hygiea: "SPHERE image of Hygiea.jpg",
   vesta: "Vesta as seen with the Dawn spacecraft (ann14003b).jpg",
   pallas: "Potw1749a Pallas crop.png",
   psyche: "Psyche VLT.png",
@@ -21,12 +26,12 @@ const CELESTIAL_FILES = {
   ida: "243 ida.jpg",
   gaspra: "951 Gaspra.jpg",
   mathilde: "(253) mathilde.jpg",
-  eros: "PIA02475 Eros' Bland Butterscotch Colors.jpg",
+  eros: "Eros - PIA02923 (color).jpg",
   itokawa: "Itokawa06 hayabusa.jpg",
   lutetia:
     "An image of the strange asteroid Lutetia from the ESA Rosetta probe.jpg",
   halley: "Comet Halley close up.jpg",
-  "hale-bopp": "Comet Hale-Bopp (opo9708a).jpg",
+  "hale-bopp": "The near-nucleus region of comet Hale-Bopp - Eso9624a.jpg",
   "67p":
     "A Rosetta colour image of the surface of Comet 67P-Churyumov-Gerasimenko (49948151618).png",
   "tempel-1": "Deep Impact HRI - PIA02137.png",
@@ -42,7 +47,7 @@ const CROP_ZOOM = {
 
 const OUT_DIR = join(dirname(fileURLToPath(import.meta.url)), "../public/bodies");
 const SIZE = 1024;
-const USER_AGENT = "CosmicaGame/0.15.11 (educational; charlietheboss151/cosmica)";
+const USER_AGENT = "CosmicaGame/0.16.2 (educational; charlietheboss151/cosmica)";
 const API_DELAY_MS = 2200;
 
 function sleep(ms) {

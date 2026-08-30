@@ -26,6 +26,12 @@ describe("cartoon body art", () => {
       "ceres",
       "vesta",
       "halley",
+      "haumea",
+      "hygiea",
+      "gonggong",
+      "ixion",
+      "orcus",
+      "varuna",
     ]) {
       expect(BODY_ART[id]).toBe(`/bodies/${id}.png`);
     }
@@ -110,14 +116,14 @@ describe("cartoon body art", () => {
     expect(container.querySelector(".celestial-globe")).toBeNull();
   });
 
-  it("draws hard-mode dwarf planets with textured globe fallbacks", () => {
+  it("draws hard-mode dwarf planets from art when available", () => {
     const { container } = render(
       <svg>
         <BodyArt id="orcus" radius={10} color="#909090" type="dwarf-planet" />
       </svg>,
     );
-    expect(container.querySelector(".celestial-globe")).not.toBeNull();
-    expect(container.querySelectorAll(".globe-crater").length).toBeGreaterThan(0);
+    expect(container.querySelector("image")).toHaveAttribute("href", "/bodies/orcus.png");
+    expect(container.querySelector(".celestial-globe")).toBeNull();
   });
 
   it("draws comets with a tail and asteroids with rock sprites", () => {
