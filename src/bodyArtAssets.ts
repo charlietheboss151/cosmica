@@ -28,6 +28,9 @@ export const BODY_ART: Record<string, string> = {
   titania: "/bodies/titania.png",
   oberon: "/bodies/oberon.png",
   triton: "/bodies/triton.png",
+  pluto: "/bodies/pluto.png",
+  ida: "/bodies/ida.png",
+  gaspra: "/bodies/gaspra.png",
 };
 
 export const MOON_ART_IDS = [

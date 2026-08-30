@@ -7,7 +7,7 @@ import {
   startQuiz,
   type QuizState,
 } from "./game";
-import { randomizeOrbitalPositions } from "./layout";
+import { randomizeOrbitalPositions, layoutProfileForMode } from "./layout";
 import OrbitBackdrop from "./OrbitBackdrop";
 import SolarSystemMap from "./SolarSystemMap";
 import "./App.css";
@@ -115,7 +115,7 @@ function Menu({ onPlay }: { onPlay: (config: PlayConfig) => void }) {
 function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
   const { mode, hardMode } = config;
   const [objects, setObjects] = useState(() =>
-    randomizeOrbitalPositions(catalog, Math.random),
+    randomizeOrbitalPositions(catalog, Math.random, layoutProfileForMode(mode)),
   );
   const [quiz, setQuiz] = useState<QuizState>(() =>
     startQuiz(mode, Math.random, Date.now(), hardMode),
@@ -123,7 +123,9 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
   const [now, setNow] = useState(() => Date.now());
 
   const replay = () => {
-    setObjects(randomizeOrbitalPositions(catalog, Math.random));
+    setObjects(
+      randomizeOrbitalPositions(catalog, Math.random, layoutProfileForMode(mode)),
+    );
     setQuiz(startQuiz(mode, Math.random, Date.now(), hardMode));
   };
 

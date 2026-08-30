@@ -189,4 +189,20 @@ describe("randomizeOrbitalPositions", () => {
     const secondEarth = second.find((object) => object.id === "earth")!.longitudeDeg;
     expect(firstEarth).not.toBe(secondEarth);
   });
+
+  it("spaces outer worlds farther out in proportional layout", () => {
+    const earth = catalog.find((object) => object.id === "earth")!;
+    const eris = catalog.find((object) => object.id === "eris")!;
+    const compactEarth = layoutObject(earth, catalog, "compact");
+    const compactEris = layoutObject(eris, catalog, "compact");
+    const proportionalEarth = layoutObject(earth, catalog, "proportional");
+    const proportionalEris = layoutObject(eris, catalog, "proportional");
+    const compactRatio =
+      Math.hypot(compactEris.x, compactEris.y) /
+      Math.hypot(compactEarth.x, compactEarth.y);
+    const proportionalRatio =
+      Math.hypot(proportionalEris.x, proportionalEris.y) /
+      Math.hypot(proportionalEarth.x, proportionalEarth.y);
+    expect(proportionalRatio).toBeGreaterThan(compactRatio * 1.5);
+  });
 });

@@ -1,10 +1,14 @@
 import { useId } from "react";
 import { BODY_ART } from "./bodyArtAssets";
+import { CelestialCartoon } from "./CelestialCartoon";
+import { celestialStyleFor } from "./celestialStyles";
+import type { ObjectType } from "./catalog";
 
 type Props = {
   id: string;
   radius: number;
   color: string;
+  type?: ObjectType;
 };
 
 function saturnRingPath(
@@ -37,7 +41,12 @@ function saturnRingFrontPath(
   ].join(" ");
 }
 
-export function BodyArt({ id, radius, color }: Props) {
+export function BodyArt({ id, radius, color, type = "planet" }: Props) {
+  const celestial = celestialStyleFor(id, type);
+  if (celestial) {
+    return <CelestialCartoon id={id} radius={radius} style={celestial} />;
+  }
+
   const clipId = `clip-${id}-${useId().replace(/:/g, "")}`;
   const src = BODY_ART[id];
   if (!src) {

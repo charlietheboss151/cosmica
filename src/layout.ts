@@ -1,7 +1,13 @@
 import { catalog, isHeliocentric, type SolarObject } from "./catalog";
 import type { Rng } from "./game";
+import {
+  minBodyGap,
+  visualOrbit,
+  type LayoutProfile,
+} from "./layoutProfile";
 
-const MIN_BODY_GAP = 12;
+export { layoutProfileForMode, visualOrbit, type LayoutProfile } from "./layoutProfile";
+
 const MAX_SPAWN_ATTEMPTS = 200;
 
 export type LaidOutObject = {
@@ -10,15 +16,11 @@ export type LaidOutObject = {
   radius: number;
 };
 
-export function visualOrbit(au: number): number {
-  if (au <= 0) {
-    return 0;
-  }
-  return 92 + Math.pow(au, 0.5) * 158;
-}
-
-function heliocentricLayout(object: SolarObject): LaidOutObject {
-  const orbit = visualOrbit(object.au);
+function heliocentricLayout(
+  object: SolarObject,
+  profile: LayoutProfile = "compact",
+): LaidOutObject {
+  const orbit = visualOrbit(object.au, profile);
   const radians = (object.longitudeDeg * Math.PI) / 180;
   return {
     x: Math.cos(radians) * orbit,
@@ -27,7 +29,10 @@ function heliocentricLayout(object: SolarObject): LaidOutObject {
   };
 }
 
-export function layoutAll(bodies: SolarObject[] = catalog): Map<string, LaidOutObject> {
+export function layoutAll(
+  bodies: SolarObject[] = catalog,
+  profile: LayoutProfile = "compact",
+): Map<string, LaidOutObject> {
   const byId = new Map(bodies.map((object) => [object.id, object]));
   const laid = new Map<string, LaidOutObject>();
 
@@ -46,7 +51,7 @@ export function layoutAll(bodies: SolarObject[] = catalog): Map<string, LaidOutO
       return position;
     }
     if (isHeliocentric(object)) {
-      const position = heliocentricLayout(object);
+      const position = heliocentricLayout(object, profile);
       laid.set(id, position);
       return position;
     }
@@ -67,16 +72,25 @@ export function layoutAll(bodies: SolarObject[] = catalog): Map<string, LaidOutO
   return laid;
 }
 
-export function regionBand(object: SolarObject): { inner: number; outer: number } {
+export function regionBand(
+  object: SolarObject,
+  profile: LayoutProfile = "compact",
+): { inner: number; outer: number } {
   return {
-    inner: visualOrbit(object.innerAu),
-    outer: visualOrbit(object.au),
+    inner: visualOrbit(object.innerAu, profile),
+    outer: visualOrbit(object.au, profile),
   };
 }
 
-export function cameraFitRadius(objects: SolarObject[]): number {
+export function cameraFitRadius(
+  objects: SolarObject[],
+  profile: LayoutProfile = "compact",
+): number {
+  if (profile === "proportional") {
+    return visualOrbit(14, profile) * 1.04;
+  }
   const jupiter = objects.find((object) => object.id === "jupiter");
-  return visualOrbit(jupiter?.au ?? 5.2) * 1.08;
+  return visualOrbit(jupiter?.au ?? 5.2, profile) * 1.08;
 }
 
 export function beltDust(
@@ -144,8 +158,12 @@ export function annulusPath(inner: number, outer: number): string {
 export function layoutObject(
   object: SolarObject,
   bodies: SolarObject[] = catalog,
+  profile: LayoutProfile = "compact",
 ): LaidOutObject {
-  return layoutAll(bodies).get(object.id) ?? heliocentricLayout(object);
+  return (
+    layoutAll(bodies, profile).get(object.id) ??
+    heliocentricLayout(object, profile)
+  );
 }
 
 function shouldCheckOverlap(a: SolarObject, b: SolarObject): boolean {
@@ -158,8 +176,12 @@ function shouldCheckOverlap(a: SolarObject, b: SolarObject): boolean {
   return true;
 }
 
-function hasBodyOverlaps(bodies: SolarObject[]): boolean {
-  const laid = layoutAll(bodies);
+function hasBodyOverlaps(
+  bodies: SolarObject[],
+  profile: LayoutProfile = "compact",
+): boolean {
+  const laid = layoutAll(bodies, profile);
+  const gap = minBodyGap(profile);
   const physical = bodies.filter((object) => object.type !== "region");
   for (let i = 0; i < physical.length; i += 1) {
     for (let j = i + 1; j < physical.length; j += 1) {
@@ -174,7 +196,7 @@ function hasBodyOverlaps(bodies: SolarObject[]): boolean {
         continue;
       }
       const distance = Math.hypot(a.x - b.x, a.y - b.y);
-      if (distance <= a.radius + b.radius + MIN_BODY_GAP) {
+      if (distance <= a.radius + b.radius + gap) {
         return true;
       }
     }
@@ -197,11 +219,13 @@ function overlapsAtAngle(
   target: SolarObject,
   longitudeDeg: number,
   bodies: SolarObject[],
+  profile: LayoutProfile,
 ): boolean {
   const trial = bodies.map((object) =>
     object.id === target.id ? { ...object, longitudeDeg } : object,
   );
-  const laid = layoutAll(trial);
+  const laid = layoutAll(trial, profile);
+  const gap = minBodyGap(profile);
   const at = laid.get(target.id);
   if (!at) {
     return false;
@@ -215,7 +239,7 @@ function overlapsAtAngle(
       continue;
     }
     const distance = Math.hypot(at.x - otherAt.x, at.y - otherAt.y);
-    if (distance <= at.radius + otherAt.radius + MIN_BODY_GAP) {
+    if (distance <= at.radius + otherAt.radius + gap) {
       return true;
     }
   }
@@ -225,6 +249,7 @@ function overlapsAtAngle(
 export function randomizeOrbitalPositions(
   bodies: SolarObject[] = catalog,
   rng: Rng,
+  profile: LayoutProfile = "compact",
 ): SolarObject[] {
   const orbital = bodies.filter(
     (object) => object.type !== "star" && object.type !== "region",
@@ -240,7 +265,7 @@ export function randomizeOrbitalPositions(
       }
       return { ...object, longitudeDeg: rng() * 360 };
     });
-    if (!hasBodyOverlaps(randomized)) {
+    if (!hasBodyOverlaps(randomized, profile)) {
       return randomized;
     }
   }
@@ -262,7 +287,7 @@ export function randomizeOrbitalPositions(
     for (let tryIndex = 0; tryIndex < 120; tryIndex += 1) {
       angle = (angle + 137.508 + rng() * 48) % 360;
       target.longitudeDeg = angle;
-      if (!overlapsAtAngle(target, angle, snapshot())) {
+      if (!overlapsAtAngle(target, angle, snapshot(), profile)) {
         found = true;
         break;
       }

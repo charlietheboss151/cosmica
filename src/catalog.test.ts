@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { catalog, displayRadius, isLitInMode, isVisibleInMode } from "./catalog";
+import { catalog, displayRadius, isLitInMode, isShownLit, isVisibleInMode } from "./catalog";
 
 describe("solar system catalog", () => {
   it("includes the Sun, eight planets, and other bodies on the same map", () => {
@@ -168,5 +168,12 @@ describe("solar system catalog", () => {
     expect(earth.displaySize).toBeGreaterThanOrEqual(22);
     expect(jupiter.displaySize).toBeGreaterThanOrEqual(36);
     expect(sun.displaySize).toBeGreaterThan(jupiter.displaySize);
+  });
+
+  it("keeps the Sun full color in every mode", () => {
+    const sun = catalog.find((object) => object.id === "sun")!;
+    expect(isShownLit(sun, "moons")).toBe(true);
+    expect(isShownLit(sun, "celestial")).toBe(true);
+    expect(isLitInMode(sun, "moons")).toBe(false);
   });
 });

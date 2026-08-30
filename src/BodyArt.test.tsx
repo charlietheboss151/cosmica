@@ -14,7 +14,9 @@ describe("cartoon body art", () => {
       "enceladus",
       "europa",
       "ganymede",
+      "gaspra",
       "iapetus",
+      "ida",
       "io",
       "jupiter",
       "mars",
@@ -25,6 +27,7 @@ describe("cartoon body art", () => {
       "neptune",
       "oberon",
       "phobos",
+      "pluto",
       "rhea",
       "saturn",
       "sun",
@@ -93,10 +96,35 @@ describe("cartoon body art", () => {
   it("falls back to a simple disc for bodies without art", () => {
     const { container } = render(
       <svg>
-        <BodyArt id="ceres" radius={10} color="#9a9a9a" />
+        <BodyArt id="unknown-body" radius={10} color="#3d6fff" type="planet" />
       </svg>,
     );
     expect(container.querySelector("image")).toBeNull();
     expect(container.querySelector("circle.disc")).not.toBeNull();
+  });
+
+  it("draws dwarf planets with distinct cartoon globes", () => {
+    const { container } = render(
+      <svg>
+        <BodyArt id="ceres" radius={10} color="#9a9a9a" type="dwarf-planet" />
+      </svg>,
+    );
+    expect(container.querySelector(".celestial-globe")).not.toBeNull();
+  });
+
+  it("draws comets with a tail and asteroids with rock sprites", () => {
+    const comet = render(
+      <svg>
+        <BodyArt id="halley" radius={10} color="#c8e8ff" type="comet" />
+      </svg>,
+    );
+    expect(comet.container.querySelector(".celestial-comet")).not.toBeNull();
+
+    const asteroid = render(
+      <svg>
+        <BodyArt id="vesta" radius={10} color="#d8d0c0" type="asteroid" />
+      </svg>,
+    );
+    expect(asteroid.container.querySelector(".celestial-asteroid")).not.toBeNull();
   });
 });

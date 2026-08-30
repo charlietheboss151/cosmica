@@ -9,13 +9,14 @@ import {
 } from "./camera";
 import { BodyArt } from "./BodyArt";
 import { AsteroidBeltArt } from "./AsteroidBeltArt";
-import { isHeliocentric, isDecorativeMoon, isLitInMode, isVisibleInMode, displayRadius, type GameMode, type SolarObject } from "./catalog";
+import { isHeliocentric, isDecorativeMoon, isQuizTarget, isShownLit, isVisibleInMode, displayRadius, type GameMode, type SolarObject } from "./catalog";
 import {
   applyOrbitPhase,
   beltDust,
   cameraFitRadius,
   layoutAll,
   layoutObject,
+  layoutProfileForMode,
   MOON_ORBIT_SPEED_MULTIPLIER,
   orbitPhaseDeg,
   ORBIT_ANIMATION_PERIOD_MS,
@@ -101,33 +102,41 @@ export default function SolarSystemMap({
     return () => observer.disconnect();
   }, []);
 
+  const modeOptions = { hardMode };
+  const layoutProfile = layoutProfileForMode(mode);
+
   useEffect(() => {
     if (size.width < 80 || size.height < 80) {
       return;
     }
-    setCamera(fitCamera(cameraFitRadius(objects), size.width, size.height));
-  }, [objects, size]);
+    setCamera(
+      fitCamera(
+        cameraFitRadius(objects, layoutProfile),
+        size.width,
+        size.height,
+      ),
+    );
+  }, [objects, size, layoutProfile]);
 
-  const modeOptions = { hardMode };
   const visible = displayObjects.filter((object) => isVisibleInMode(object, mode));
-  const positions = layoutAll(displayObjects);
+  const positions = layoutAll(displayObjects, layoutProfile);
   const heliocentricOrbits = visible.filter(
     (object) =>
       isHeliocentric(object) &&
       object.au > 0 &&
-      isLitInMode(object, mode, modeOptions),
+      isQuizTarget(object, mode, modeOptions),
   );
   const moonOrbits = visible.filter(
     (object) =>
       object.type === "moon" &&
       mode !== "planets" &&
       mode !== "celestial" &&
-      isLitInMode(object, mode, modeOptions),
+      isQuizTarget(object, mode, modeOptions),
   );
   const drawOrder = [...visible].sort(
     (a, b) =>
-      Number(isLitInMode(a, mode, modeOptions)) -
-      Number(isLitInMode(b, mode, modeOptions)),
+      Number(isShownLit(a, mode, modeOptions)) -
+      Number(isShownLit(b, mode, modeOptions)),
   );
 
   const onPointerDown = (event: PointerEvent<SVGSVGElement>) => {
@@ -184,10 +193,8 @@ export default function SolarSystemMap({
           {heliocentricOrbits.map((object) => (
             <circle
               key={`${object.id}-orbit`}
-              className={
-                isLitInMode(object, mode, modeOptions) ? "orbit" : "orbit orbit-dim"
-              }
-              r={visualOrbit(object.au)}
+              className="orbit"
+              r={visualOrbit(object.au, layoutProfile)}
               cx={0}
               cy={0}
             />
@@ -197,7 +204,7 @@ export default function SolarSystemMap({
             if (!parent) {
               return null;
             }
-            const at = layoutObject(parent, displayObjects);
+            const at = layoutObject(parent, displayObjects, layoutProfile);
             return (
               <circle
                 key={`${moon.id}-orbit`}
@@ -209,22 +216,40 @@ export default function SolarSystemMap({
             );
           })}
           {drawOrder.map((object) => {
-            const laid = positions.get(object.id) ?? layoutObject(object, displayObjects);
-            const lit = isLitInMode(object, mode, modeOptions);
+            const laid =
+              positions.get(object.id) ??
+              layoutObject(object, displayObjects, layoutProfile);
+            const shownLit = isShownLit(object, mode, modeOptions);
+            const quizTarget = isQuizTarget(object, mode, modeOptions);
             const decorMoon = isDecorativeMoon(object, mode);
             const radius = displayRadius(object, mode);
             if (object.type === "region") {
-              const { inner, outer } = regionBand(object);
+              const { inner, outer } = regionBand(object, layoutProfile);
               const mid = (inner + outer) / 2;
               if (object.id === "asteroid-belt") {
                 return (
                   <g
                     key={object.id}
-                    className={`body body-region ${lit ? "body-lit" : "body-dim"}`}
+                    className={`body body-region ${shownLit ? "body-lit" : "body-dim"}`}
                     role="button"
                     aria-label={object.name}
-                    aria-disabled={lit ? undefined : true}
-                    tabIndex={lit ? 0 : -1}
+                    aria-disabled={quizTarget ? undefined : true}
+                    tabIndex={quizTarget ? 0 : -1}
+                    onPointerDown={(event) => event.stopPropagation()}
+                    onClick={() => {
+                      if (quizTarget) {
+                        onSelect(object.id);
+                      }
+                    }}
+                    onKeyDown={(event) => {
+                      if (!quizTarget) {
+                        return;
+                      }
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        onSelect(object.id);
+                      }
+                    }}
                   >
                     <AsteroidBeltArt inner={inner} outer={outer} label={object.name} />
                   </g>
@@ -239,11 +264,26 @@ export default function SolarSystemMap({
               return (
                 <g
                   key={object.id}
-                  className={`body body-region ${lit ? "body-lit" : "body-dim"}`}
+                  className={`body body-region ${shownLit ? "body-lit" : "body-dim"}`}
                   role="button"
                   aria-label={object.name}
-                  aria-disabled={lit ? undefined : true}
-                  tabIndex={lit ? 0 : -1}
+                  aria-disabled={quizTarget ? undefined : true}
+                  tabIndex={quizTarget ? 0 : -1}
+                  onPointerDown={(event) => event.stopPropagation()}
+                  onClick={() => {
+                    if (quizTarget) {
+                      onSelect(object.id);
+                    }
+                  }}
+                  onKeyDown={(event) => {
+                    if (!quizTarget) {
+                      return;
+                    }
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      onSelect(object.id);
+                    }
+                  }}
                 >
                   <circle
                     className={`belt belt-${object.id}`}
@@ -273,31 +313,33 @@ export default function SolarSystemMap({
                 </g>
               );
             }
+            const passive = decorMoon;
+            const isSun = object.type === "star";
             return (
               <g
                 key={object.id}
-                className={`body body-${object.type} ${lit ? "body-lit" : "body-dim"}${decorMoon ? " body-moon-decor" : ""}`}
+                className={`body body-${object.type} ${shownLit ? "body-lit" : "body-dim"}${decorMoon ? " body-moon-decor" : ""}${isSun ? " body-sun-anchor" : ""}`}
                 transform={`translate(${laid.x} ${laid.y})`}
-                role={decorMoon ? "presentation" : "button"}
+                role={decorMoon ? "presentation" : isSun ? "img" : "button"}
                 aria-label={decorMoon ? undefined : object.name}
                 aria-hidden={decorMoon ? true : undefined}
-                aria-disabled={decorMoon ? undefined : lit ? undefined : true}
-                tabIndex={decorMoon ? undefined : lit ? 0 : -1}
-                onPointerDown={decorMoon ? undefined : (event) => event.stopPropagation()}
+                aria-disabled={decorMoon || isSun ? undefined : quizTarget ? undefined : true}
+                tabIndex={decorMoon || isSun ? undefined : quizTarget ? 0 : -1}
+                onPointerDown={passive || isSun ? undefined : (event) => event.stopPropagation()}
                 onClick={
-                  decorMoon
+                  passive || isSun
                     ? undefined
                     : () => {
-                        if (lit) {
+                        if (quizTarget) {
                           onSelect(object.id);
                         }
                       }
                 }
                 onKeyDown={
-                  decorMoon
+                  passive || isSun
                     ? undefined
                     : (event) => {
-                        if (!lit) {
+                        if (!quizTarget) {
                           return;
                         }
                         if (event.key === "Enter" || event.key === " ") {
@@ -307,7 +349,7 @@ export default function SolarSystemMap({
                       }
                 }
               >
-                {decorMoon ? null : (
+                {passive || isSun ? null : (
                   <circle
                     className="hit"
                     r={
@@ -335,6 +377,7 @@ export default function SolarSystemMap({
                   id={object.id}
                   radius={radius}
                   color={object.color}
+                  type={object.type}
                 />
                 {foundIds.includes(object.id) ? (
                   <text className="label" y={radius + 18}>

@@ -104,7 +104,7 @@ export const catalog: SolarObject[] = [
     parentId: "sun",
     au: 2.77,
     longitudeDeg: 210,
-    displaySize: 11,
+    displaySize: 13,
     color: "#c4b8a8",
   }),
   body({
@@ -154,7 +154,7 @@ export const catalog: SolarObject[] = [
     parentId: "sun",
     au: 39.48,
     longitudeDeg: 294,
-    displaySize: 12,
+    displaySize: 13,
     color: "#d6c4b0",
   }),
   body({
@@ -173,7 +173,7 @@ export const catalog: SolarObject[] = [
     name: "Kuiper Belt",
     type: "region",
     parentId: "sun",
-    innerAu: 32,
+    innerAu: 30,
     au: 48,
     longitudeDeg: 0,
     displaySize: 0,
@@ -184,8 +184,8 @@ export const catalog: SolarObject[] = [
     name: "Oort Cloud",
     type: "region",
     parentId: "sun",
-    innerAu: 70,
-    au: 105,
+    innerAu: 48,
+    au: 62,
     longitudeDeg: 0,
     displaySize: 0,
     color: "#5a6578",
@@ -444,7 +444,34 @@ export function displayRadius(object: SolarObject, mode: GameMode): number {
   if (isDecorativeMoon(object, mode)) {
     return Math.max(3, object.displaySize * PLANETS_MODE_MOON_SCALE);
   }
+  if (
+    mode === "celestial" &&
+    (object.type === "dwarf-planet" ||
+      object.type === "asteroid" ||
+      object.type === "comet")
+  ) {
+    return object.displaySize + 3;
+  }
   return object.displaySize;
+}
+
+export function isShownLit(
+  object: SolarObject,
+  mode: GameMode,
+  options: ModeOptions = { hardMode: false },
+): boolean {
+  if (object.type === "star") {
+    return true;
+  }
+  return isLitInMode(object, mode, options);
+}
+
+export function isQuizTarget(
+  object: SolarObject,
+  mode: GameMode,
+  options: ModeOptions = { hardMode: false },
+): boolean {
+  return isLitInMode(object, mode, options);
 }
 
 export function isLitInMode(

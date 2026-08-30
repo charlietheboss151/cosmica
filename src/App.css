@@ -443,6 +443,31 @@ h1 {
   stroke-width: 1.5;
 }
 
+.body-sun-anchor.body-lit .body-art,
+.body-star.body-lit .body-art {
+  filter: none;
+  opacity: 1;
+}
+
+.body-lit .celestial-art .disc,
+.body-lit .celestial-art .globe-band {
+  stroke: #241833;
+  stroke-width: 2;
+}
+
+.body-lit .celestial-comet .comet-tail {
+  opacity: 0.72;
+}
+
+.body-lit .celestial-asteroid .asteroid-rock-sprite {
+  opacity: 1;
+}
+
+.body-dim .celestial-art {
+  filter: grayscale(0.15) brightness(0.92);
+  opacity: 0.88;
+}
+
 .body-lit:hover .disc,
 .body-lit:focus-visible .disc {
   stroke: #fff;
