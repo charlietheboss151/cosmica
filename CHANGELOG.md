@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.1] - 2026-08-30
+
+### Changed
+- In-game orbital drift is a bit faster so the real planets and moons are easier to see moving.
+
 ## [0.14.0] - 2026-08-30
 
 ### Changed
@@ -15,10 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.13.0] - 2026-08-30
 
 ### Added
-- The orbiting solar-system backdrop on the menu (decorative only).
-
-### Removed
-- Faded duplicate planet backdrop during gameplay (replaced by slow orbit on the real map bodies).
+- The orbiting solar-system backdrop also played behind the map in-game, at a slower speed than the menu.
 
 ## [0.12.2] - 2026-08-30
 

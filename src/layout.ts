@@ -208,8 +208,8 @@ export function randomizeOrbitalPositions(
   return bodies;
 }
 
-/** One full trip around an orbit ring during gameplay. */
-export const ORBIT_ANIMATION_PERIOD_MS = 240_000;
+/** One full trip around an orbit ring during gameplay (~2 minutes). */
+export const ORBIT_ANIMATION_PERIOD_MS = 120_000;
 
 export function orbitPhaseDeg(
   elapsedMs: number,
