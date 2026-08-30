@@ -28,6 +28,28 @@ describe("Cosmica prototype", () => {
     );
   });
 
+  it("lets the player pick Moons mode from the menu", () => {
+    render(<App />);
+    expect(screen.getByRole("button", { name: "Moons" })).toBeEnabled();
+  });
+
+  it("starts a FIND round with moons lit and planets grayed", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole("button", { name: "Moons" }));
+    expect(screen.getByTestId("find-prompt").textContent).toMatch(/^FIND: /);
+    expect(screen.getByRole("button", { name: "Europa" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Phobos" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Earth" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+    expect(screen.getByRole("button", { name: "Mercury" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+  });
+
   it("does not show moons to click in Planets mode", async () => {
     const user = userEvent.setup();
     render(<App />);

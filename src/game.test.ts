@@ -26,6 +26,19 @@ describe("FIND round", () => {
     expect(after).toEqual(round);
   });
 
+  it("asks the player to find a moon in Moons mode", () => {
+    const round = startRound(alwaysFirst, "moons");
+    expect(round.mode).toBe("moons");
+    expect(round.prompt).toBe("FIND: MOON");
+    expect(round.targetId).toBe("moon");
+  });
+
+  it("ignores planet clicks in Moons mode", () => {
+    const round = startRound(alwaysFirst, "moons");
+    const after = applyClick(round, "earth", alwaysFirst);
+    expect(after).toEqual(round);
+  });
+
   it("resets the streak when the wrong object is clicked", () => {
     const afterCorrect = applyClick(
       startRound(alwaysFirst),

@@ -1,9 +1,15 @@
-import { catalog, isLitInMode, objectById, type SolarObject } from "./catalog";
+import {
+  catalog,
+  isLitInMode,
+  objectById,
+  type GameMode,
+  type SolarObject,
+} from "./catalog";
 
 export type Rng = () => number;
 
 export type RoundState = {
-  mode: "planets";
+  mode: GameMode;
   targetId: string;
   prompt: string;
   score: number;
@@ -11,9 +17,12 @@ export type RoundState = {
   feedback: "correct" | "incorrect" | null;
 };
 
-function planets(): SolarObject[] {
+function playable(mode: GameMode): SolarObject[] {
   return catalog.filter(
-    (object) => object.type === "planet" && isLitInMode(object, "planets"),
+    (object) =>
+      isLitInMode(object, mode) &&
+      object.type !== "star" &&
+      object.type !== "region",
   );
 }
 
@@ -21,8 +30,8 @@ function promptFor(object: SolarObject): string {
   return `FIND: ${object.name.toUpperCase()}`;
 }
 
-function pickPlanet(rng: Rng, excludeId?: string): SolarObject {
-  const all = planets();
+function pickTarget(mode: GameMode, rng: Rng, excludeId?: string): SolarObject {
+  const all = playable(mode);
   const pool = all.filter((object) => object.id !== excludeId);
   const list = pool.length > 0 ? pool : all;
   const index = Math.min(
@@ -32,10 +41,10 @@ function pickPlanet(rng: Rng, excludeId?: string): SolarObject {
   return list[index]!;
 }
 
-export function startRound(rng: Rng): RoundState {
-  const target = pickPlanet(rng);
+export function startRound(rng: Rng, mode: GameMode = "planets"): RoundState {
+  const target = pickTarget(mode, rng);
   return {
-    mode: "planets",
+    mode,
     targetId: target.id,
     prompt: promptFor(target),
     score: 0,
@@ -56,7 +65,7 @@ export function applyClick(
   if (objectId !== state.targetId) {
     return { ...state, streak: 0, feedback: "incorrect" };
   }
-  const next = pickPlanet(rng, state.targetId);
+  const next = pickTarget(state.mode, rng, state.targetId);
   return {
     ...state,
     targetId: next.id,

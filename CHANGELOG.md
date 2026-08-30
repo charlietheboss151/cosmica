@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-08-30
+
+### Added
+
+- Moons mode: FIND the major moons while planets stay on the map grayed out. Mercury and Venus have none; Earth, Mars, Jupiter, Saturn, Uranus, and Neptune include their main moons.
+
 ## [0.6.3] - 2026-08-30
 
 ### Fixed

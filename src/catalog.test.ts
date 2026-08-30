@@ -60,6 +60,60 @@ describe("solar system catalog", () => {
     expect(isLitInMode(belt, "planets")).toBe(false);
   });
 
+  it("includes each planet's main moons", () => {
+    const moonsOf = (parentId: string) =>
+      catalog
+        .filter((object) => object.type === "moon" && object.parentId === parentId)
+        .map((object) => object.id)
+        .sort();
+    expect(moonsOf("mercury")).toEqual([]);
+    expect(moonsOf("venus")).toEqual([]);
+    expect(moonsOf("earth")).toEqual(["moon"]);
+    expect(moonsOf("mars")).toEqual(["deimos", "phobos"]);
+    expect(moonsOf("jupiter")).toEqual([
+      "callisto",
+      "europa",
+      "ganymede",
+      "io",
+    ]);
+    expect(moonsOf("saturn")).toEqual([
+      "dione",
+      "enceladus",
+      "iapetus",
+      "mimas",
+      "rhea",
+      "tethys",
+      "titan",
+    ]);
+    expect(moonsOf("uranus")).toEqual([
+      "ariel",
+      "miranda",
+      "oberon",
+      "titania",
+      "umbriel",
+    ]);
+    expect(moonsOf("neptune")).toEqual(["triton"]);
+  });
+
+  it("lights only moons in Moons mode and keeps planets visible but gray", () => {
+    const lit = catalog
+      .filter((object) => isLitInMode(object, "moons"))
+      .map((object) => object.type);
+    expect(new Set(lit)).toEqual(new Set(["moon"]));
+    expect(isVisibleInMode(catalog.find((object) => object.id === "earth")!, "moons")).toBe(
+      true,
+    );
+    expect(isLitInMode(catalog.find((object) => object.id === "earth")!, "moons")).toBe(
+      false,
+    );
+    expect(isVisibleInMode(catalog.find((object) => object.id === "europa")!, "moons")).toBe(
+      true,
+    );
+    expect(isLitInMode(catalog.find((object) => object.id === "europa")!, "moons")).toBe(
+      true,
+    );
+  });
+
   it("draws the Sun and planets at cartoon overscale", () => {
     const sun = catalog.find((object) => object.id === "sun")!;
     const earth = catalog.find((object) => object.id === "earth")!;
