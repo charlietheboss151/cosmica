@@ -1,18 +1,22 @@
-.title {
+.menu,
+.play {
   min-height: 100vh;
   margin: 0;
+}
+
+.menu {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 24px;
+  padding: 32px 24px 48px;
 }
 
 .eyebrow {
   text-transform: uppercase;
-  letter-spacing: 0.2em;
-  font-size: 0.75rem;
+  letter-spacing: 0.22em;
+  font-size: 0.72rem;
   color: #8eb4ff;
   margin: 0 0 12px;
 }
@@ -20,7 +24,7 @@
 h1 {
   font-size: clamp(3rem, 10vw, 5.5rem);
   font-weight: 700;
-  letter-spacing: -0.04em;
+  letter-spacing: 0.08em;
   margin: 0 0 16px;
   background: linear-gradient(120deg, #e8f0ff, #7aa2ff 45%, #c9a6ff);
   -webkit-background-clip: text;
@@ -29,7 +33,216 @@ h1 {
 }
 
 .lede {
-  margin: 0;
+  margin: 0 0 36px;
   color: #9aa8c2;
-  font-size: 1.15rem;
+  font-size: 1.1rem;
+  max-width: 34rem;
+}
+
+.modes {
+  display: grid;
+  gap: 10px;
+  width: min(420px, 100%);
+}
+
+.mode-play,
+.mode-soon,
+.ghost {
+  font: inherit;
+  cursor: pointer;
+  border-radius: 12px;
+}
+
+.mode-play {
+  border: 1px solid #7aa2ff;
+  background: linear-gradient(180deg, #2a4a88, #1a2f5c);
+  color: #e8eef8;
+  padding: 14px 18px;
+  font-size: 1.05rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mode-play:hover {
+  background: linear-gradient(180deg, #3558a0, #21407a);
+}
+
+.mode-soon {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #243049;
+  background: #101726;
+  color: #6d7b94;
+  padding: 12px 16px;
+}
+
+.mode-soon span {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.play {
+  position: relative;
+  overflow: hidden;
+  background: #05070d;
+}
+
+.starfield {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(1px 1px at 12% 18%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 28% 72%, #cde 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 63% 22%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 81% 58%, #9cf 50%, transparent 51%),
+    radial-gradient(1px 1px at 44% 41%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 8% 88%, #eef 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 92% 12%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 73% 86%, #bbd 50%, transparent 51%),
+    radial-gradient(1px 1px at 51% 9%, #fff 50%, transparent 51%),
+    radial-gradient(1200px 700px at 50% -10%, #1a2a4a55 0%, transparent 55%);
+}
+
+.map {
+  position: absolute;
+  inset: 0;
+}
+
+.map-svg {
+  display: block;
+  cursor: grab;
+  touch-action: none;
+}
+
+.map-svg:active {
+  cursor: grabbing;
+}
+
+.orbit {
+  fill: none;
+  stroke: #7aa2ff;
+  stroke-opacity: 0.28;
+  stroke-width: 1.2;
+}
+
+.ring {
+  fill: none;
+  stroke: #ead29a;
+  stroke-opacity: 0.7;
+  stroke-width: 2;
+}
+
+.body {
+  cursor: pointer;
+  outline: none;
+}
+
+.body .hit {
+  fill: transparent;
+}
+
+.body .disc {
+  filter: drop-shadow(0 0 8px currentColor);
+}
+
+.body-star .disc {
+  filter: drop-shadow(0 0 18px #ffd36a);
+}
+
+.body:hover .disc,
+.body:focus-visible .disc {
+  stroke: #fff;
+  stroke-width: 1.5;
+}
+
+.label {
+  fill: #d5deee;
+  font-size: 11px;
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+.hud {
+  pointer-events: none;
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: start;
+  gap: 12px;
+  padding: 16px 18px;
+}
+
+.hud .ghost,
+.hud .stats {
+  pointer-events: auto;
+}
+
+.ghost {
+  justify-self: start;
+  border: 1px solid #2c3c5c;
+  background: #0c1322cc;
+  color: #c5d2ea;
+  padding: 8px 12px;
+}
+
+.prompt {
+  margin: 0;
+  justify-self: center;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: #0c1322ee;
+  border: 1px solid #3d5a99;
+  letter-spacing: 0.14em;
+  font-weight: 650;
+}
+
+.stats {
+  justify-self: end;
+  display: flex;
+  gap: 12px;
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: #0c1322cc;
+  border: 1px solid #2c3c5c;
+}
+
+.stats p {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.feedback {
+  position: absolute;
+  left: 50%;
+  top: 88px;
+  transform: translateX(-50%);
+  z-index: 1;
+  margin: 0;
+  letter-spacing: 0.2em;
+  font-weight: 700;
+}
+
+.feedback-correct {
+  color: #7dffb3;
+}
+
+.feedback-incorrect {
+  color: #ff8d8d;
+}
+
+.hint {
+  pointer-events: none;
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  margin: 0;
+  color: #6d7b94;
+  font-size: 0.8rem;
+  z-index: 1;
 }

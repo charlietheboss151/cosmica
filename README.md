@@ -1,6 +1,8 @@
 # Cosmica
 
-Cosmica is a new browser game. This repo is the starting point: a Vite + React + TypeScript app with a title screen, ready to grow into the real game.
+Cosmica is a browser game: an interactive 2D map of the Solar System that you learn by navigating. Find objects on the map — it is the answer interface, not a multiple-choice quiz.
+
+This version is a **Planets** prototype: the Sun is fixed at the center, the eight planets sit on a compressed visual scale, and you play FIND rounds for score and streak. Later modes (moons, more bodies, spacecraft, Who am I?, live orbits) are listed in the menu but not playable yet.
 
 ## How to run it
 
@@ -17,12 +19,15 @@ npm run dev
 
 Open the URL Vite prints (usually **http://localhost:5173**). There are no env files or secrets.
 
+On the menu, choose **Planets**. Scroll to zoom, drag to pan, click the named world on the map.
+
 ## How it is built
 
-Vite + React + TypeScript.
+Vite + React + TypeScript. Celestial bodies live in a data catalog so more objects can be added without rewriting the map.
 
 ```bash
 npm run dev      # local dev server
+npm test         # Vitest
 npm run build    # typecheck and write production files to dist/
 npm run preview  # serve the dist/ build locally
 npm run lint     # oxlint
