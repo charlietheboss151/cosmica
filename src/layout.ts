@@ -314,6 +314,9 @@ export const ORBIT_ANIMATION_PERIOD_MS = 480_000;
 /** Moons orbit their parent faster than planets lap the Sun, but stay slow enough to click. */
 export const MOON_ORBIT_SPEED_MULTIPLIER = 2;
 
+/** Sun surface spin during gameplay (~3 minutes per rotation). */
+export const SUN_SPIN_PERIOD_MS = 180_000;
+
 export function orbitPhaseDeg(
   elapsedMs: number,
   periodMs: number = ORBIT_ANIMATION_PERIOD_MS,

@@ -33,6 +33,7 @@ import {
   orbitPhaseDeg,
   ORBIT_ANIMATION_PERIOD_MS,
   regionBand,
+  SUN_SPIN_PERIOD_MS,
   visualLocalOrbit,
   visualOrbit,
 } from "./layout";
@@ -79,6 +80,7 @@ export default function SolarSystemMap({
     orbitElapsedMs,
     ORBIT_ANIMATION_PERIOD_MS / MOON_ORBIT_SPEED_MULTIPLIER,
   );
+  const sunSpinDeg = orbitPhaseDeg(orbitElapsedMs, SUN_SPIN_PERIOD_MS);
   const displayObjects = orbiting
     ? applyOrbitPhase(objects, heliocentricPhase, moonPhase)
     : objects;
@@ -302,11 +304,13 @@ export default function SolarSystemMap({
     const radius = displayRadius(object, mode);
     const passive = decorMoon;
     const isSun = object.type === "star";
+    const spin =
+      isSun && orbiting ? ` rotate(${sunSpinDeg.toFixed(2)})` : "";
     return (
       <g
         key={object.id}
         className={`body body-${object.type} ${shownLit ? "body-lit" : "body-dim"}${decorMoon ? " body-moon-decor" : ""}${isSun ? " body-sun-anchor" : ""}`}
-        transform={`translate(${laid.x} ${laid.y})`}
+        transform={`translate(${laid.x} ${laid.y})${spin}`}
         role={decorMoon ? "presentation" : isSun ? "img" : "button"}
         aria-label={decorMoon ? undefined : object.name}
         aria-hidden={decorMoon ? true : undefined}

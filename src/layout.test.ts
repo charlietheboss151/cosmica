@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { catalog } from "./catalog";
-import { annulusPath, applyOrbitPhase, beltAsteroids, cameraFitRadius, layoutObject, MOON_ORBIT_SPEED_MULTIPLIER, orbitPhaseDeg, randomizeOrbitalPositions, regionBand, visualOrbit } from "./layout";
+import { annulusPath, applyOrbitPhase, beltAsteroids, cameraFitRadius, layoutObject, MOON_ORBIT_SPEED_MULTIPLIER, ORBIT_ANIMATION_PERIOD_MS, orbitPhaseDeg, randomizeOrbitalPositions, regionBand, SUN_SPIN_PERIOD_MS, visualOrbit } from "./layout";
 
 describe("compressed visual layout", () => {
   it("pins the Sun at the origin", () => {
@@ -101,6 +101,11 @@ describe("compressed visual layout", () => {
     }
     expect(delta).toBeCloseTo(Math.PI / 2, 1);
     expect(MOON_ORBIT_SPEED_MULTIPLIER).toBeGreaterThan(1);
+  });
+
+  it("spins the Sun on its own period during gameplay", () => {
+    expect(orbitPhaseDeg(90_000, SUN_SPIN_PERIOD_MS)).toBe(180);
+    expect(SUN_SPIN_PERIOD_MS).toBeLessThan(ORBIT_ANIMATION_PERIOD_MS);
   });
 
   it("keeps the Sun and planets from overlapping", () => {

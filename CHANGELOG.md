@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.8] - 2026-08-30
+
+### Changed
+- The Sun rotates slowly during gameplay (and on the menu backdrop) so the surface art spins like the orbiting worlds.
+
 ## [0.15.7] - 2026-08-30
 
 ### Changed

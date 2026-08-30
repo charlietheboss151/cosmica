@@ -222,14 +222,17 @@ export default function OrbitBackdrop({ speed = 1, className = "" }: Props) {
             speed={speed}
           />
         ))}
-        <image
-          href="/bodies/sun.png"
-          x={-36}
-          y={-36}
-          width={72}
-          height={72}
-          className="orbit-backdrop-sun"
-        />
+        <g className="orbit-backdrop-sun">
+          <animateTransform
+            attributeName="transform"
+            type="rotate"
+            from="0"
+            to="360"
+            dur={`${120 * speed}s`}
+            repeatCount="indefinite"
+          />
+          <image href="/bodies/sun.png" x={-36} y={-36} width={72} height={72} />
+        </g>
         {PLANETS.map((planet) => (
           <PlanetBody key={planet.id} planet={planet} speed={speed} />
         ))}
