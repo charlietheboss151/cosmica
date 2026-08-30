@@ -44,15 +44,6 @@
   height: min(132vw, 980px);
 }
 
-.orbit-backdrop-play {
-  opacity: 0.24;
-}
-
-.orbit-backdrop-play .orbit-backdrop-svg {
-  width: min(140vw, 1080px);
-  height: min(140vw, 1080px);
-}
-
 .orbit-backdrop-ring {
   stroke: #7aa2ff;
   stroke-opacity: 0.09;
@@ -69,14 +60,6 @@
 
 .orbit-backdrop-drift {
   opacity: 0.55;
-}
-
-.play-backdrop {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  overflow: hidden;
 }
 
 .menu-panel {

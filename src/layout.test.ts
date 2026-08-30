@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { catalog } from "./catalog";
-import { annulusPath, beltAsteroids, cameraFitRadius, layoutObject, randomizeOrbitalPositions, regionBand, visualOrbit } from "./layout";
+import { annulusPath, applyOrbitPhase, beltAsteroids, cameraFitRadius, layoutObject, orbitPhaseDeg, randomizeOrbitalPositions, regionBand, visualOrbit } from "./layout";
 
 describe("compressed visual layout", () => {
   it("pins the Sun at the origin", () => {
@@ -57,6 +57,16 @@ describe("compressed visual layout", () => {
       expect(distance).toBeLessThanOrEqual(outer * 1.05);
     }
     expect(annulusPath(inner, outer)).toContain("M");
+  });
+
+  it("rotates orbital bodies when an orbit phase is applied", () => {
+    const earth = catalog.find((object) => object.id === "earth")!;
+    const phased = applyOrbitPhase(catalog, 90);
+    const base = layoutObject(earth, catalog);
+    const rotated = layoutObject(earth, phased);
+    expect(rotated.x).not.toBeCloseTo(base.x);
+    expect(rotated.y).not.toBeCloseTo(base.y);
+    expect(orbitPhaseDeg(60_000, 120_000)).toBe(180);
   });
 
   it("keeps the Sun and planets from overlapping", () => {

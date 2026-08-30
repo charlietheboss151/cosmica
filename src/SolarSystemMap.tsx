@@ -10,7 +10,17 @@ import {
 import { BodyArt } from "./BodyArt";
 import { AsteroidBeltArt } from "./AsteroidBeltArt";
 import { isHeliocentric, isLitInMode, isVisibleInMode, type GameMode, type SolarObject } from "./catalog";
-import { beltDust, cameraFitRadius, layoutAll, layoutObject, regionBand, visualOrbit } from "./layout";
+import {
+  applyOrbitPhase,
+  beltDust,
+  cameraFitRadius,
+  layoutAll,
+  layoutObject,
+  orbitPhaseDeg,
+  ORBIT_ANIMATION_PERIOD_MS,
+  regionBand,
+  visualOrbit,
+} from "./layout";
 
 type Props = {
   objects: SolarObject[];
@@ -18,6 +28,8 @@ type Props = {
   foundIds?: string[];
   marks?: Record<string, string>;
   flashId?: string | null;
+  orbitStartMs?: number | null;
+  orbitFreezeMs?: number | null;
   onSelect: (id: string) => void;
 };
 
@@ -27,12 +39,36 @@ export default function SolarSystemMap({
   foundIds = [],
   marks = {},
   flashId = null,
+  orbitStartMs = null,
+  orbitFreezeMs = null,
   onSelect,
 }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [camera, setCamera] = useState<Camera>(createCamera);
+  const [orbitNow, setOrbitNow] = useState(() => Date.now());
   const drag = useRef<{ x: number; y: number } | null>(null);
+
+  const orbiting = orbitStartMs !== null;
+  const orbitElapsedMs = orbiting
+    ? Math.max(0, (orbitFreezeMs ?? orbitNow) - orbitStartMs)
+    : 0;
+  const displayObjects = orbiting
+    ? applyOrbitPhase(objects, orbitPhaseDeg(orbitElapsedMs, ORBIT_ANIMATION_PERIOD_MS))
+    : objects;
+
+  useEffect(() => {
+    if (!orbiting || orbitFreezeMs !== null) {
+      return;
+    }
+    let frame = 0;
+    const loop = () => {
+      setOrbitNow(Date.now());
+      frame = requestAnimationFrame(loop);
+    };
+    frame = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(frame);
+  }, [orbiting, orbitFreezeMs, orbitStartMs]);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -60,6 +96,16 @@ export default function SolarSystemMap({
     }
     setCamera(fitCamera(cameraFitRadius(objects), size.width, size.height));
   }, [objects, size]);
+
+  const visible = displayObjects.filter((object) => isVisibleInMode(object, mode));
+  const positions = layoutAll(displayObjects);
+  const heliocentricOrbits = visible.filter(
+    (object) => isHeliocentric(object) && object.au > 0,
+  );
+  const moonOrbits = visible.filter((object) => object.type === "moon");
+  const drawOrder = [...visible].sort(
+    (a, b) => Number(isLitInMode(a, mode)) - Number(isLitInMode(b, mode)),
+  );
 
   const onPointerDown = (event: PointerEvent<SVGSVGElement>) => {
     if (event.button !== 0) {
@@ -99,16 +145,6 @@ export default function SolarSystemMap({
     );
   };
 
-  const visible = objects.filter((object) => isVisibleInMode(object, mode));
-  const positions = layoutAll(objects);
-  const heliocentricOrbits = visible.filter(
-    (object) => isHeliocentric(object) && object.au > 0,
-  );
-  const moonOrbits = visible.filter((object) => object.type === "moon");
-  const drawOrder = [...visible].sort(
-    (a, b) => Number(isLitInMode(a, mode)) - Number(isLitInMode(b, mode)),
-  );
-
   return (
     <div className="map" ref={hostRef}>
       <svg
@@ -134,11 +170,11 @@ export default function SolarSystemMap({
             />
           ))}
           {moonOrbits.map((moon) => {
-            const parent = objects.find((object) => object.id === moon.parentId);
+            const parent = displayObjects.find((object) => object.id === moon.parentId);
             if (!parent) {
               return null;
             }
-            const at = layoutObject(parent, objects);
+            const at = layoutObject(parent, displayObjects);
             return (
               <circle
                 key={`${moon.id}-orbit`}
@@ -150,7 +186,7 @@ export default function SolarSystemMap({
             );
           })}
           {drawOrder.map((object) => {
-            const laid = positions.get(object.id) ?? layoutObject(object, objects);
+            const laid = positions.get(object.id) ?? layoutObject(object, displayObjects);
             const lit = isLitInMode(object, mode);
             if (object.type === "region") {
               const { inner, outer } = regionBand(object);

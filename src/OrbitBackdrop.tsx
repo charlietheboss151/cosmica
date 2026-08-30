@@ -237,5 +237,3 @@ export default function OrbitBackdrop({ speed = 1, className = "" }: Props) {
     </div>
   );
 }
-
-export const PLAY_ORBIT_SPEED = 4;

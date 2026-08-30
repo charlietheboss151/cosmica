@@ -207,3 +207,33 @@ export function randomizeOrbitalPositions(
 
   return bodies;
 }
+
+/** One full trip around an orbit ring during gameplay. */
+export const ORBIT_ANIMATION_PERIOD_MS = 240_000;
+
+export function orbitPhaseDeg(
+  elapsedMs: number,
+  periodMs: number = ORBIT_ANIMATION_PERIOD_MS,
+): number {
+  const safePeriod = Math.max(periodMs, 1);
+  const elapsed = ((elapsedMs % safePeriod) + safePeriod) % safePeriod;
+  return (elapsed / safePeriod) * 360;
+}
+
+export function applyOrbitPhase(
+  bodies: SolarObject[],
+  phaseDeg: number,
+): SolarObject[] {
+  if (phaseDeg === 0) {
+    return bodies;
+  }
+  return bodies.map((object) => {
+    if (object.type === "star" || object.type === "region") {
+      return object;
+    }
+    return {
+      ...object,
+      longitudeDeg: (object.longitudeDeg + phaseDeg) % 360,
+    };
+  });
+}
