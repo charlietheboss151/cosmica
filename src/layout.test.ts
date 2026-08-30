@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { catalog } from "./catalog";
-import { annulusPath, applyOrbitPhase, beltAsteroids, cameraFitRadius, layoutObject, orbitPhaseDeg, randomizeOrbitalPositions, regionBand, visualOrbit } from "./layout";
+import { annulusPath, applyOrbitPhase, beltAsteroids, cameraFitRadius, layoutObject, MOON_ORBIT_SPEED_MULTIPLIER, orbitPhaseDeg, randomizeOrbitalPositions, regionBand, visualOrbit } from "./layout";
 
 describe("compressed visual layout", () => {
   it("pins the Sun at the origin", () => {
@@ -67,6 +67,40 @@ describe("compressed visual layout", () => {
     expect(rotated.x).not.toBeCloseTo(base.x);
     expect(rotated.y).not.toBeCloseTo(base.y);
     expect(orbitPhaseDeg(60_000, 120_000)).toBe(180);
+  });
+
+  it("keeps moons fixed relative to a parent when only the planet phase moves", () => {
+    const jupiter = catalog.find((object) => object.id === "jupiter")!;
+    const europa = catalog.find((object) => object.id === "europa")!;
+    const baseJ = layoutObject(jupiter, catalog);
+    const baseE = layoutObject(europa, catalog);
+    const baseAngle = Math.atan2(baseE.y - baseJ.y, baseE.x - baseJ.x);
+    const phased = applyOrbitPhase(catalog, 45, 0);
+    const movedJ = layoutObject(jupiter, phased);
+    const movedE = layoutObject(europa, phased);
+    const movedAngle = Math.atan2(movedE.y - movedJ.y, movedE.x - movedJ.x);
+    expect(movedAngle).toBeCloseTo(baseAngle, 5);
+  });
+
+  it("orbits moons around their parent when a moon phase is applied", () => {
+    const jupiter = catalog.find((object) => object.id === "jupiter")!;
+    const europa = catalog.find((object) => object.id === "europa")!;
+    const baseJ = layoutObject(jupiter, catalog);
+    const baseE = layoutObject(europa, catalog);
+    const baseAngle = Math.atan2(baseE.y - baseJ.y, baseE.x - baseJ.x);
+    const phased = applyOrbitPhase(catalog, 0, 90);
+    const movedJ = layoutObject(jupiter, phased);
+    const movedE = layoutObject(europa, phased);
+    const movedAngle = Math.atan2(movedE.y - movedJ.y, movedE.x - movedJ.x);
+    let delta = movedAngle - baseAngle;
+    while (delta <= -Math.PI) {
+      delta += Math.PI * 2;
+    }
+    while (delta > Math.PI) {
+      delta -= Math.PI * 2;
+    }
+    expect(delta).toBeCloseTo(Math.PI / 2, 1);
+    expect(MOON_ORBIT_SPEED_MULTIPLIER).toBeGreaterThan(1);
   });
 
   it("keeps the Sun and planets from overlapping", () => {

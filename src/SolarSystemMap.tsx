@@ -16,6 +16,7 @@ import {
   cameraFitRadius,
   layoutAll,
   layoutObject,
+  MOON_ORBIT_SPEED_MULTIPLIER,
   orbitPhaseDeg,
   ORBIT_ANIMATION_PERIOD_MS,
   regionBand,
@@ -53,8 +54,16 @@ export default function SolarSystemMap({
   const orbitElapsedMs = orbiting
     ? Math.max(0, (orbitFreezeMs ?? orbitNow) - orbitStartMs)
     : 0;
+  const heliocentricPhase = orbitPhaseDeg(
+    orbitElapsedMs,
+    ORBIT_ANIMATION_PERIOD_MS,
+  );
+  const moonPhase = orbitPhaseDeg(
+    orbitElapsedMs,
+    ORBIT_ANIMATION_PERIOD_MS / MOON_ORBIT_SPEED_MULTIPLIER,
+  );
   const displayObjects = orbiting
-    ? applyOrbitPhase(objects, orbitPhaseDeg(orbitElapsedMs, ORBIT_ANIMATION_PERIOD_MS))
+    ? applyOrbitPhase(objects, heliocentricPhase, moonPhase)
     : objects;
 
   useEffect(() => {

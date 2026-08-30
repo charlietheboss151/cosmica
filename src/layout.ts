@@ -211,6 +211,9 @@ export function randomizeOrbitalPositions(
 /** One full trip around an orbit ring during gameplay (~2 minutes). */
 export const ORBIT_ANIMATION_PERIOD_MS = 120_000;
 
+/** Moons lap their parent much faster than planets lap the Sun. */
+export const MOON_ORBIT_SPEED_MULTIPLIER = 8;
+
 export function orbitPhaseDeg(
   elapsedMs: number,
   periodMs: number = ORBIT_ANIMATION_PERIOD_MS,
@@ -222,18 +225,34 @@ export function orbitPhaseDeg(
 
 export function applyOrbitPhase(
   bodies: SolarObject[],
-  phaseDeg: number,
+  heliocentricPhaseDeg: number,
+  moonPhaseDeg: number = heliocentricPhaseDeg * MOON_ORBIT_SPEED_MULTIPLIER,
 ): SolarObject[] {
-  if (phaseDeg === 0) {
+  if (heliocentricPhaseDeg === 0 && moonPhaseDeg === 0) {
     return bodies;
   }
   return bodies.map((object) => {
     if (object.type === "star" || object.type === "region") {
       return object;
     }
-    return {
-      ...object,
-      longitudeDeg: (object.longitudeDeg + phaseDeg) % 360,
-    };
+    if (object.type === "moon") {
+      if (moonPhaseDeg === 0) {
+        return object;
+      }
+      return {
+        ...object,
+        longitudeDeg: (object.longitudeDeg + moonPhaseDeg) % 360,
+      };
+    }
+    if (isHeliocentric(object)) {
+      if (heliocentricPhaseDeg === 0) {
+        return object;
+      }
+      return {
+        ...object,
+        longitudeDeg: (object.longitudeDeg + heliocentricPhaseDeg) % 360,
+      };
+    }
+    return object;
   });
 }
