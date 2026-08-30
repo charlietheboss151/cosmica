@@ -8,7 +8,7 @@ import {
   type QuizState,
 } from "./game";
 import { randomizeOrbitalPositions } from "./layout";
-import MenuOrbits from "./MenuOrbits";
+import OrbitBackdrop, { PLAY_ORBIT_SPEED } from "./OrbitBackdrop";
 import SolarSystemMap from "./SolarSystemMap";
 import "./App.css";
 
@@ -34,7 +34,7 @@ function Menu({ onPlay }: { onPlay: (mode: GameMode) => void }) {
       <div className="menu-backdrop" aria-hidden="true">
         <div className="starfield" />
         <div className="menu-glow" />
-        <MenuOrbits />
+        <OrbitBackdrop className="orbit-backdrop-menu" />
       </div>
       <div className="menu-panel">
         <header className="menu-brand">
@@ -128,7 +128,10 @@ function Play({ mode, onMenu }: { mode: GameMode; onMenu: () => void }) {
 
   return (
     <div className="play">
-      <div className="starfield" aria-hidden="true" />
+      <div className="play-backdrop" aria-hidden="true">
+        <div className="starfield" />
+        <OrbitBackdrop speed={PLAY_ORBIT_SPEED} className="orbit-backdrop-play" />
+      </div>
       <SolarSystemMap
         objects={objects}
         mode={mode}

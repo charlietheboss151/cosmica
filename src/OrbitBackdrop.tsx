@@ -95,7 +95,6 @@ const PLANETS: PlanetOrbit[] = [
   },
 ];
 
-/** Slow-spinning bodies in the outer field for extra depth. */
 const DRIFTERS = [
   { src: "/bodies/ganymede.png", x: -248, y: -118, size: 7, duration: 52, start: 12 },
   { src: "/bodies/callisto.png", x: 236, y: -156, size: 7, duration: 48, start: 88 },
@@ -109,7 +108,23 @@ const DRIFTERS = [
 
 const RING_RADII = [72, 118, 178, 218, 282];
 
-function PlanetBody({ planet }: { planet: PlanetOrbit }) {
+type Props = {
+  /** Higher values spin more slowly. Menu uses 1; gameplay uses ~4. */
+  speed?: number;
+  className?: string;
+};
+
+function spin(seconds: number, speed: number): string {
+  return `${seconds * speed}s`;
+}
+
+function PlanetBody({
+  planet,
+  speed,
+}: {
+  planet: PlanetOrbit;
+  speed: number;
+}) {
   return (
     <g>
       <animateTransform
@@ -117,7 +132,7 @@ function PlanetBody({ planet }: { planet: PlanetOrbit }) {
         type="rotate"
         from={`${planet.start} 0 0`}
         to={`${planet.start + 360} 0 0`}
-        dur={`${planet.duration}s`}
+        dur={spin(planet.duration, speed)}
         repeatCount="indefinite"
       />
       <g transform={`translate(${planet.r} 0)`}>
@@ -135,13 +150,13 @@ function PlanetBody({ planet }: { planet: PlanetOrbit }) {
               type="rotate"
               from={`${moon.start} 0 0`}
               to={`${moon.start + 360} 0 0`}
-              dur={`${moon.duration}s`}
+              dur={spin(moon.duration, speed)}
               repeatCount="indefinite"
             />
             <g transform={`translate(${moon.localR} 0)`}>
               <image
                 href={moon.src}
-                className="menu-orbit-moon"
+                className="orbit-backdrop-moon"
                 x={-moon.size / 2}
                 y={-moon.size / 2}
                 width={moon.size}
@@ -157,8 +172,10 @@ function PlanetBody({ planet }: { planet: PlanetOrbit }) {
 
 function DrifterBody({
   body,
+  speed,
 }: {
   body: (typeof DRIFTERS)[number];
+  speed: number;
 }) {
   return (
     <g transform={`translate(${body.x} ${body.y})`}>
@@ -168,12 +185,12 @@ function DrifterBody({
           type="rotate"
           from={`${body.start} 0 0`}
           to={`${body.start + 360} 0 0`}
-          dur={`${body.duration}s`}
+          dur={spin(body.duration, speed)}
           repeatCount="indefinite"
         />
         <image
           href={body.src}
-          className="menu-orbit-drift"
+          className="orbit-backdrop-drift"
           x={-body.size / 2}
           y={-body.size / 2}
           width={body.size}
@@ -184,14 +201,14 @@ function DrifterBody({
   );
 }
 
-export default function MenuOrbits() {
+export default function OrbitBackdrop({ speed = 1, className = "" }: Props) {
   return (
-    <div className="menu-orbits" aria-hidden="true">
-      <svg viewBox="-300 -300 600 600" className="menu-orbits-svg">
+    <div className={`orbit-backdrop ${className}`.trim()} aria-hidden="true">
+      <svg viewBox="-300 -300 600 600" className="orbit-backdrop-svg">
         {RING_RADII.map((r) => (
           <circle
             key={r}
-            className="menu-orbit-ring"
+            className="orbit-backdrop-ring"
             r={r}
             cx={0}
             cy={0}
@@ -199,7 +216,11 @@ export default function MenuOrbits() {
           />
         ))}
         {DRIFTERS.map((body) => (
-          <DrifterBody key={`${body.src}-${body.x}-${body.y}`} body={body} />
+          <DrifterBody
+            key={`${body.src}-${body.x}-${body.y}`}
+            body={body}
+            speed={speed}
+          />
         ))}
         <image
           href="/bodies/sun.png"
@@ -207,12 +228,14 @@ export default function MenuOrbits() {
           y={-36}
           width={72}
           height={72}
-          className="menu-orbit-sun"
+          className="orbit-backdrop-sun"
         />
         {PLANETS.map((planet) => (
-          <PlanetBody key={planet.id} planet={planet} />
+          <PlanetBody key={planet.id} planet={planet} speed={speed} />
         ))}
       </svg>
     </div>
   );
 }
+
+export const PLAY_ORBIT_SPEED = 4;

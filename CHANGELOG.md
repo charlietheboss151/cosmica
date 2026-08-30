@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-08-30
+
+### Added
+- The orbiting solar-system backdrop now also plays behind the map in-game, at a slower speed than the menu.
+
 ## [0.12.2] - 2026-08-30
 
 ### Changed

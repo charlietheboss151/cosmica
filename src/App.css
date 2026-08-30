@@ -27,35 +27,56 @@
     radial-gradient(280px 220px at 50% 48%, #7aa2ff18 0%, transparent 100%);
 }
 
-.menu-orbits {
+.menu-orbits,
+.orbit-backdrop {
   position: absolute;
   inset: 0;
   display: grid;
   place-items: center;
+}
+
+.orbit-backdrop-menu {
   opacity: 0.58;
 }
 
-.menu-orbits-svg {
+.orbit-backdrop-menu .orbit-backdrop-svg {
   width: min(132vw, 980px);
   height: min(132vw, 980px);
 }
 
-.menu-orbit-ring {
+.orbit-backdrop-play {
+  opacity: 0.24;
+}
+
+.orbit-backdrop-play .orbit-backdrop-svg {
+  width: min(140vw, 1080px);
+  height: min(140vw, 1080px);
+}
+
+.orbit-backdrop-ring {
   stroke: #7aa2ff;
   stroke-opacity: 0.09;
   stroke-width: 1;
 }
 
-.menu-orbit-sun {
+.orbit-backdrop-sun {
   filter: drop-shadow(0 0 22px #ffcc4d99);
 }
 
-.menu-orbit-moon {
+.orbit-backdrop-moon {
   opacity: 0.88;
 }
 
-.menu-orbit-drift {
+.orbit-backdrop-drift {
   opacity: 0.55;
+}
+
+.play-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
 }
 
 .menu-panel {
@@ -258,6 +279,7 @@ h1 {
 .map {
   position: absolute;
   inset: 0;
+  z-index: 1;
 }
 
 .map-svg {
