@@ -190,9 +190,17 @@ h1 {
   opacity: 0.35;
 }
 
+.body-art-saturn {
+  mix-blend-mode: lighten;
+}
+
 .body-dim .body-art {
   filter: grayscale(1) brightness(0.7);
   opacity: 0.55;
+}
+
+.body-dim .body-art-saturn {
+  mix-blend-mode: normal;
 }
 
 .body-dim .disc {

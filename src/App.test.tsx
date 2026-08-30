@@ -20,6 +20,7 @@ describe("Cosmica prototype", () => {
     await user.click(screen.getByRole("button", { name: "Planets" }));
     expect(screen.getByTestId("find-prompt").textContent).toMatch(/^FIND: /);
     expect(screen.getByRole("button", { name: "Mercury" })).toBeEnabled();
+    expect(document.querySelectorAll("text.label")).toHaveLength(0);
     expect(screen.queryByRole("button", { name: "Europa" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Asteroid Belt" })).toHaveAttribute(
       "aria-disabled",

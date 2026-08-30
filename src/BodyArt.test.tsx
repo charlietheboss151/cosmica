@@ -28,6 +28,18 @@ describe("cartoon body art", () => {
     expect(image).toHaveAttribute("href", "/bodies/earth.png");
   });
 
+  it("draws Saturn with the full ring, not a sliced crop", () => {
+    const { container } = render(
+      <svg>
+        <BodyArt id="saturn" radius={40} color="#f0d48a" />
+      </svg>,
+    );
+    const image = container.querySelector("image");
+    expect(image).toHaveAttribute("href", "/bodies/saturn.png");
+    expect(image).toHaveAttribute("preserveAspectRatio", "xMidYMid meet");
+    expect(container.querySelector("clipPath")).toBeNull();
+  });
+
   it("falls back to a simple disc for moons", () => {
     const { container } = render(
       <svg>

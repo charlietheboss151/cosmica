@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.2] - 2026-08-30
+
+### Changed
+
+- Planet names no longer appear on the map during FIND rounds, so the drawing is the clue.
+
+### Fixed
+
+- Saturn’s sticker shows rings going behind the globe instead of a cropped, flattened loop.
+
 ## [0.6.1] - 2026-08-30
 
 ### Changed

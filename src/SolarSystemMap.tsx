@@ -221,9 +221,6 @@ export default function SolarSystemMap({ objects, mode, onSelect }: Props) {
                   radius={laid.radius}
                   color={object.color}
                 />
-                <text className="label" y={laid.radius + 22}>
-                  {object.name}
-                </text>
               </g>
             );
           })}
