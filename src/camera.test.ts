@@ -30,8 +30,8 @@ describe("map camera", () => {
   });
 
   it("fits a far orbit inside the viewport", () => {
-    const camera = fitCamera(832, 800, 600);
+    const camera = fitCamera(400, 800, 600);
     const edge = screenToWorld(camera, 400, 0, 800, 600);
-    expect(Math.abs(edge.y)).toBeGreaterThan(832);
+    expect(Math.abs(edge.y)).toBeGreaterThanOrEqual(400);
   });
 });

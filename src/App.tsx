@@ -69,7 +69,7 @@ function Play({ onMenu }: { onMenu: () => void }) {
           {round.feedback === "correct" ? "CORRECT" : "INCORRECT"}
         </p>
       ) : null}
-      <p className="hint">Lit bodies are in play · gray is the rest of the map · scroll out to see the whole system</p>
+      <p className="hint">Lit bodies are in play · gray is the rest of the map · scroll to zoom</p>
     </div>
   );
 }

@@ -45,10 +45,34 @@ describe("compressed visual layout", () => {
     expect(outer).toBeLessThan(jupiter);
   });
 
-  it("starts zoomed in so the cartoon Sun fills the view", () => {
-    const sun = catalog.find((object) => object.id === "sun")!;
+  it("keeps the Sun and planets from overlapping", () => {
+    const worlds = catalog.filter(
+      (object) => object.type === "star" || object.type === "planet",
+    );
+    const laid = worlds.map((object) => ({
+      object,
+      at: layoutObject(object),
+    }));
+    for (let i = 0; i < laid.length; i += 1) {
+      for (let j = i + 1; j < laid.length; j += 1) {
+        const a = laid[i]!;
+        const b = laid[j]!;
+        const distance = Math.hypot(a.at.x - b.at.x, a.at.y - b.at.y);
+        expect(
+          distance,
+          `${a.object.name} vs ${b.object.name}`,
+        ).toBeGreaterThan(a.at.radius + b.at.radius + 12);
+      }
+    }
+  });
+
+  it("frames the first view around the inner system through Jupiter", () => {
     const mars = catalog.find((object) => object.id === "mars")!;
-    expect(cameraFitRadius(catalog)).toBeCloseTo(sun.displaySize * 2.4);
-    expect(cameraFitRadius(catalog)).toBeGreaterThan(visualOrbit(mars.au) * 0.9);
+    const jupiter = catalog.find((object) => object.id === "jupiter")!;
+    const saturn = catalog.find((object) => object.id === "saturn")!;
+    const fit = cameraFitRadius(catalog);
+    expect(fit).toBeGreaterThan(visualOrbit(mars.au));
+    expect(fit).toBeGreaterThan(visualOrbit(jupiter.au));
+    expect(fit).toBeLessThan(visualOrbit(saturn.au));
   });
 });

@@ -18,9 +18,8 @@ type Props = {
 
 export default function SolarSystemMap({ objects, mode, onSelect }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
-  const [size, setSize] = useState({ width: 800, height: 600 });
+  const [size, setSize] = useState({ width: 0, height: 0 });
   const [camera, setCamera] = useState<Camera>(createCamera);
-  const fitted = useRef(false);
   const drag = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
@@ -29,7 +28,13 @@ export default function SolarSystemMap({ objects, mode, onSelect }: Props) {
       return;
     }
     const sync = () => {
-      setSize({ width: host.clientWidth, height: host.clientHeight });
+      const width = host.clientWidth;
+      const height = host.clientHeight;
+      setSize((current) =>
+        current.width === width && current.height === height
+          ? current
+          : { width, height },
+      );
     };
     sync();
     const observer = new ResizeObserver(sync);
@@ -38,12 +43,10 @@ export default function SolarSystemMap({ objects, mode, onSelect }: Props) {
   }, []);
 
   useEffect(() => {
-    if (fitted.current || size.width < 2 || size.height < 2) {
+    if (size.width < 80 || size.height < 80) {
       return;
     }
-    const maxRadius = cameraFitRadius(objects);
-    fitted.current = true;
-    setCamera(fitCamera(maxRadius, size.width, size.height));
+    setCamera(fitCamera(cameraFitRadius(objects), size.width, size.height));
   }, [objects, size]);
 
   const onPointerDown = (event: PointerEvent<SVGSVGElement>) => {

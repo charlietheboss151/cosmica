@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-08-30
+
+### Fixed
+
+- Cartoon planets no longer sit on top of each other. The first view frames the inner system through Jupiter at the real window size, instead of looking stuck zoomed out.
+
 ## [0.5.0] - 2026-08-30
 
 ### Changed

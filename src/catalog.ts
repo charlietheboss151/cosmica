@@ -38,7 +38,7 @@ export const catalog: SolarObject[] = [
     parentId: null,
     au: 0,
     longitudeDeg: 0,
-    displaySize: 82,
+    displaySize: 54,
     color: "#ffcc4d",
   }),
   body({
@@ -48,7 +48,7 @@ export const catalog: SolarObject[] = [
     parentId: "sun",
     au: 0.387,
     longitudeDeg: 248,
-    displaySize: 28,
+    displaySize: 16,
     color: "#c5b8a4",
   }),
   body({
@@ -58,7 +58,7 @@ export const catalog: SolarObject[] = [
     parentId: "sun",
     au: 0.723,
     longitudeDeg: 312,
-    displaySize: 40,
+    displaySize: 24,
     color: "#f0c56e",
   }),
   body({
@@ -68,7 +68,7 @@ export const catalog: SolarObject[] = [
     parentId: "sun",
     au: 1,
     longitudeDeg: 157,
-    displaySize: 42,
+    displaySize: 26,
     color: "#4ea3ff",
   }),
   body({
@@ -78,7 +78,7 @@ export const catalog: SolarObject[] = [
     parentId: "sun",
     au: 1.524,
     longitudeDeg: 84,
-    displaySize: 36,
+    displaySize: 20,
     color: "#ff6b3d",
   }),
   body({
@@ -88,7 +88,7 @@ export const catalog: SolarObject[] = [
     parentId: "sun",
     au: 2.77,
     longitudeDeg: 210,
-    displaySize: 16,
+    displaySize: 11,
     color: "#c4b8a8",
   }),
   body({
@@ -98,7 +98,7 @@ export const catalog: SolarObject[] = [
     parentId: "sun",
     au: 5.203,
     longitudeDeg: 71,
-    displaySize: 72,
+    displaySize: 42,
     color: "#e0a05a",
   }),
   body({
@@ -108,7 +108,7 @@ export const catalog: SolarObject[] = [
     parentId: "sun",
     au: 9.537,
     longitudeDeg: 341,
-    displaySize: 64,
+    displaySize: 38,
     color: "#f0d48a",
   }),
   body({
@@ -118,7 +118,7 @@ export const catalog: SolarObject[] = [
     parentId: "sun",
     au: 19.191,
     longitudeDeg: 54,
-    displaySize: 50,
+    displaySize: 30,
     color: "#6ed4e0",
   }),
   body({
@@ -128,7 +128,7 @@ export const catalog: SolarObject[] = [
     parentId: "sun",
     au: 30.069,
     longitudeDeg: 358,
-    displaySize: 48,
+    displaySize: 28,
     color: "#3d6fff",
   }),
   body({
@@ -138,7 +138,7 @@ export const catalog: SolarObject[] = [
     parentId: "sun",
     au: 39.48,
     longitudeDeg: 294,
-    displaySize: 16,
+    displaySize: 12,
     color: "#d6c4b0",
   }),
   body({

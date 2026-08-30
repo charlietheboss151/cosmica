@@ -16,7 +16,7 @@ export function fitCamera(
   width: number,
   height: number,
 ): Camera {
-  const span = Math.min(width, height) * 0.4;
+  const span = Math.min(width, height) * 0.5;
   const zoom = Math.min(
     MAX_ZOOM,
     Math.max(MIN_ZOOM, span / Math.max(maxRadius, 1)),

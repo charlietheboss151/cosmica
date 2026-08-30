@@ -63,9 +63,9 @@ describe("solar system catalog", () => {
     const sun = catalog.find((object) => object.id === "sun")!;
     const earth = catalog.find((object) => object.id === "earth")!;
     const jupiter = catalog.find((object) => object.id === "jupiter")!;
-    expect(sun.displaySize).toBeGreaterThanOrEqual(70);
-    expect(earth.displaySize).toBeGreaterThanOrEqual(36);
-    expect(jupiter.displaySize).toBeGreaterThanOrEqual(55);
+    expect(sun.displaySize).toBeGreaterThanOrEqual(48);
+    expect(earth.displaySize).toBeGreaterThanOrEqual(22);
+    expect(jupiter.displaySize).toBeGreaterThanOrEqual(36);
     expect(sun.displaySize).toBeGreaterThan(jupiter.displaySize);
   });
 });

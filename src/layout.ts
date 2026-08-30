@@ -10,7 +10,7 @@ export function visualOrbit(au: number): number {
   if (au <= 0) {
     return 0;
   }
-  return 55 + Math.pow(au, 0.58) * 105;
+  return 92 + Math.pow(au, 0.5) * 158;
 }
 
 function heliocentricLayout(object: SolarObject): LaidOutObject {
@@ -71,8 +71,8 @@ export function regionBand(object: SolarObject): { inner: number; outer: number 
 }
 
 export function cameraFitRadius(objects: SolarObject[]): number {
-  const sun = objects.find((object) => object.type === "star");
-  return (sun?.displaySize ?? 80) * 2.4;
+  const jupiter = objects.find((object) => object.id === "jupiter");
+  return visualOrbit(jupiter?.au ?? 5.2) * 1.08;
 }
 
 export function beltDust(
