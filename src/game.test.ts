@@ -3,6 +3,8 @@ import { catalog } from "./catalog";
 import {
   applyClick,
   formatElapsed,
+  markForTries,
+  MAX_GUESSES_PER_BODY,
   startQuiz,
 } from "./game";
 
@@ -95,8 +97,33 @@ describe("Seterra-style quiz", () => {
     quiz = applyClick(quiz, other(fourth), 7);
     quiz = applyClick(quiz, other(fourth), 8);
     quiz = applyClick(quiz, other(fourth), 9);
-    quiz = applyClick(quiz, fourth, 10);
     expect(quiz.marks[fourth]).toBe("red");
+    expect(quiz.foundIds).toContain(fourth);
+    expect(quiz.currentId).not.toBe(fourth);
+    expect(quiz.lastResult).toBe("revealed");
+  });
+
+  it("limits each body to three guesses before revealing the answer", () => {
+    const quiz = startQuiz("planets", alwaysFirst, 0);
+    const target = quiz.currentId!;
+    const wrong = target === "venus" ? "mars" : "venus";
+    let current = applyClick(quiz, wrong, 1);
+    expect(current.triesOnCurrent).toBe(1);
+    expect(current.currentId).toBe(target);
+    current = applyClick(current, wrong, 2);
+    expect(current.triesOnCurrent).toBe(2);
+    current = applyClick(current, wrong, 3);
+    expect(current.marks[target]).toBe("red");
+    expect(current.foundIds).toContain(target);
+    expect(current.currentId).not.toBe(target);
+    expect(current.placed).toBe(1);
+  });
+
+  it("colors rings green, yellow, and orange for correct finds on tries 1-3", () => {
+    expect(markForTries(1)).toBe("green");
+    expect(markForTries(2)).toBe("yellow");
+    expect(markForTries(3)).toBe("orange");
+    expect(MAX_GUESSES_PER_BODY).toBe(3);
   });
 
   it("flashes the wrong body without leaving a red ring", () => {

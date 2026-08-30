@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-08-30
+
+### Changed
+- Each body allows 3 guesses total. Correct on try 1–3 gets a green, yellow, or orange ring; missing all three reveals the answer with a red ring and shows its name.
+
 ## [0.10.0] - 2026-08-30
 
 ### Added

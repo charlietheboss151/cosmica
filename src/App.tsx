@@ -3,6 +3,7 @@ import { catalog, objectById, type GameMode } from "./catalog";
 import {
   applyClick,
   formatElapsed,
+  MAX_GUESSES_PER_BODY,
   startQuiz,
   type QuizState,
 } from "./game";
@@ -67,23 +68,29 @@ function Play({ mode, onMenu }: { mode: GameMode; onMenu: () => void }) {
   };
 
   useEffect(() => {
-    if (!quiz.wrongFlashId) {
+    if (!quiz.wrongFlashId && quiz.lastResult !== "revealed") {
       return;
     }
+    const delay = quiz.lastResult === "revealed" ? 1500 : 750;
     const timer = window.setTimeout(() => {
       setQuiz((current) =>
-        current.wrongFlashId
+        current.wrongFlashId || current.lastResult === "revealed"
           ? {
               ...current,
               wrongFlashId: null,
+              lastResolvedId:
+                current.lastResult === "revealed" ? null : current.lastResolvedId,
               lastResult:
-                current.lastResult === "incorrect" ? null : current.lastResult,
+                current.lastResult === "incorrect" ||
+                current.lastResult === "revealed"
+                  ? null
+                  : current.lastResult,
             }
           : current,
       );
-    }, 750);
+    }, delay);
     return () => window.clearTimeout(timer);
-  }, [quiz.wrongFlashId]);
+  }, [quiz.wrongFlashId, quiz.lastResult]);
 
   useEffect(() => {
     if (quiz.finishedAt !== null) {
@@ -124,6 +131,9 @@ function Play({ mode, onMenu }: { mode: GameMode; onMenu: () => void }) {
             {quiz.placed} / {quiz.total}
           </p>
           <p data-testid="timer">{formatElapsed(elapsedMs)}</p>
+          <p data-testid="guesses-left">
+            {MAX_GUESSES_PER_BODY - quiz.triesOnCurrent} left
+          </p>
           <p data-testid="mistakes">
             {quiz.mistakes === 1 ? "1 miss" : `${quiz.mistakes} misses`}
           </p>
@@ -136,7 +146,9 @@ function Play({ mode, onMenu }: { mode: GameMode; onMenu: () => void }) {
         >
           {quiz.lastResult === "correct"
             ? "CORRECT"
-            : objectById(quiz.wrongFlashId ?? "")?.name ?? "Wrong"}
+            : quiz.lastResult === "revealed"
+              ? `It was ${objectById(quiz.lastResolvedId ?? "")?.name ?? "?"}`
+              : objectById(quiz.wrongFlashId ?? "")?.name ?? "Wrong"}
         </p>
       ) : null}
       {done ? (
@@ -164,7 +176,7 @@ function Play({ mode, onMenu }: { mode: GameMode; onMenu: () => void }) {
         </div>
       ) : null}
       <p className="hint">
-        Click the named body · gray is the rest of the map · scroll to zoom
+        3 guesses per body · click the named body · scroll to zoom
       </p>
     </div>
   );
