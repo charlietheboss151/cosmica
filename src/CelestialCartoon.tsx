@@ -15,6 +15,87 @@ function hash(id: string): number {
   return value;
 }
 
+function seededUnit(seed: number, slot: number): number {
+  return ((seed * 1103515245 + slot * 12345 + 6789) >>> 0) / 0xffffffff;
+}
+
+function GlobeFallback({
+  id,
+  radius,
+  style,
+}: {
+  id: string;
+  radius: number;
+  style: CelestialStyle;
+}) {
+  const seed = hash(id);
+  const stretch = style.stretch ?? 1;
+  const craterCount = 4 + (seed % 5);
+  const craters = Array.from({ length: craterCount }, (_, index) => {
+    const angle = seededUnit(seed, index * 2) * Math.PI * 2;
+    const dist = radius * (0.15 + seededUnit(seed, index * 2 + 1) * 0.55);
+    const size = radius * (0.08 + seededUnit(seed, index * 2 + 50) * 0.14);
+    return {
+      cx: Math.cos(angle) * dist * stretch,
+      cy: Math.sin(angle) * dist,
+      r: size,
+      opacity: 0.18 + seededUnit(seed, index + 90) * 0.22,
+    };
+  });
+  const bandCount = 1 + (seed % 3);
+  const bands = Array.from({ length: bandCount }, (_, index) => ({
+    cy: radius * (-0.35 + seededUnit(seed, index + 20) * 0.7),
+    ry: radius * (0.12 + seededUnit(seed, index + 30) * 0.12),
+    opacity: 0.25 + seededUnit(seed, index + 40) * 0.2,
+  }));
+
+  return (
+    <g className="body-art celestial-art celestial-globe" data-testid={`art-${id}`}>
+      <ellipse className="disc" rx={radius * stretch} ry={radius} fill={style.base} />
+      {bands.map((band, index) => (
+        <ellipse
+          key={`band-${index}`}
+          className="globe-band"
+          rx={radius * stretch * 0.86}
+          ry={band.ry}
+          cy={band.cy}
+          fill={style.accent}
+          opacity={band.opacity}
+        />
+      ))}
+      {craters.map((crater, index) => (
+        <circle
+          key={`crater-${index}`}
+          className="globe-crater"
+          cx={crater.cx}
+          cy={crater.cy}
+          r={crater.r}
+          fill="#000"
+          opacity={crater.opacity}
+        />
+      ))}
+      {id === "haumea" ? (
+        <ellipse
+          rx={radius * stretch * 0.12}
+          ry={radius * 0.55}
+          fill={style.accent}
+          opacity={0.35}
+          transform="rotate(-24)"
+        />
+      ) : null}
+      <ellipse
+        className="shine"
+        cx={-radius * 0.28 * stretch}
+        cy={-radius * 0.34}
+        rx={radius * 0.34 * stretch}
+        ry={radius * 0.22}
+        fill="#fff"
+        opacity={0.42}
+      />
+    </g>
+  );
+}
+
 export function CelestialCartoon({ id, radius, style }: Props) {
   const src = BODY_ART[id];
   if (src) {
@@ -83,7 +164,7 @@ export function CelestialCartoon({ id, radius, style }: Props) {
         transform={`rotate(${spin})`}
       >
         <image
-          href="/bodies/asteroid-rock.svg"
+          href="/bodies/asteroid-rock.png"
           className="asteroid-rock-sprite"
           x={-radius * 1.35}
           y={-radius * 1.35}
@@ -105,42 +186,5 @@ export function CelestialCartoon({ id, radius, style }: Props) {
     );
   }
 
-  const stretch = style.stretch ?? 1;
-  return (
-    <g className="body-art celestial-art celestial-globe" data-testid={`art-${id}`}>
-      <ellipse className="disc" rx={radius * stretch} ry={radius} fill={style.base} />
-      <ellipse
-        className="globe-band"
-        rx={radius * stretch * 0.82}
-        ry={radius * 0.22}
-        cy={radius * 0.08}
-        fill={style.accent}
-        opacity={0.45}
-      />
-      <ellipse
-        className="shine"
-        cx={-radius * 0.28 * stretch}
-        cy={-radius * 0.34}
-        rx={radius * 0.34 * stretch}
-        ry={radius * 0.22}
-        fill="#fff"
-        opacity={0.42}
-      />
-      {id === "ceres" ? (
-        <>
-          <circle cx={radius * 0.2} cy={-radius * 0.1} r={radius * 0.16} fill="#fff" opacity={0.7} />
-          <circle cx={-radius * 0.35} cy={radius * 0.25} r={radius * 0.1} fill="#fff" opacity={0.5} />
-        </>
-      ) : null}
-      {id === "haumea" ? (
-        <ellipse
-          rx={radius * stretch * 0.12}
-          ry={radius * 0.55}
-          fill={style.accent}
-          opacity={0.35}
-          transform={`rotate(-24)`}
-        />
-      ) : null}
-    </g>
-  );
+  return <GlobeFallback id={id} radius={radius} style={style} />;
 }

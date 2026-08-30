@@ -4,36 +4,40 @@ import { accessSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+/** Wikimedia Commons filenames verified via the Commons API (Aug 2026). */
 const CELESTIAL_FILES = {
-  ceres: "Ceres - RC3 - Haulani Crater.jpg",
+  ceres: "Ceres - RC3 - Haulani Crater (22381131691) (cropped).jpg",
   pluto: "Pluto in True Color - High-Res.jpg",
-  eris: "Eris (dwarf planet).jpg",
-  haumea: "Haumea - artist's impression (cropped).jpg",
-  makemake: "Makemake - Hubble.jpg",
-  sedna: "Sedna - artist's conception.jpg",
-  quaoar: "Quaoar - artist's impression.jpg",
-  vesta: "4 Vesta - Dawn.jpg",
-  pallas: "2 Pallas - Hubble.jpg",
-  psyche: "16 Psyche - artist concept.jpg",
-  bennu: "101955 Bennu - OSIRIS-REx mosaic.jpg",
-  ryugu: "162173 Ryugu - Hayabusa2.jpg",
+  eris: "Eris and dysnomia.jpg",
+  haumea: "Haumea Hubble.png",
+  makemake: "Makemake and its moon.jpg",
+  sedna: "Sedna Dwarf Planet (Artist\u2019s Interpretation).jpg",
+  quaoar: "Quaoar-weywot hst.jpg",
+  vesta: "Vesta as seen with the Dawn spacecraft (ann14003b).jpg",
+  pallas: "Potw1749a Pallas crop.png",
+  psyche: "Psyche VLT.png",
+  bennu: "Bennu mosaic OSIRIS-REx (square).png",
+  ryugu:
+    "A Box of Treasure from Asteroid Ryugu (SVS14089 - AsteroidRyuguOrganicsV4).png",
   ida: "243 ida.jpg",
   gaspra: "951 Gaspra.jpg",
-  mathilde: "253 Mathilde.jpg",
-  eros: "433 Eros - NEAR Shoemaker.jpg",
-  itokawa: "25143 Itokawa.jpg",
-  lutetia: "21 Lutetia - Rosetta.jpg",
-  halley: "Comet Halley - Giotto.jpg",
-  "hale-bopp": "Comet Hale-Bopp 1997.jpg",
-  "67p": "Comet 67P - Rosetta (1024).jpg",
-  "tempel-1": "Comet Tempel 1 - Deep Impact.jpg",
-  "wild-2": "Comet Wild 2 - Stardust.jpg",
-  "shoemaker-levy-9": "Comet Shoemaker-Levy 9 - Hubble.jpg",
+  mathilde: "(253) mathilde.jpg",
+  eros: "PIA02475 Eros' Bland Butterscotch Colors.jpg",
+  itokawa: "Itokawa06 hayabusa.jpg",
+  lutetia: "Rosetta triumphs at asteroid Lutetia.jpg",
+  halley: "Comet Halley close up-cropped.jpg",
+  "hale-bopp": "Comet-Hale-Bopp-29-03-1997 hires adj.jpg",
+  "67p": "Comet 67P on 19 September 2014 NavCam mosaic.jpg",
+  "tempel-1":
+    "Hubble Images Comet Tempel 1 Just Before Deep Impact Probe Arrives (heic0509h).jpg",
+  "wild-2": "Comet Wild2.jpg",
+  "shoemaker-levy-9": "Comet P-Shoemaker-Levy 9 (1994-43-203).jpg",
 };
 
 const OUT_DIR = join(dirname(fileURLToPath(import.meta.url)), "../public/bodies");
 const SIZE = 1024;
-const USER_AGENT = "CosmicaGame/0.15.0 (educational; charlietheboss151/cosmica)";
+const USER_AGENT = "CosmicaGame/0.15.3 (educational; charlietheboss151/cosmica)";
+const API_DELAY_MS = 2200;
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -46,7 +50,7 @@ async function fetchWithRetry(url, label, attempts = 6) {
       return response;
     }
     if (response.status === 429 && attempt < attempts) {
-      await sleep(1500 * attempt);
+      await sleep(2000 * attempt);
       continue;
     }
     throw new Error(`${label} failed: ${response.status}`);
@@ -117,7 +121,7 @@ for (const [id, filename] of Object.entries(CELESTIAL_FILES)) {
     const bytes = await download(filename);
     toPng(id, bytes);
     process.stdout.write("ok\n");
-    await sleep(1200);
+    await sleep(API_DELAY_MS);
   } catch (error) {
     failures.push(`${id}: ${error.message}`);
     process.stdout.write(`failed (${error.message})\n`);
@@ -126,5 +130,6 @@ for (const [id, filename] of Object.entries(CELESTIAL_FILES)) {
 
 if (failures.length > 0) {
   console.warn("Some images failed:\n" + failures.join("\n"));
+  process.exitCode = 1;
 }
 console.log(`Processed ${Object.keys(CELESTIAL_FILES).length} celestial images in ${OUT_DIR}`);

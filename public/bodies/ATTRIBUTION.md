@@ -1,6 +1,6 @@
 # Body art sources
 
-Planet sticker art is original to Cosmica. Moon photos are public-domain NASA / JPL / USGS mission images fetched from Wikimedia Commons.
+Planet sticker art is original to Cosmica. Moon and celestial-body photos are public-domain NASA / ESA / JPL mission images fetched from Wikimedia Commons.
 
 | Moon | Wikimedia file |
 | --- | --- |
@@ -25,10 +25,38 @@ Planet sticker art is original to Cosmica. Moon photos are public-domain NASA / 
 | Oberon | Oberon map JPL USGS.jpg |
 | Triton | Triton moon mosaic Voyager 2 (large).jpg |
 
+| Celestial body | Wikimedia file |
+| --- | --- |
+| Ceres | Ceres - RC3 - Haulani Crater (22381131691) (cropped).jpg |
+| Pluto | Pluto in True Color - High-Res.jpg |
+| Eris | Eris and dysnomia.jpg |
+| Haumea | Haumea Hubble.png |
+| Makemake | Makemake and its moon.jpg |
+| Sedna | Sedna Dwarf Planet (Artist's Interpretation).jpg |
+| Quaoar | Quaoar-weywot hst.jpg |
+| Vesta | Vesta as seen with the Dawn spacecraft (ann14003b).jpg |
+| Pallas | Potw1749a Pallas crop.png |
+| Psyche | Psyche VLT.png |
+| Bennu | Bennu mosaic OSIRIS-REx (square).png |
+| Ryugu | A Box of Treasure from Asteroid Ryugu (SVS14089 - AsteroidRyuguOrganicsV4).png |
+| Ida | 243 ida.jpg |
+| Gaspra | 951 Gaspra.jpg |
+| Mathilde | (253) mathilde.jpg |
+| Eros | PIA02475 Eros' Bland Butterscotch Colors.jpg |
+| Itokawa | Itokawa06 hayabusa.jpg |
+| Lutetia | Rosetta triumphs at asteroid Lutetia.jpg |
+| Halley's Comet | Comet Halley close up-cropped.jpg |
+| Hale-Bopp | Comet-Hale-Bopp-29-03-1997 hires adj.jpg |
+| 67P | Comet 67P on 19 September 2014 NavCam mosaic.jpg |
+| Tempel 1 | Hubble Images Comet Tempel 1 Just Before Deep Impact Probe Arrives (heic0509h).jpg |
+| Wild 2 | Comet Wild2.jpg |
+| Shoemaker-Levy 9 | Comet P-Shoemaker-Levy 9 (1994-43-203).jpg |
+
 Cartoon asteroid sprite: `asteroid-rock.svg` / `asteroid-rock.png` from [OpenClipart #323535](https://openclipart.org/detail/323535/asteroid) (public domain).
 
 Regenerate PNGs with:
 
 ```bash
 node scripts/fetch-moon-art.mjs
+node scripts/fetch-celestial-art.mjs
 ```

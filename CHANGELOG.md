@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.3] - 2026-08-30
+
+### Fixed
+- Celestial bodies no longer render as plain colored ovals. NASA photos are fetched for dwarf planets, asteroids, and comets; hard-mode candidates without photos get textured globe fallbacks with craters and bands.
+
+## [0.15.2] - 2026-08-30
+
+### Fixed
+- Bodies inside belt regions (Pluto in the Kuiper Belt, Ceres in the Asteroid Belt, etc.) are clickable again. Belt art is drawn underneath with a separate hit layer so it no longer blocks clicks.
+
 ## [0.15.1] - 2026-08-30
 
 ### Changed
