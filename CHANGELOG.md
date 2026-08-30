@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.3] - 2026-08-30
+
+### Fixed
+
+- Saturn is a ringless globe with SVG rings that have a hole, drawn behind and in front of the planet, so the rings wrap the globe instead of covering it or showing a navy square.
+
 ## [0.6.2] - 2026-08-30
 
 ### Changed

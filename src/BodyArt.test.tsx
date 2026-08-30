@@ -28,16 +28,30 @@ describe("cartoon body art", () => {
     expect(image).toHaveAttribute("href", "/bodies/earth.png");
   });
 
-  it("draws Saturn with the full ring, not a sliced crop", () => {
+  it("draws Saturn with a ring behind the globe and a ring in front", () => {
     const { container } = render(
       <svg>
         <BodyArt id="saturn" radius={40} color="#f0d48a" />
       </svg>,
     );
-    const image = container.querySelector("image");
-    expect(image).toHaveAttribute("href", "/bodies/saturn.png");
-    expect(image).toHaveAttribute("preserveAspectRatio", "xMidYMid meet");
-    expect(container.querySelector("clipPath")).toBeNull();
+    const back = container.querySelector(".saturn-ring-back");
+    const front = container.querySelector(".saturn-ring-front");
+    expect(back?.tagName.toLowerCase()).toBe("path");
+    expect(front?.tagName.toLowerCase()).toBe("path");
+    expect(back).toHaveAttribute("fill-rule", "evenodd");
+    expect(back?.getAttribute("d")?.match(/A /g)?.length).toBe(4);
+    expect(front?.getAttribute("d")?.match(/A /g)?.length).toBe(2);
+    expect(front?.getAttribute("d")).toMatch(/0 0 0 /);
+    expect(front?.getAttribute("d")).toMatch(/0 0 1 /);
+    expect(container.querySelector("image")).toHaveAttribute(
+      "href",
+      "/bodies/saturn.png",
+    );
+    const inner = Number(back?.getAttribute("data-inner-rx"));
+    const outer = Number(back?.getAttribute("data-outer-rx"));
+    expect(inner).toBeGreaterThan(40);
+    expect(inner).toBeLessThan(40 * 1.35);
+    expect(outer).toBeGreaterThan(inner);
   });
 
   it("falls back to a simple disc for moons", () => {

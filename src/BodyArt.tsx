@@ -7,6 +7,36 @@ type Props = {
   color: string;
 };
 
+function saturnRingPath(
+  outerRx: number,
+  outerRy: number,
+  innerRx: number,
+  innerRy: number,
+) {
+  return [
+    `M ${-outerRx} 0`,
+    `A ${outerRx} ${outerRy} 0 1 1 ${outerRx} 0`,
+    `A ${outerRx} ${outerRy} 0 1 1 ${-outerRx} 0 Z`,
+    `M ${-innerRx} 0`,
+    `A ${innerRx} ${innerRy} 0 1 0 ${innerRx} 0`,
+    `A ${innerRx} ${innerRy} 0 1 0 ${-innerRx} 0 Z`,
+  ].join(" ");
+}
+
+function saturnRingFrontPath(
+  outerRx: number,
+  outerRy: number,
+  innerRx: number,
+  innerRy: number,
+) {
+  return [
+    `M ${-outerRx} 0`,
+    `A ${outerRx} ${outerRy} 0 0 0 ${outerRx} 0`,
+    `L ${innerRx} 0`,
+    `A ${innerRx} ${innerRy} 0 0 1 ${-innerRx} 0 Z`,
+  ].join(" ");
+}
+
 export function BodyArt({ id, radius, color }: Props) {
   const clipId = `clip-${id}-${useId().replace(/:/g, "")}`;
   const src = BODY_ART[id];
@@ -26,16 +56,52 @@ export function BodyArt({ id, radius, color }: Props) {
   }
 
   if (id === "saturn") {
-    const pad = 1.72;
+    const innerRx = radius * 1.18;
+    const innerRy = radius * 0.34;
+    const outerRx = radius * 2.16;
+    const outerRy = radius * 0.6;
+    const globeClip = `${clipId}-globe`;
+    const behindClip = `${clipId}-behind`;
+    const globePad = 1.08;
+    const ringD = saturnRingPath(outerRx, outerRy, innerRx, innerRy);
+    const frontD = saturnRingFrontPath(outerRx, outerRy, innerRx, innerRy);
+    const globeR = radius * 1.02;
     return (
-      <g className="body-art body-art-saturn" data-testid="art-saturn">
-        <image
-          href={src}
-          x={-radius * pad}
-          y={-radius * pad}
-          width={radius * pad * 2}
-          height={radius * pad * 2}
-          preserveAspectRatio="xMidYMid meet"
+      <g className="body-art" data-testid="art-saturn">
+        <defs>
+          <clipPath id={globeClip}>
+            <circle r={globeR} />
+          </clipPath>
+          <clipPath id={behindClip} clipRule="evenodd">
+            <path
+              d={`M ${-outerRx * 2} ${-outerRy * 2} H ${outerRx * 2} V ${outerRy * 2} H ${-outerRx * 2} Z M 0 ${-globeR} A ${globeR} ${globeR} 0 1 1 0 ${globeR} A ${globeR} ${globeR} 0 1 1 0 ${-globeR} Z`}
+            />
+          </clipPath>
+        </defs>
+        <g clipPath={`url(#${behindClip})`}>
+          <path
+            className="saturn-ring-back"
+            d={ringD}
+            fill="#efe4b4"
+            fillRule="evenodd"
+            data-inner-rx={innerRx}
+            data-outer-rx={outerRx}
+          />
+        </g>
+        <g clipPath={`url(#${globeClip})`}>
+          <image
+            href={src}
+            x={-radius * globePad}
+            y={-radius * globePad}
+            width={radius * globePad * 2}
+            height={radius * globePad * 2}
+            preserveAspectRatio="xMidYMid slice"
+          />
+        </g>
+        <path
+          className="saturn-ring-front"
+          d={frontD}
+          fill="#efe4b4"
         />
       </g>
     );

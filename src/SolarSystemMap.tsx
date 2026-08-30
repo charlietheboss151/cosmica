@@ -214,7 +214,11 @@ export default function SolarSystemMap({ objects, mode, onSelect }: Props) {
               >
                 <circle
                   className="hit"
-                  r={Math.max(laid.radius, 12)}
+                  r={
+                    object.id === "saturn"
+                      ? laid.radius * 2.1
+                      : Math.max(laid.radius, 12)
+                  }
                 />
                 <BodyArt
                   id={object.id}
