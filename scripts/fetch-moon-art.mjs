@@ -24,11 +24,11 @@ const MOON_FILES = {
   ariel: "Ariel in monochrome.jpg",
   umbriel: "PIA00040 Umbrielx2.47.jpg",
   titania: "Titania (moon) color, cropped.jpg",
-  oberon: "Oberon map JPL USGS.jpg",
+  oberon: "Voyager 2 picture of Oberon.jpg",
   triton: "Triton moon mosaic Voyager 2 (large).jpg",
   charon: "Charon in True Color - High-Res.jpg",
-  nix: "Nix and Hydra viewed from New Horizons 2015-07-14.jpg",
-  hydra: "Hydra, Charon and Pluto (19540320858).jpg",
+  nix: "Nix by New Horizons on 13 July 2015.jpg",
+  hydra: "Hydra (moon) 2015-7-15 (raw).jpg",
   kerberos: "Kerberos (moon).jpg",
   styx: "Styx (moon).jpg",
   amalthea: "Jupiter's moon Amalthea photographed by Galileo.jpg",
@@ -37,7 +37,7 @@ const MOON_FILES = {
   puck: "Puck, moon of Uranus (1986).png",
   proteus: "Proteus (Voyager 2).jpg",
   nereid: "Nereid - Voyager 2.jpg",
-  dysnomia: "Eris and moon Dysnomia JWST NIRCam.jpg",
+  dysnomia: "Dysnomia-moon-transparent.png",
   hiiaka: "Hi'iakaMoon.png",
   namaka: "NamakaMoon.png",
   mk2: "Makemake moon Hubble image only.jpg",
@@ -45,7 +45,7 @@ const MOON_FILES = {
 
 const OUT_DIR = join(dirname(fileURLToPath(import.meta.url)), "../public/bodies");
 const SIZE = 1024;
-const USER_AGENT = "CosmicaGame/0.15.10 (educational; charlietheboss151/cosmica)";
+const USER_AGENT = "CosmicaGame/0.15.11 (educational; charlietheboss151/cosmica)";
 const API_DELAY_MS = 2200;
 
 function sleep(ms) {

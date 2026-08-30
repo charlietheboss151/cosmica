@@ -22,11 +22,11 @@ Planet sticker art is original to Cosmica. Moon and celestial-body photos are pu
 | Ariel | Ariel in monochrome.jpg |
 | Umbriel | PIA00040 Umbrielx2.47.jpg |
 | Titania | Titania (moon) color, cropped.jpg |
-| Oberon | Oberon map JPL USGS.jpg |
+| Oberon | Voyager 2 picture of Oberon.jpg |
 | Triton | Triton moon mosaic Voyager 2 (large).jpg |
 | Charon | Charon in True Color - High-Res.jpg |
-| Nix | Nix and Hydra viewed from New Horizons 2015-07-14.jpg |
-| Hydra | Hydra, Charon and Pluto (19540320858).jpg |
+| Nix | Nix by New Horizons on 13 July 2015.jpg |
+| Hydra | Hydra (moon) 2015-7-15 (raw).jpg |
 | Kerberos | Kerberos (moon).jpg |
 | Styx | Styx (moon).jpg |
 | Amalthea | Jupiter's moon Amalthea photographed by Galileo.jpg |
@@ -35,7 +35,7 @@ Planet sticker art is original to Cosmica. Moon and celestial-body photos are pu
 | Puck | Puck, moon of Uranus (1986).png |
 | Proteus | Proteus (Voyager 2).jpg |
 | Nereid | Nereid - Voyager 2.jpg |
-| Dysnomia | Eris and moon Dysnomia JWST NIRCam.jpg |
+| Dysnomia | Dysnomia-moon-transparent.png |
 | Hi'iaka | Hi'iakaMoon.png |
 | Namaka | NamakaMoon.png |
 | MK 2 | Makemake moon Hubble image only.jpg |
@@ -44,28 +44,28 @@ Planet sticker art is original to Cosmica. Moon and celestial-body photos are pu
 | --- | --- |
 | Ceres | Ceres - RC3 - Haulani Crater (22381131691) (cropped).jpg |
 | Pluto | Pluto in True Color - High-Res.jpg |
-| Eris | Eris and dysnomia.jpg |
+| Eris | Hubble ACS image of Eris.jpg |
 | Haumea | Haumea Hubble.png |
-| Makemake | Makemake and its moon.jpg |
-| Sedna | Sedna Dwarf Planet (Artist's Interpretation).jpg |
+| Makemake | Dwarf Planet Makemake and Its Moon.jpg |
+| Sedna | Sedna PRC2004-14d.png |
 | Quaoar | Quaoar-weywot hst.jpg |
 | Vesta | Vesta as seen with the Dawn spacecraft (ann14003b).jpg |
 | Pallas | Potw1749a Pallas crop.png |
 | Psyche | Psyche VLT.png |
 | Bennu | Bennu mosaic OSIRIS-REx (square).png |
-| Ryugu | A Box of Treasure from Asteroid Ryugu (SVS14089 - AsteroidRyuguOrganicsV4).png |
+| Ryugu | Ryugu colored.jpg |
 | Ida | 243 ida.jpg |
 | Gaspra | 951 Gaspra.jpg |
 | Mathilde | (253) mathilde.jpg |
 | Eros | PIA02475 Eros' Bland Butterscotch Colors.jpg |
 | Itokawa | Itokawa06 hayabusa.jpg |
-| Lutetia | Rosetta triumphs at asteroid Lutetia.jpg |
-| Halley's Comet | Comet Halley close up-cropped.jpg |
-| Hale-Bopp | Comet-Hale-Bopp-29-03-1997 hires adj.jpg |
-| 67P | Comet 67P on 19 September 2014 NavCam mosaic.jpg |
-| Tempel 1 | Hubble Images Comet Tempel 1 Just Before Deep Impact Probe Arrives (heic0509h).jpg |
+| Lutetia | An image of the strange asteroid Lutetia from the ESA Rosetta probe.jpg |
+| Halley's Comet | Comet Halley close up.jpg |
+| Hale-Bopp | Comet Hale-Bopp (opo9708a).jpg |
+| 67P | A Rosetta colour image of the surface of Comet 67P-Churyumov-Gerasimenko (49948151618).png |
+| Tempel 1 | Deep Impact HRI - PIA02137.png |
 | Wild 2 | Comet Wild2.jpg |
-| Shoemaker-Levy 9 | Comet P-Shoemaker-Levy 9 (1994-43-203).jpg |
+| Shoemaker-Levy 9 | Comet P-Shoemaker-Levy 9 (1994-43-206).jpg |
 
 Cartoon asteroid sprite: `asteroid-rock.svg` / `asteroid-rock.png` from [OpenClipart #323535](https://openclipart.org/detail/323535/asteroid) (public domain).
 

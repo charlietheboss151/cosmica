@@ -8,35 +8,41 @@ import { fileURLToPath } from "node:url";
 const CELESTIAL_FILES = {
   ceres: "Ceres - RC3 - Haulani Crater (22381131691) (cropped).jpg",
   pluto: "Pluto in True Color - High-Res.jpg",
-  eris: "Eris and dysnomia.jpg",
+  eris: "Hubble ACS image of Eris.jpg",
   haumea: "Haumea Hubble.png",
-  makemake: "Makemake and its moon.jpg",
-  sedna: "Sedna Dwarf Planet (Artist\u2019s Interpretation).jpg",
+  makemake: "Dwarf Planet Makemake and Its Moon.jpg",
+  sedna: "Sedna PRC2004-14d.png",
   quaoar: "Quaoar-weywot hst.jpg",
   vesta: "Vesta as seen with the Dawn spacecraft (ann14003b).jpg",
   pallas: "Potw1749a Pallas crop.png",
   psyche: "Psyche VLT.png",
   bennu: "Bennu mosaic OSIRIS-REx (square).png",
-  ryugu:
-    "A Box of Treasure from Asteroid Ryugu (SVS14089 - AsteroidRyuguOrganicsV4).png",
+  ryugu: "Ryugu colored.jpg",
   ida: "243 ida.jpg",
   gaspra: "951 Gaspra.jpg",
   mathilde: "(253) mathilde.jpg",
   eros: "PIA02475 Eros' Bland Butterscotch Colors.jpg",
   itokawa: "Itokawa06 hayabusa.jpg",
-  lutetia: "Rosetta triumphs at asteroid Lutetia.jpg",
-  halley: "Comet Halley close up-cropped.jpg",
-  "hale-bopp": "Comet-Hale-Bopp-29-03-1997 hires adj.jpg",
-  "67p": "Comet 67P on 19 September 2014 NavCam mosaic.jpg",
-  "tempel-1":
-    "Hubble Images Comet Tempel 1 Just Before Deep Impact Probe Arrives (heic0509h).jpg",
+  lutetia:
+    "An image of the strange asteroid Lutetia from the ESA Rosetta probe.jpg",
+  halley: "Comet Halley close up.jpg",
+  "hale-bopp": "Comet Hale-Bopp (opo9708a).jpg",
+  "67p":
+    "A Rosetta colour image of the surface of Comet 67P-Churyumov-Gerasimenko (49948151618).png",
+  "tempel-1": "Deep Impact HRI - PIA02137.png",
   "wild-2": "Comet Wild2.jpg",
-  "shoemaker-levy-9": "Comet P-Shoemaker-Levy 9 (1994-43-203).jpg",
+  "shoemaker-levy-9": "Comet P-Shoemaker-Levy 9 (1994-43-206).jpg",
+};
+
+/** Center-crop zoom when the source frame includes a companion object. */
+const CROP_ZOOM = {
+  makemake: 1.8,
+  quaoar: 1.6,
 };
 
 const OUT_DIR = join(dirname(fileURLToPath(import.meta.url)), "../public/bodies");
 const SIZE = 1024;
-const USER_AGENT = "CosmicaGame/0.15.3 (educational; charlietheboss151/cosmica)";
+const USER_AGENT = "CosmicaGame/0.15.11 (educational; charlietheboss151/cosmica)";
 const API_DELAY_MS = 2200;
 
 function sleep(ms) {
@@ -84,6 +90,8 @@ async function download(filename) {
 function toPng(id, inputBuffer) {
   const tmpIn = join(OUT_DIR, `.${id}.src`);
   const tmpOut = join(OUT_DIR, `${id}.png`);
+  const zoom = CROP_ZOOM[id] ?? 1;
+  const scaled = Math.round(SIZE * zoom);
   writeFileSync(tmpIn, inputBuffer);
   execFileSync(
     "ffmpeg",
@@ -92,7 +100,7 @@ function toPng(id, inputBuffer) {
       "-i",
       tmpIn,
       "-vf",
-      `scale=${SIZE}:${SIZE}:force_original_aspect_ratio=increase,crop=${SIZE}:${SIZE}`,
+      `scale=${scaled}:${scaled}:force_original_aspect_ratio=increase,crop=${SIZE}:${SIZE}`,
       tmpOut,
     ],
     { stdio: "pipe" },

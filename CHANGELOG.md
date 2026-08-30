@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.11] - 2026-08-30
+
+### Changed
+- Swapped moon and celestial body photos for mission close-ups without text overlays or ground-based views (comets, asteroids, dwarf planets, and small moons).
+
 ## [0.15.10] - 2026-08-30
 
 ### Added
