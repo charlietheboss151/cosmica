@@ -13,7 +13,7 @@ const MOON_FILES = {
   ganymede: "Ganymede, moon of Jupiter, NASA.jpg",
   callisto: "Callisto, moon of Jupiter, NASA.jpg",
   mimas: "Mimas Cassini.jpg",
-  enceladus: "Cassini Enceladus NASA.jpg",
+  enceladus: "Enceladusstripes cassini-edit2.jpg",
   tethys: "Tethys from Cassini (1).jpg",
   dione: "Dione-from-Cassini(Nov-2004).jpg",
   rhea: "PIA07763 Rhea full globe5.jpg",

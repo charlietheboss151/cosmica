@@ -12,7 +12,7 @@ Planet sticker art is original to Cosmica. Moon photos are public-domain NASA / 
 | Ganymede | Ganymede, moon of Jupiter, NASA.jpg |
 | Callisto | Callisto, moon of Jupiter, NASA.jpg |
 | Mimas | Mimas Cassini.jpg |
-| Enceladus | Cassini Enceladus NASA.jpg |
+| Enceladus | Enceladusstripes cassini-edit2.jpg |
 | Tethys | Tethys from Cassini (1).jpg |
 | Dione | Dione-from-Cassini(Nov-2004).jpg |
 | Rhea | PIA07763 Rhea full globe5.jpg |
