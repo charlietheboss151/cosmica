@@ -313,7 +313,7 @@ h1 {
   border-radius: 999px;
   background: #0c1322ee;
   border: 1px solid #3d5a99;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.04em;
   font-weight: 650;
 }
 
@@ -362,4 +362,41 @@ h1 {
   color: #6d7b94;
   font-size: 0.8rem;
   z-index: 1;
+}
+
+.results {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  width: min(360px, calc(100% - 32px));
+  padding: 28px 24px;
+  border-radius: 16px;
+  background: #0c1322f2;
+  border: 1px solid #3d5a99;
+  text-align: center;
+}
+
+.results h2 {
+  margin: 0 0 12px;
+  font-size: 1.35rem;
+}
+
+.results p {
+  margin: 6px 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.results-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.results-actions .mode-play,
+.results-actions .ghost {
+  pointer-events: auto;
+  width: auto;
 }

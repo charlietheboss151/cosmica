@@ -8,13 +8,18 @@ import {
 
 export type Rng = () => number;
 
-export type RoundState = {
+export type QuizState = {
   mode: GameMode;
-  targetId: string;
+  currentId: string | null;
+  remainingIds: string[];
+  foundIds: string[];
+  placed: number;
+  total: number;
+  mistakes: number;
+  startedAt: number;
+  finishedAt: number | null;
+  lastResult: "correct" | "incorrect" | null;
   prompt: string;
-  score: number;
-  streak: number;
-  feedback: "correct" | "incorrect" | null;
 };
 
 function playable(mode: GameMode): SolarObject[] {
@@ -26,52 +31,84 @@ function playable(mode: GameMode): SolarObject[] {
   );
 }
 
-function promptFor(object: SolarObject): string {
-  return `FIND: ${object.name.toUpperCase()}`;
+function shuffle<T>(items: T[], rng: Rng): T[] {
+  const next = [...items];
+  for (let i = next.length - 1; i > 0; i -= 1) {
+    const j = Math.min(i, Math.floor(rng() * (i + 1)));
+    const a = next[i]!;
+    next[i] = next[j]!;
+    next[j] = a;
+  }
+  return next;
 }
 
-function pickTarget(mode: GameMode, rng: Rng, excludeId?: string): SolarObject {
-  const all = playable(mode);
-  const pool = all.filter((object) => object.id !== excludeId);
-  const list = pool.length > 0 ? pool : all;
-  const index = Math.min(
-    list.length - 1,
-    Math.max(0, Math.floor(rng() * list.length)),
+function promptFor(id: string | null): string {
+  if (!id) {
+    return "Round complete";
+  }
+  const object = objectById(id);
+  return object ? `Click on ${object.name}` : "Round complete";
+}
+
+export function formatElapsed(ms: number): string {
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${String(seconds).padStart(2, "0")}`;
+}
+
+export function startQuiz(
+  mode: GameMode,
+  rng: Rng,
+  now: number = Date.now(),
+): QuizState {
+  const ids = shuffle(
+    playable(mode).map((object) => object.id),
+    rng,
   );
-  return list[index]!;
-}
-
-export function startRound(rng: Rng, mode: GameMode = "planets"): RoundState {
-  const target = pickTarget(mode, rng);
+  const currentId = ids[0] ?? null;
+  const remainingIds = ids.slice(1);
   return {
     mode,
-    targetId: target.id,
-    prompt: promptFor(target),
-    score: 0,
-    streak: 0,
-    feedback: null,
+    currentId,
+    remainingIds,
+    foundIds: [],
+    placed: 0,
+    total: ids.length,
+    mistakes: 0,
+    startedAt: now,
+    finishedAt: currentId ? null : now,
+    lastResult: null,
+    prompt: promptFor(currentId),
   };
 }
 
 export function applyClick(
-  state: RoundState,
+  state: QuizState,
   objectId: string,
-  rng: Rng,
-): RoundState {
+  now: number = Date.now(),
+): QuizState {
+  if (state.finishedAt !== null || !state.currentId) {
+    return state;
+  }
   const clicked = objectById(objectId);
   if (!clicked || !isLitInMode(clicked, state.mode)) {
     return state;
   }
-  if (objectId !== state.targetId) {
-    return { ...state, streak: 0, feedback: "incorrect" };
+  if (objectId !== state.currentId) {
+    return { ...state, mistakes: state.mistakes + 1, lastResult: "incorrect" };
   }
-  const next = pickTarget(state.mode, rng, state.targetId);
+  const foundIds = [...state.foundIds, objectId];
+  const [currentId, ...remainingIds] = state.remainingIds;
+  const finished = !currentId;
   return {
     ...state,
-    targetId: next.id,
-    prompt: promptFor(next),
-    score: state.score + 100,
-    streak: state.streak + 1,
-    feedback: "correct",
+    currentId: currentId ?? null,
+    remainingIds,
+    foundIds,
+    placed: foundIds.length,
+    finishedAt: finished ? now : null,
+    lastResult: "correct",
+    prompt: promptFor(currentId ?? null),
   };
 }

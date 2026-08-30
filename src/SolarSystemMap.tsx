@@ -14,10 +14,16 @@ import { beltDust, cameraFitRadius, layoutAll, layoutObject, regionBand, visualO
 type Props = {
   objects: SolarObject[];
   mode: GameMode;
+  foundIds?: string[];
   onSelect: (id: string) => void;
 };
 
-export default function SolarSystemMap({ objects, mode, onSelect }: Props) {
+export default function SolarSystemMap({
+  objects,
+  mode,
+  foundIds = [],
+  onSelect,
+}: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [camera, setCamera] = useState<Camera>(createCamera);
@@ -225,6 +231,11 @@ export default function SolarSystemMap({ objects, mode, onSelect }: Props) {
                   radius={laid.radius}
                   color={object.color}
                 />
+                {foundIds.includes(object.id) ? (
+                  <text className="label" y={laid.radius + 18}>
+                    {object.name}
+                  </text>
+                ) : null}
               </g>
             );
           })}

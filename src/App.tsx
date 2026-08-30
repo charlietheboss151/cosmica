@@ -1,6 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { catalog, type GameMode } from "./catalog";
-import { applyClick, startRound, type RoundState } from "./game";
+import {
+  applyClick,
+  formatElapsed,
+  startQuiz,
+  type QuizState,
+} from "./game";
 import SolarSystemMap from "./SolarSystemMap";
 import "./App.css";
 
@@ -48,40 +53,87 @@ function Menu({ onPlay }: { onPlay: (mode: GameMode) => void }) {
 
 function Play({ mode, onMenu }: { mode: GameMode; onMenu: () => void }) {
   const objects = catalog;
-  const [round, setRound] = useState<RoundState>(() =>
-    startRound(Math.random, mode),
+  const [quiz, setQuiz] = useState<QuizState>(() =>
+    startQuiz(mode, Math.random),
   );
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    if (quiz.finishedAt !== null) {
+      return;
+    }
+    const tick = window.setInterval(() => setNow(Date.now()), 200);
+    return () => window.clearInterval(tick);
+  }, [quiz.finishedAt]);
 
   const choose = (id: string) => {
-    setRound((current) => applyClick(current, id, Math.random));
+    setQuiz((current) => applyClick(current, id));
   };
+
+  const elapsedMs =
+    (quiz.finishedAt ?? now) - quiz.startedAt;
+  const done = quiz.finishedAt !== null;
 
   return (
     <div className="play">
       <div className="starfield" aria-hidden="true" />
-      <SolarSystemMap objects={objects} mode={mode} onSelect={choose} />
+      <SolarSystemMap
+        objects={objects}
+        mode={mode}
+        foundIds={quiz.foundIds}
+        onSelect={choose}
+      />
       <header className="hud">
         <button type="button" className="ghost" onClick={onMenu}>
           Menu
         </button>
         <p className="prompt" data-testid="find-prompt">
-          {round.prompt}
+          {quiz.prompt}
         </p>
         <div className="stats">
-          <p data-testid="score">{round.score} XP</p>
-          <p data-testid="streak">🔥 {round.streak}</p>
+          <p data-testid="score">
+            {quiz.placed} / {quiz.total}
+          </p>
+          <p data-testid="timer">{formatElapsed(elapsedMs)}</p>
+          <p data-testid="mistakes">
+            {quiz.mistakes === 1 ? "1 miss" : `${quiz.mistakes} misses`}
+          </p>
         </div>
       </header>
-      {round.feedback ? (
+      {quiz.lastResult && !done ? (
         <p
-          className={`feedback feedback-${round.feedback}`}
+          className={`feedback feedback-${quiz.lastResult}`}
           data-testid="feedback"
         >
-          {round.feedback === "correct" ? "CORRECT" : "INCORRECT"}
+          {quiz.lastResult === "correct" ? "CORRECT" : "INCORRECT"}
         </p>
       ) : null}
+      {done ? (
+        <div className="results" role="dialog" aria-labelledby="results-title">
+          <h2 id="results-title">Round complete</h2>
+          <p data-testid="results-score">
+            {quiz.placed} / {quiz.total}
+          </p>
+          <p data-testid="results-time">{formatElapsed(elapsedMs)}</p>
+          <p data-testid="results-mistakes">
+            {quiz.mistakes} {quiz.mistakes === 1 ? "mistake" : "mistakes"}
+          </p>
+          <div className="results-actions">
+            <button
+              type="button"
+              className="mode-play"
+              onClick={() => setQuiz(startQuiz(mode, Math.random))}
+            >
+              Play again
+            </button>
+            <button type="button" className="ghost" onClick={onMenu}>
+              Menu
+            </button>
+          </div>
+        </div>
+      ) : null}
       <p className="hint">
-        Lit bodies are in play · gray is the rest of the map · scroll to zoom
+        Click the named body · gray is the rest of the map · scroll to zoom
       </p>
     </div>
   );

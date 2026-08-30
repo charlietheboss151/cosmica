@@ -18,7 +18,7 @@ describe("Cosmica prototype", () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole("button", { name: "Planets" }));
-    expect(screen.getByTestId("find-prompt").textContent).toMatch(/^FIND: /);
+    expect(screen.getByTestId("find-prompt").textContent).toMatch(/^Click on /);
     expect(screen.getByRole("button", { name: "Mercury" })).toBeEnabled();
     expect(document.querySelectorAll("text.label")).toHaveLength(0);
     expect(screen.queryByRole("button", { name: "Europa" })).not.toBeInTheDocument();
@@ -37,7 +37,7 @@ describe("Cosmica prototype", () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole("button", { name: "Moons" }));
-    expect(screen.getByTestId("find-prompt").textContent).toMatch(/^FIND: /);
+    expect(screen.getByTestId("find-prompt").textContent).toMatch(/^Click on /);
     expect(screen.getByRole("button", { name: "Europa" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Phobos" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Earth" })).toHaveAttribute(
@@ -56,7 +56,8 @@ describe("Cosmica prototype", () => {
     await user.click(screen.getByRole("button", { name: "Planets" }));
     expect(screen.queryByRole("button", { name: "Europa" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Moon" })).not.toBeInTheDocument();
-    expect(screen.getByTestId("score")).toHaveTextContent("0");
+    expect(screen.getByTestId("score")).toHaveTextContent("0 / 8");
+    expect(screen.getByTestId("timer")).toHaveTextContent(/^\d+:\d{2}$/);
   });
 
   it("scores a correct planet click and keeps the map as the answer", async () => {
@@ -64,13 +65,10 @@ describe("Cosmica prototype", () => {
     render(<App />);
     await user.click(screen.getByRole("button", { name: "Planets" }));
     const prompt = screen.getByTestId("find-prompt").textContent ?? "";
-    const target = prompt.replace("FIND: ", "");
-    const name =
-      target.charAt(0) + target.slice(1).toLowerCase();
+    const name = prompt.replace("Click on ", "");
     await user.click(screen.getByRole("button", { name }));
-    expect(screen.getByTestId("score")).toHaveTextContent("100");
-    expect(screen.getByTestId("streak")).toHaveTextContent("1");
-    expect(screen.getByTestId("feedback")).toHaveTextContent("CORRECT");
+    expect(screen.getByTestId("score")).toHaveTextContent("1 / 8");
+    expect(screen.getByTestId("find-prompt").textContent).not.toBe(prompt);
     expect(screen.queryByRole("radio")).not.toBeInTheDocument();
   });
 });

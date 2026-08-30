@@ -1,54 +1,75 @@
 import { describe, expect, it } from "vitest";
-import { applyClick, startRound } from "./game";
+import { catalog } from "./catalog";
+import {
+  applyClick,
+  formatElapsed,
+  startQuiz,
+} from "./game";
 
 const alwaysFirst = () => 0;
 
-describe("FIND round", () => {
-  it("asks the player to find a planet, never the Sun", () => {
-    const round = startRound(alwaysFirst);
-    expect(round.prompt).toBe("FIND: MERCURY");
-    expect(round.targetId).toBe("mercury");
-    expect(round.score).toBe(0);
-    expect(round.streak).toBe(0);
+function planetCount() {
+  return catalog.filter((object) => object.type === "planet").length;
+}
+
+describe("Seterra-style quiz", () => {
+  it("asks the player to click a planet, never the Sun", () => {
+    const quiz = startQuiz("planets", alwaysFirst, 0);
+    expect(quiz.currentId).not.toBe("sun");
+    expect(quiz.prompt).toMatch(/^Click on /);
+    expect(quiz.placed).toBe(0);
+    expect(quiz.total).toBe(planetCount());
+    expect(quiz.mistakes).toBe(0);
   });
 
-  it("awards 100 XP and grows the streak on a correct click", () => {
-    const after = applyClick(startRound(alwaysFirst), "mercury", alwaysFirst);
-    expect(after.feedback).toBe("correct");
-    expect(after.score).toBe(100);
-    expect(after.streak).toBe(1);
-    expect(after.targetId).not.toBe("mercury");
+  it("moves to a new body after a correct click and never repeats", () => {
+    let quiz = startQuiz("planets", () => 0.4, 1_000);
+    const seen: string[] = [];
+    while (quiz.currentId) {
+      expect(seen).not.toContain(quiz.currentId);
+      seen.push(quiz.currentId);
+      quiz = applyClick(quiz, quiz.currentId, 1_000 + seen.length * 250);
+    }
+    expect(seen).toHaveLength(planetCount());
+    expect(new Set(seen).size).toBe(planetCount());
+    expect(quiz.placed).toBe(planetCount());
+    expect(quiz.finishedAt).toBe(1_000 + planetCount() * 250);
+    expect(quiz.mistakes).toBe(0);
+  });
+
+  it("counts a wrong click as a mistake and stays on the same body", () => {
+    const quiz = startQuiz("planets", alwaysFirst, 0);
+    const target = quiz.currentId!;
+    const after = applyClick(quiz, target === "venus" ? "mars" : "venus", 500);
+    expect(after.currentId).toBe(target);
+    expect(after.mistakes).toBe(1);
+    expect(after.placed).toBe(0);
+    expect(after.lastResult).toBe("incorrect");
   });
 
   it("ignores clicks on bodies that are grayed out in this mode", () => {
-    const round = startRound(alwaysFirst);
-    const after = applyClick(round, "europa", alwaysFirst);
-    expect(after).toEqual(round);
+    const quiz = startQuiz("planets", alwaysFirst, 0);
+    const after = applyClick(quiz, "europa", 10);
+    expect(after).toEqual(quiz);
   });
 
-  it("asks the player to find a moon in Moons mode", () => {
-    const round = startRound(alwaysFirst, "moons");
-    expect(round.mode).toBe("moons");
-    expect(round.prompt).toBe("FIND: MOON");
-    expect(round.targetId).toBe("moon");
+  it("asks the player to click a moon in Moons mode", () => {
+    const quiz = startQuiz("moons", alwaysFirst, 0);
+    expect(quiz.mode).toBe("moons");
+    const target = catalog.find((object) => object.id === quiz.currentId);
+    expect(target?.type).toBe("moon");
+    expect(quiz.prompt.startsWith("Click on ")).toBe(true);
   });
 
   it("ignores planet clicks in Moons mode", () => {
-    const round = startRound(alwaysFirst, "moons");
-    const after = applyClick(round, "earth", alwaysFirst);
-    expect(after).toEqual(round);
+    const quiz = startQuiz("moons", alwaysFirst, 0);
+    const after = applyClick(quiz, "earth", 10);
+    expect(after).toEqual(quiz);
   });
 
-  it("resets the streak when the wrong object is clicked", () => {
-    const afterCorrect = applyClick(
-      startRound(alwaysFirst),
-      "mercury",
-      alwaysFirst,
-    );
-    const afterWrong = applyClick(afterCorrect, "sun", alwaysFirst);
-    expect(afterWrong.feedback).toBe("incorrect");
-    expect(afterWrong.score).toBe(100);
-    expect(afterWrong.streak).toBe(0);
-    expect(afterWrong.targetId).toBe(afterCorrect.targetId);
+  it("formats the timer as m:ss", () => {
+    expect(formatElapsed(0)).toBe("0:00");
+    expect(formatElapsed(5_000)).toBe("0:05");
+    expect(formatElapsed(65_000)).toBe("1:05");
   });
 });
