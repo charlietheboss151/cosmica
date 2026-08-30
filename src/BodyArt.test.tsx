@@ -1,21 +1,44 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { BODY_ART } from "./bodyArtAssets";
+import { BODY_ART, MOON_ART_IDS } from "./bodyArtAssets";
 import { BodyArt } from "./BodyArt";
 
 describe("cartoon body art", () => {
-  it("has a drawing for the Sun and every planet", () => {
+  it("has a drawing for the Sun, every planet, and every playable moon", () => {
     expect(Object.keys(BODY_ART).sort()).toEqual([
+      "ariel",
+      "callisto",
+      "deimos",
+      "dione",
       "earth",
+      "enceladus",
+      "europa",
+      "ganymede",
+      "iapetus",
+      "io",
       "jupiter",
       "mars",
       "mercury",
+      "mimas",
+      "miranda",
+      "moon",
       "neptune",
+      "oberon",
+      "phobos",
+      "rhea",
       "saturn",
       "sun",
+      "tethys",
+      "titan",
+      "titania",
+      "triton",
+      "umbriel",
       "uranus",
       "venus",
     ]);
+    for (const id of MOON_ART_IDS) {
+      expect(BODY_ART[id]).toBe(`/bodies/${id}.png`);
+    }
   });
 
   it("draws Earth from its cartoon sticker, not a flat blue disc", () => {
@@ -54,10 +77,23 @@ describe("cartoon body art", () => {
     expect(outer).toBeGreaterThan(inner);
   });
 
-  it("falls back to a simple disc for moons", () => {
+  it("draws moons from NASA photos instead of flat discs", () => {
     const { container } = render(
       <svg>
         <BodyArt id="europa" radius={10} color="#c9ddd8" />
+      </svg>,
+    );
+    expect(container.querySelector("image")).toHaveAttribute(
+      "href",
+      "/bodies/europa.png",
+    );
+    expect(container.querySelector("circle.disc")).toBeNull();
+  });
+
+  it("falls back to a simple disc for bodies without art", () => {
+    const { container } = render(
+      <svg>
+        <BodyArt id="ceres" radius={10} color="#9a9a9a" />
       </svg>,
     );
     expect(container.querySelector("image")).toBeNull();
