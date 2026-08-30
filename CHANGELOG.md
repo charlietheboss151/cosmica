@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.5] - 2026-08-30
+
+### Changed
+- Tightened the map layout so planets, moons, and celestial bodies sit closer together and the initial view fits more on screen without endless zooming.
+
 ## [0.15.4] - 2026-08-30
 
 ### Changed

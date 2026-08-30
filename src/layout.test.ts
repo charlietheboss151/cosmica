@@ -31,7 +31,7 @@ describe("compressed visual layout", () => {
     const e = layoutObject(europa);
     const separation = Math.hypot(e.x - j.x, e.y - j.y);
     expect(separation).toBeGreaterThan(jupiter.displaySize);
-    expect(separation).toBeLessThan(jupiter.displaySize + 90);
+    expect(separation).toBeLessThan(jupiter.displaySize + 80);
   });
 
   it("places the Asteroid Belt between Mars and Jupiter", () => {

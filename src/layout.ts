@@ -2,11 +2,18 @@ import { catalog, isHeliocentric, type SolarObject } from "./catalog";
 import type { Rng } from "./game";
 import {
   minBodyGap,
+  visualLocalOrbit,
   visualOrbit,
   type LayoutProfile,
 } from "./layoutProfile";
 
-export { layoutProfileForMode, visualOrbit, type LayoutProfile } from "./layoutProfile";
+export {
+  layoutProfileForMode,
+  LOCAL_ORBIT_SCALE,
+  visualLocalOrbit,
+  visualOrbit,
+  type LayoutProfile,
+} from "./layoutProfile";
 
 const MAX_SPAWN_ATTEMPTS = 200;
 
@@ -57,9 +64,10 @@ export function layoutAll(
     }
     const parent = object.parentId ? place(object.parentId) : { x: 0, y: 0, radius: 0 };
     const radians = (object.longitudeDeg * Math.PI) / 180;
+    const moonOrbit = visualLocalOrbit(object.localOrbit);
     const position = {
-      x: parent.x + Math.cos(radians) * object.localOrbit,
-      y: parent.y + Math.sin(radians) * object.localOrbit,
+      x: parent.x + Math.cos(radians) * moonOrbit,
+      y: parent.y + Math.sin(radians) * moonOrbit,
       radius: object.displaySize,
     };
     laid.set(id, position);
@@ -87,7 +95,7 @@ export function cameraFitRadius(
   profile: LayoutProfile = "compact",
 ): number {
   if (profile === "proportional") {
-    return visualOrbit(14, profile) * 1.04;
+    return visualOrbit(10, profile) * 1.06;
   }
   const jupiter = objects.find((object) => object.id === "jupiter");
   return visualOrbit(jupiter?.au ?? 5.2, profile) * 1.08;

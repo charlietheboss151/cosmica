@@ -31,6 +31,7 @@ import {
   orbitPhaseDeg,
   ORBIT_ANIMATION_PERIOD_MS,
   regionBand,
+  visualLocalOrbit,
   visualOrbit,
 } from "./layout";
 
@@ -392,7 +393,7 @@ export default function SolarSystemMap({
               <circle
                 key={`${moon.id}-orbit`}
                 className="orbit orbit-local"
-                r={moon.localOrbit}
+                r={visualLocalOrbit(moon.localOrbit)}
                 cx={at.x}
                 cy={at.y}
               />
