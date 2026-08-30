@@ -300,11 +300,11 @@ export function randomizeOrbitalPositions(
   return snapshot();
 }
 
-/** One full trip around an orbit ring during gameplay (~2 minutes). */
-export const ORBIT_ANIMATION_PERIOD_MS = 120_000;
+/** One full trip around an orbit ring during gameplay (~8 minutes). */
+export const ORBIT_ANIMATION_PERIOD_MS = 480_000;
 
-/** Moons lap their parent much faster than planets lap the Sun. */
-export const MOON_ORBIT_SPEED_MULTIPLIER = 8;
+/** Moons orbit their parent faster than planets lap the Sun, but stay slow enough to click. */
+export const MOON_ORBIT_SPEED_MULTIPLIER = 2;
 
 export function orbitPhaseDeg(
   elapsedMs: number,

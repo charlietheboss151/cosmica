@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.4] - 2026-08-30
+
+### Changed
+- Orbital motion during gameplay is much slower so planets and moons stay easy to click (planets ~8 minutes per lap, moons ~4 minutes).
+
 ## [0.15.3] - 2026-08-30
 
 ### Fixed

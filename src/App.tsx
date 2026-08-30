@@ -61,7 +61,7 @@ function Menu({ onPlay }: { onPlay: (config: PlayConfig) => void }) {
       <div className="menu-backdrop" aria-hidden="true">
         <div className="starfield" />
         <div className="menu-glow" />
-        <OrbitBackdrop className="orbit-backdrop-menu" />
+        <OrbitBackdrop className="orbit-backdrop-menu" speed={4} />
       </div>
       <div className="menu-panel">
         <header className="menu-brand">
