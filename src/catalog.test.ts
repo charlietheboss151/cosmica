@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { catalog, isLitInMode, isVisibleInMode } from "./catalog";
+import { catalog, displayRadius, isLitInMode, isVisibleInMode } from "./catalog";
 
 describe("solar system catalog", () => {
   it("includes the Sun, eight planets, and other bodies on the same map", () => {
@@ -50,12 +50,13 @@ describe("solar system catalog", () => {
     ]);
   });
 
-  it("hides moons in Planets mode and keeps other bodies grayed", () => {
+  it("shows tiny decorative moons in Planets mode and keeps other bodies grayed", () => {
     const europa = catalog.find((object) => object.id === "europa")!;
     const ceres = catalog.find((object) => object.id === "ceres")!;
     const belt = catalog.find((object) => object.id === "asteroid-belt")!;
-    expect(isVisibleInMode(europa, "planets")).toBe(false);
-    expect(isVisibleInMode(ceres, "planets")).toBe(true);
+    expect(isVisibleInMode(europa, "planets")).toBe(true);
+    expect(isLitInMode(europa, "planets")).toBe(false);
+    expect(displayRadius(europa, "planets")).toBeLessThan(europa.displaySize);
     expect(isLitInMode(ceres, "planets")).toBe(false);
     expect(isLitInMode(belt, "planets")).toBe(false);
   });

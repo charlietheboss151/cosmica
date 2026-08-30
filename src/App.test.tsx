@@ -50,12 +50,13 @@ describe("Cosmica prototype", () => {
     );
   });
 
-  it("does not show moons to click in Planets mode", async () => {
+  it("shows tiny decorative moons in Planets mode without making them clickable", async () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole("button", { name: "Planets" }));
     expect(screen.queryByRole("button", { name: "Europa" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Moon" })).not.toBeInTheDocument();
+    expect(document.querySelectorAll(".body-moon-decor").length).toBeGreaterThan(0);
     expect(screen.getByTestId("score")).toHaveTextContent("0 / 8");
     expect(screen.getByTestId("timer")).toHaveTextContent(/^\d+:\d{2}$/);
   });

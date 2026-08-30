@@ -401,10 +401,21 @@ export function isHeliocentric(object: SolarObject): boolean {
 }
 
 export function isVisibleInMode(object: SolarObject, mode: GameMode): boolean {
-  if (mode === "planets" && object.type === "moon") {
-    return false;
-  }
   return true;
+}
+
+/** Moons in Planets mode are tiny scenery, not quiz targets. */
+export const PLANETS_MODE_MOON_SCALE = 0.32;
+
+export function isDecorativeMoon(object: SolarObject, mode: GameMode): boolean {
+  return mode === "planets" && object.type === "moon";
+}
+
+export function displayRadius(object: SolarObject, mode: GameMode): number {
+  if (isDecorativeMoon(object, mode)) {
+    return Math.max(3, object.displaySize * PLANETS_MODE_MOON_SCALE);
+  }
+  return object.displaySize;
 }
 
 export function isLitInMode(object: SolarObject, mode: GameMode): boolean {

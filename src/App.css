@@ -415,6 +415,15 @@ h1 {
   fill: #5e6a7e;
 }
 
+.body-moon-decor .body-art {
+  filter: none;
+  opacity: 0.72;
+}
+
+.body-moon-decor .disc {
+  stroke-width: 1.5;
+}
+
 .body-lit:hover .disc,
 .body-lit:focus-visible .disc {
   stroke: #fff;
