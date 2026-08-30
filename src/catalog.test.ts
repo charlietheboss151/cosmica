@@ -61,6 +61,46 @@ describe("solar system catalog", () => {
     expect(isLitInMode(belt, "planets")).toBe(false);
   });
 
+  it("lights dwarf planets, asteroids, comets, and regions in Celestial mode", () => {
+    expect(isLitInMode(catalog.find((object) => object.id === "eris")!, "celestial")).toBe(
+      true,
+    );
+    expect(isLitInMode(catalog.find((object) => object.id === "vesta")!, "celestial")).toBe(
+      true,
+    );
+    expect(isLitInMode(catalog.find((object) => object.id === "halley")!, "celestial")).toBe(
+      true,
+    );
+    expect(
+      isLitInMode(catalog.find((object) => object.id === "scattered-disc")!, "celestial"),
+    ).toBe(true);
+    expect(isLitInMode(catalog.find((object) => object.id === "earth")!, "celestial")).toBe(
+      false,
+    );
+  });
+
+  it("keeps hard-only objects out of Celestial mode until hard mode is on", () => {
+    const sedna = catalog.find((object) => object.id === "sedna")!;
+    expect(isLitInMode(sedna, "celestial")).toBe(false);
+    expect(isLitInMode(sedna, "celestial", { hardMode: true })).toBe(true);
+  });
+
+  it("adds every moon in hard Moons mode", () => {
+    const base = catalog.filter((object) => isLitInMode(object, "moons")).length;
+    const all = catalog.filter((object) =>
+      isLitInMode(object, "moons", { hardMode: true }),
+    ).length;
+    expect(all).toBeGreaterThan(base);
+    expect(isLitInMode(catalog.find((object) => object.id === "charon")!, "moons")).toBe(
+      false,
+    );
+    expect(
+      isLitInMode(catalog.find((object) => object.id === "charon")!, "moons", {
+        hardMode: true,
+      }),
+    ).toBe(true);
+  });
+
   it("includes each planet's main moons", () => {
     const moonsOf = (parentId: string) =>
       catalog
@@ -71,7 +111,9 @@ describe("solar system catalog", () => {
     expect(moonsOf("venus")).toEqual([]);
     expect(moonsOf("earth")).toEqual(["moon"]);
     expect(moonsOf("mars")).toEqual(["deimos", "phobos"]);
+    expect(moonsOf("pluto")).toEqual(["charon", "hydra", "kerberos", "nix", "styx"]);
     expect(moonsOf("jupiter")).toEqual([
+      "amalthea",
       "callisto",
       "europa",
       "ganymede",
@@ -80,8 +122,10 @@ describe("solar system catalog", () => {
     expect(moonsOf("saturn")).toEqual([
       "dione",
       "enceladus",
+      "hyperion",
       "iapetus",
       "mimas",
+      "phoebe",
       "rhea",
       "tethys",
       "titan",
@@ -90,10 +134,11 @@ describe("solar system catalog", () => {
       "ariel",
       "miranda",
       "oberon",
+      "puck",
       "titania",
       "umbriel",
     ]);
-    expect(moonsOf("neptune")).toEqual(["triton"]);
+    expect(moonsOf("neptune")).toEqual(["nereid", "proteus", "triton"]);
   });
 
   it("lights only moons in Moons mode and keeps planets visible but gray", () => {

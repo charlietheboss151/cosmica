@@ -182,6 +182,46 @@ function hasBodyOverlaps(bodies: SolarObject[]): boolean {
   return false;
 }
 
+function shuffleIds(ids: string[], rng: Rng): string[] {
+  const next = [...ids];
+  for (let i = next.length - 1; i > 0; i -= 1) {
+    const j = Math.min(i, Math.floor(rng() * (i + 1)));
+    const a = next[i]!;
+    next[i] = next[j]!;
+    next[j] = a;
+  }
+  return next;
+}
+
+function overlapsAtAngle(
+  target: SolarObject,
+  longitudeDeg: number,
+  bodies: SolarObject[],
+): boolean {
+  const trial = bodies.map((object) =>
+    object.id === target.id ? { ...object, longitudeDeg } : object,
+  );
+  const laid = layoutAll(trial);
+  const at = laid.get(target.id);
+  if (!at) {
+    return false;
+  }
+  for (const other of bodies) {
+    if (other.id === target.id || !shouldCheckOverlap(target, other)) {
+      continue;
+    }
+    const otherAt = laid.get(other.id);
+    if (!otherAt) {
+      continue;
+    }
+    const distance = Math.hypot(at.x - otherAt.x, at.y - otherAt.y);
+    if (distance <= at.radius + otherAt.radius + MIN_BODY_GAP) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export function randomizeOrbitalPositions(
   bodies: SolarObject[] = catalog,
   rng: Rng,
@@ -205,7 +245,34 @@ export function randomizeOrbitalPositions(
     }
   }
 
-  return bodies;
+  const placed = new Map(bodies.map((object) => [object.id, { ...object }]));
+  const order = shuffleIds(
+    orbital
+      .slice()
+      .sort((a, b) => b.displaySize - a.displaySize)
+      .map((object) => object.id),
+    rng,
+  );
+  const snapshot = () => bodies.map((object) => placed.get(object.id)!);
+
+  for (const id of order) {
+    const target = placed.get(id)!;
+    let angle = rng() * 360;
+    let found = false;
+    for (let tryIndex = 0; tryIndex < 120; tryIndex += 1) {
+      angle = (angle + 137.508 + rng() * 48) % 360;
+      target.longitudeDeg = angle;
+      if (!overlapsAtAngle(target, angle, snapshot())) {
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      target.longitudeDeg = rng() * 360;
+    }
+  }
+
+  return snapshot();
 }
 
 /** One full trip around an orbit ring during gameplay (~2 minutes). */

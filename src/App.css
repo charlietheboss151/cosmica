@@ -125,6 +125,25 @@ h1 {
   margin-bottom: 22px;
 }
 
+.mode-card-wrap {
+  display: grid;
+  gap: 8px;
+}
+
+.mode-hard-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 4px;
+  font-size: 0.84rem;
+  color: #8ea0bc;
+  cursor: pointer;
+}
+
+.mode-hard-toggle input {
+  accent-color: #7aa2ff;
+}
+
 .mode-card,
 .mode-play,
 .mode-soon,

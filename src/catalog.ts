@@ -1,5 +1,16 @@
-export type ObjectType = "star" | "planet" | "moon" | "dwarf-planet" | "region";
-export type GameMode = "planets" | "moons";
+export type ObjectType =
+  | "star"
+  | "planet"
+  | "moon"
+  | "dwarf-planet"
+  | "asteroid"
+  | "comet"
+  | "region";
+export type GameMode = "planets" | "moons" | "celestial";
+
+export type ModeOptions = {
+  hardMode: boolean;
+};
 
 export type SolarObject = {
   id: string;
@@ -13,19 +24,24 @@ export type SolarObject = {
   displaySize: number;
   color: string;
   difficulty: number;
+  hardOnly: boolean;
 };
 
+import { EXTRA_CATALOG } from "./extraCatalog";
+
 function body(
-  partial: Omit<SolarObject, "localOrbit" | "difficulty" | "innerAu"> & {
+  partial: Omit<SolarObject, "localOrbit" | "difficulty" | "innerAu" | "hardOnly"> & {
     localOrbit?: number;
     difficulty?: number;
     innerAu?: number;
+    hardOnly?: boolean;
   },
 ): SolarObject {
   return {
     localOrbit: 0,
     innerAu: 0,
     difficulty: 1,
+    hardOnly: false,
     ...partial,
   };
 }
@@ -394,13 +410,26 @@ export const catalog: SolarObject[] = [
     displaySize: 14,
     color: "#c5d0d8",
   }),
+  ...EXTRA_CATALOG.map((entry) =>
+    body({
+      ...entry,
+      innerAu: entry.innerAu ?? 0,
+      localOrbit: entry.localOrbit ?? 0,
+    }),
+  ),
 ];
 
 export function isHeliocentric(object: SolarObject): boolean {
-  return object.type === "star" || object.type === "planet" || object.type === "dwarf-planet";
+  return (
+    object.type === "star" ||
+    object.type === "planet" ||
+    object.type === "dwarf-planet" ||
+    object.type === "asteroid" ||
+    object.type === "comet"
+  );
 }
 
-export function isVisibleInMode(object: SolarObject, mode: GameMode): boolean {
+export function isVisibleInMode(_object: SolarObject, _mode: GameMode): boolean {
   return true;
 }
 
@@ -408,7 +437,7 @@ export function isVisibleInMode(object: SolarObject, mode: GameMode): boolean {
 export const PLANETS_MODE_MOON_SCALE = 0.32;
 
 export function isDecorativeMoon(object: SolarObject, mode: GameMode): boolean {
-  return mode === "planets" && object.type === "moon";
+  return (mode === "planets" || mode === "celestial") && object.type === "moon";
 }
 
 export function displayRadius(object: SolarObject, mode: GameMode): number {
@@ -418,14 +447,38 @@ export function displayRadius(object: SolarObject, mode: GameMode): number {
   return object.displaySize;
 }
 
-export function isLitInMode(object: SolarObject, mode: GameMode): boolean {
+export function isLitInMode(
+  object: SolarObject,
+  mode: GameMode,
+  options: ModeOptions = { hardMode: false },
+): boolean {
+  if (object.hardOnly && !options.hardMode) {
+    return false;
+  }
   if (mode === "planets") {
     return object.type === "star" || object.type === "planet";
   }
   if (mode === "moons") {
     return object.type === "moon";
   }
+  if (mode === "celestial") {
+    return (
+      object.type === "dwarf-planet" ||
+      object.type === "asteroid" ||
+      object.type === "comet" ||
+      object.type === "region"
+    );
+  }
   return false;
+}
+
+export function playableInMode(
+  mode: GameMode,
+  options: ModeOptions = { hardMode: false },
+): SolarObject[] {
+  return catalog.filter(
+    (object) => isLitInMode(object, mode, options) && object.type !== "star",
+  );
 }
 
 export function objectById(id: string): SolarObject | undefined {

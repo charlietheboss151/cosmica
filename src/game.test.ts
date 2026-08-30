@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { catalog } from "./catalog";
+import {
+  catalog,
+  objectById,
+  playableInMode,
+} from "./catalog";
 import {
   applyClick,
   formatElapsed,
@@ -134,5 +138,18 @@ describe("Seterra-style quiz", () => {
     expect(after.wrongFlashId).toBe(wrong);
     expect(after.marks[wrong]).toBeUndefined();
     expect(after.marks[target]).toBeUndefined();
+  });
+
+  it("asks for celestial bodies and regions in Celestial mode", () => {
+    const quiz = startQuiz("celestial", alwaysFirst, 0);
+    const target = objectById(quiz.currentId!);
+    expect(target?.type).toMatch(/dwarf-planet|asteroid|comet|region/);
+    expect(quiz.total).toBe(playableInMode("celestial").length);
+  });
+
+  it("adds hard-only objects when hard mode is enabled", () => {
+    const base = startQuiz("celestial", alwaysFirst, 0).total;
+    const hard = startQuiz("celestial", alwaysFirst, 0, true).total;
+    expect(hard).toBeGreaterThan(base);
   });
 });

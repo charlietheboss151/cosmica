@@ -61,6 +61,17 @@ describe("Cosmica prototype", () => {
     expect(screen.getByTestId("timer")).toHaveTextContent(/^\d+:\d{2}$/);
   });
 
+  it("starts Celestial bodies mode from the menu", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole("button", { name: "Celestial bodies" }));
+    expect(screen.getByTestId("find-prompt").textContent).toMatch(/^Click on /);
+    expect(screen.getByRole("button", { name: "Mercury" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+  });
+
   it("shows the clicked planet name after a wrong click", async () => {
     const user = userEvent.setup();
     render(<App />);

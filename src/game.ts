@@ -1,7 +1,7 @@
 import {
-  catalog,
   isLitInMode,
   objectById,
+  playableInMode,
   type GameMode,
   type SolarObject,
 } from "./catalog";
@@ -14,6 +14,7 @@ export const MAX_GUESSES_PER_BODY = 3;
 
 export type QuizState = {
   mode: GameMode;
+  hardMode: boolean;
   currentId: string | null;
   remainingIds: string[];
   foundIds: string[];
@@ -30,13 +31,8 @@ export type QuizState = {
   prompt: string;
 };
 
-function playable(mode: GameMode): SolarObject[] {
-  return catalog.filter(
-    (object) =>
-      isLitInMode(object, mode) &&
-      object.type !== "star" &&
-      object.type !== "region",
-  );
+function playable(mode: GameMode, hardMode: boolean): SolarObject[] {
+  return playableInMode(mode, { hardMode });
 }
 
 function shuffle<T>(items: T[], rng: Rng): T[] {
@@ -78,15 +74,17 @@ export function startQuiz(
   mode: GameMode,
   rng: Rng,
   now: number = Date.now(),
+  hardMode: boolean = false,
 ): QuizState {
   const ids = shuffle(
-    playable(mode).map((object) => object.id),
+    playable(mode, hardMode).map((object) => object.id),
     rng,
   );
   const currentId = ids[0] ?? null;
   const remainingIds = ids.slice(1);
   return {
     mode,
+    hardMode,
     currentId,
     remainingIds,
     foundIds: [],
@@ -139,7 +137,10 @@ export function applyClick(
     return state;
   }
   const clicked = objectById(objectId);
-  if (!clicked || !isLitInMode(clicked, state.mode)) {
+  if (
+    !clicked ||
+    !isLitInMode(clicked, state.mode, { hardMode: state.hardMode })
+  ) {
     return state;
   }
   if (objectId !== state.currentId) {

@@ -26,6 +26,7 @@ import {
 type Props = {
   objects: SolarObject[];
   mode: GameMode;
+  hardMode?: boolean;
   foundIds?: string[];
   marks?: Record<string, string>;
   flashId?: string | null;
@@ -37,6 +38,7 @@ type Props = {
 export default function SolarSystemMap({
   objects,
   mode,
+  hardMode = false,
   foundIds = [],
   marks = {},
   flashId = null,
@@ -106,16 +108,26 @@ export default function SolarSystemMap({
     setCamera(fitCamera(cameraFitRadius(objects), size.width, size.height));
   }, [objects, size]);
 
+  const modeOptions = { hardMode };
   const visible = displayObjects.filter((object) => isVisibleInMode(object, mode));
   const positions = layoutAll(displayObjects);
   const heliocentricOrbits = visible.filter(
-    (object) => isHeliocentric(object) && object.au > 0,
+    (object) =>
+      isHeliocentric(object) &&
+      object.au > 0 &&
+      isLitInMode(object, mode, modeOptions),
   );
   const moonOrbits = visible.filter(
-    (object) => object.type === "moon" && mode !== "planets",
+    (object) =>
+      object.type === "moon" &&
+      mode !== "planets" &&
+      mode !== "celestial" &&
+      isLitInMode(object, mode, modeOptions),
   );
   const drawOrder = [...visible].sort(
-    (a, b) => Number(isLitInMode(a, mode)) - Number(isLitInMode(b, mode)),
+    (a, b) =>
+      Number(isLitInMode(a, mode, modeOptions)) -
+      Number(isLitInMode(b, mode, modeOptions)),
   );
 
   const onPointerDown = (event: PointerEvent<SVGSVGElement>) => {
@@ -173,7 +185,7 @@ export default function SolarSystemMap({
             <circle
               key={`${object.id}-orbit`}
               className={
-                isLitInMode(object, mode) ? "orbit" : "orbit orbit-dim"
+                isLitInMode(object, mode, modeOptions) ? "orbit" : "orbit orbit-dim"
               }
               r={visualOrbit(object.au)}
               cx={0}
@@ -198,7 +210,7 @@ export default function SolarSystemMap({
           })}
           {drawOrder.map((object) => {
             const laid = positions.get(object.id) ?? layoutObject(object, displayObjects);
-            const lit = isLitInMode(object, mode);
+            const lit = isLitInMode(object, mode, modeOptions);
             const decorMoon = isDecorativeMoon(object, mode);
             const radius = displayRadius(object, mode);
             if (object.type === "region") {

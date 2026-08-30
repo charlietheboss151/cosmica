@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-08-30
+
+### Added
+- **Celestial bodies** mode: all five official dwarf planets, famous asteroids, comets, and solar-system regions (belts, scattered disc, heliosphere, trojans).
+- **Hard mode** checkboxes on Moons and Celestial bodies — optional extra moons, dwarf-planet candidates, and lesser-known asteroids.
+
+### Changed
+- Moons hard mode adds Charon, Amalthea, Hyperion, and other moons beyond the original major set.
+
 ## [0.14.3] - 2026-08-30
 
 ### Changed
