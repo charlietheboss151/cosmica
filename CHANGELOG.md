@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-08-30
+
+### Changed
+- Wrong clicks flash a brief red ring instead of leaving it on the map, and show the name of the body you clicked.
+
 ## [0.9.0] - 2026-08-30
 
 ### Changed

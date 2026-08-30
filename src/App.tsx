@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { catalog, type GameMode } from "./catalog";
+import { catalog, objectById, type GameMode } from "./catalog";
 import {
   applyClick,
   formatElapsed,
@@ -67,6 +67,25 @@ function Play({ mode, onMenu }: { mode: GameMode; onMenu: () => void }) {
   };
 
   useEffect(() => {
+    if (!quiz.wrongFlashId) {
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      setQuiz((current) =>
+        current.wrongFlashId
+          ? {
+              ...current,
+              wrongFlashId: null,
+              lastResult:
+                current.lastResult === "incorrect" ? null : current.lastResult,
+            }
+          : current,
+      );
+    }, 750);
+    return () => window.clearTimeout(timer);
+  }, [quiz.wrongFlashId]);
+
+  useEffect(() => {
     if (quiz.finishedAt !== null) {
       return;
     }
@@ -90,6 +109,7 @@ function Play({ mode, onMenu }: { mode: GameMode; onMenu: () => void }) {
         mode={mode}
         foundIds={quiz.foundIds}
         marks={quiz.marks}
+        flashId={quiz.wrongFlashId}
         onSelect={choose}
       />
       <header className="hud">
@@ -114,7 +134,9 @@ function Play({ mode, onMenu }: { mode: GameMode; onMenu: () => void }) {
           className={`feedback feedback-${quiz.lastResult}`}
           data-testid="feedback"
         >
-          {quiz.lastResult === "correct" ? "CORRECT" : "INCORRECT"}
+          {quiz.lastResult === "correct"
+            ? "CORRECT"
+            : objectById(quiz.wrongFlashId ?? "")?.name ?? "Wrong"}
         </p>
       ) : null}
       {done ? (

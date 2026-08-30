@@ -20,6 +20,7 @@ export type QuizState = {
   mistakes: number;
   triesOnCurrent: number;
   marks: Record<string, TryMark>;
+  wrongFlashId: string | null;
   startedAt: number;
   finishedAt: number | null;
   lastResult: "correct" | "incorrect" | null;
@@ -94,6 +95,7 @@ export function startQuiz(
     mistakes: 0,
     triesOnCurrent: 0,
     marks: {},
+    wrongFlashId: null,
     startedAt: now,
     finishedAt: currentId ? null : now,
     lastResult: null,
@@ -118,7 +120,7 @@ export function applyClick(
       ...state,
       mistakes: state.mistakes + 1,
       triesOnCurrent: state.triesOnCurrent + 1,
-      marks: { ...state.marks, [objectId]: "red" },
+      wrongFlashId: objectId,
       lastResult: "incorrect",
     };
   }
@@ -133,6 +135,7 @@ export function applyClick(
     foundIds,
     placed: foundIds.length,
     triesOnCurrent: 0,
+    wrongFlashId: null,
     marks: { ...state.marks, [objectId]: markForTries(tries) },
     finishedAt: finished ? now : null,
     lastResult: "correct",

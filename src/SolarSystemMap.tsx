@@ -16,6 +16,7 @@ type Props = {
   mode: GameMode;
   foundIds?: string[];
   marks?: Record<string, string>;
+  flashId?: string | null;
   onSelect: (id: string) => void;
 };
 
@@ -24,6 +25,7 @@ export default function SolarSystemMap({
   mode,
   foundIds = [],
   marks = {},
+  flashId = null,
   onSelect,
 }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -231,6 +233,13 @@ export default function SolarSystemMap({
                 {marks[object.id] ? (
                   <circle
                     className={`try-ring try-ring-${marks[object.id]}`}
+                    r={laid.radius + 6}
+                    fill="none"
+                  />
+                ) : null}
+                {flashId === object.id ? (
+                  <circle
+                    className="try-ring try-ring-flash"
                     r={laid.radius + 6}
                     fill="none"
                   />

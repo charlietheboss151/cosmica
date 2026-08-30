@@ -60,6 +60,19 @@ describe("Cosmica prototype", () => {
     expect(screen.getByTestId("timer")).toHaveTextContent(/^\d+:\d{2}$/);
   });
 
+  it("shows the clicked planet name after a wrong click", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole("button", { name: "Planets" }));
+    const prompt = screen.getByTestId("find-prompt").textContent ?? "";
+    const target = prompt.replace("Click on ", "");
+    const decoy = target === "Venus" ? "Mars" : "Venus";
+    await user.click(screen.getByRole("button", { name: decoy }));
+    expect(screen.getByTestId("feedback")).toHaveTextContent(decoy);
+    expect(document.querySelector(".try-ring-flash")).not.toBeNull();
+    expect(document.querySelector(".try-ring-red")).toBeNull();
+  });
+
   it("scores a correct planet click and keeps the map as the answer", async () => {
     const user = userEvent.setup();
     render(<App />);

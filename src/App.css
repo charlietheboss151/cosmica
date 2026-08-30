@@ -177,6 +177,28 @@ h1 {
   stroke: #ff5a5a;
 }
 
+.try-ring-flash {
+  stroke: #ff5a5a;
+  animation: try-ring-flash 0.65s ease-out forwards;
+}
+
+@keyframes try-ring-flash {
+  0% {
+    stroke-opacity: 1;
+    stroke-width: 3;
+  }
+
+  70% {
+    stroke-opacity: 1;
+    stroke-width: 4;
+  }
+
+  100% {
+    stroke-opacity: 0;
+    stroke-width: 5;
+  }
+}
+
 .corona {
   opacity: 0.32;
   pointer-events: none;

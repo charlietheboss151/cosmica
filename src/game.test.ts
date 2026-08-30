@@ -99,12 +99,13 @@ describe("Seterra-style quiz", () => {
     expect(quiz.marks[fourth]).toBe("red");
   });
 
-  it("puts a red ring on a planet clicked by mistake", () => {
+  it("flashes the wrong body without leaving a red ring", () => {
     const quiz = startQuiz("planets", alwaysFirst, 0);
     const target = quiz.currentId!;
     const wrong = target === "venus" ? "mars" : "venus";
     const after = applyClick(quiz, wrong, 1);
-    expect(after.marks[wrong]).toBe("red");
+    expect(after.wrongFlashId).toBe(wrong);
+    expect(after.marks[wrong]).toBeUndefined();
     expect(after.marks[target]).toBeUndefined();
   });
 });
