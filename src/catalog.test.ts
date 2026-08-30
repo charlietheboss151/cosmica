@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { catalog, isLitInMode } from "./catalog";
+import { catalog, isLitInMode, isVisibleInMode } from "./catalog";
 
 describe("solar system catalog", () => {
   it("includes the Sun, eight planets, and other bodies on the same map", () => {
@@ -50,11 +50,12 @@ describe("solar system catalog", () => {
     ]);
   });
 
-  it("keeps moons, dwarf planets, and regions on the map but unlit in Planets mode", () => {
+  it("hides moons in Planets mode and keeps other bodies grayed", () => {
     const europa = catalog.find((object) => object.id === "europa")!;
     const ceres = catalog.find((object) => object.id === "ceres")!;
     const belt = catalog.find((object) => object.id === "asteroid-belt")!;
-    expect(isLitInMode(europa, "planets")).toBe(false);
+    expect(isVisibleInMode(europa, "planets")).toBe(false);
+    expect(isVisibleInMode(ceres, "planets")).toBe(true);
     expect(isLitInMode(ceres, "planets")).toBe(false);
     expect(isLitInMode(belt, "planets")).toBe(false);
   });

@@ -8,7 +8,7 @@ import {
   type Camera,
 } from "./camera";
 import { BodyArt } from "./BodyArt";
-import { isHeliocentric, isLitInMode, type GameMode, type SolarObject } from "./catalog";
+import { isHeliocentric, isLitInMode, isVisibleInMode, type GameMode, type SolarObject } from "./catalog";
 import { beltDust, cameraFitRadius, layoutAll, layoutObject, regionBand, visualOrbit } from "./layout";
 
 type Props = {
@@ -88,12 +88,13 @@ export default function SolarSystemMap({ objects, mode, onSelect }: Props) {
     );
   };
 
+  const visible = objects.filter((object) => isVisibleInMode(object, mode));
   const positions = layoutAll(objects);
-  const heliocentricOrbits = objects.filter(
+  const heliocentricOrbits = visible.filter(
     (object) => isHeliocentric(object) && object.au > 0,
   );
-  const moonOrbits = objects.filter((object) => object.type === "moon");
-  const drawOrder = [...objects].sort(
+  const moonOrbits = visible.filter((object) => object.type === "moon");
+  const drawOrder = [...visible].sort(
     (a, b) => Number(isLitInMode(a, mode)) - Number(isLitInMode(b, mode)),
   );
 

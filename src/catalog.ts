@@ -301,6 +301,13 @@ export function isHeliocentric(object: SolarObject): boolean {
   return object.type === "star" || object.type === "planet" || object.type === "dwarf-planet";
 }
 
+export function isVisibleInMode(object: SolarObject, mode: GameMode): boolean {
+  if (mode === "planets" && object.type === "moon") {
+    return false;
+  }
+  return true;
+}
+
 export function isLitInMode(object: SolarObject, mode: GameMode): boolean {
   if (mode === "planets") {
     return object.type === "star" || object.type === "planet";

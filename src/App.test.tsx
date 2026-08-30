@@ -20,23 +20,19 @@ describe("Cosmica prototype", () => {
     await user.click(screen.getByRole("button", { name: "Planets" }));
     expect(screen.getByTestId("find-prompt").textContent).toMatch(/^FIND: /);
     expect(screen.getByRole("button", { name: "Mercury" })).toBeEnabled();
-    expect(screen.getByRole("button", { name: "Europa" })).toHaveAttribute(
-      "aria-disabled",
-      "true",
-    );
+    expect(screen.queryByRole("button", { name: "Europa" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Asteroid Belt" })).toHaveAttribute(
       "aria-disabled",
       "true",
     );
   });
 
-  it("does not score a grayed-out moon in Planets mode", async () => {
+  it("does not show moons to click in Planets mode", async () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole("button", { name: "Planets" }));
-    const prompt = screen.getByTestId("find-prompt").textContent;
-    await user.click(screen.getByRole("button", { name: "Europa" }));
-    expect(screen.getByTestId("find-prompt").textContent).toBe(prompt);
+    expect(screen.queryByRole("button", { name: "Europa" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Moon" })).not.toBeInTheDocument();
     expect(screen.getByTestId("score")).toHaveTextContent("0");
   });
 

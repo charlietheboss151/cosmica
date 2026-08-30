@@ -2,7 +2,7 @@
 
 Cosmica is a browser game: an interactive 2D map of the Solar System that you learn by navigating. Find objects on the map — it is the answer interface, not a multiple-choice quiz.
 
-This version is a **Planets** prototype on the **full map**. The Sun and planets use cartoon sticker art. The first view shows the Sun through Jupiter; zoom for the outer system. Belts stay grayed. Only planets (plus the Sun) light up as FIND targets.
+This version is a **Planets** prototype on the **full map**. The Sun and planets use cartoon sticker art. Moons are hidden in Planets mode so the map stays readable; they will return in Moons mode. The first view shows the Sun through Jupiter. Belts stay grayed. Only planets (plus the Sun) light up as FIND targets.
 
 ## How to run it
 
