@@ -25,15 +25,23 @@ describe("Cosmica prototype", () => {
     expect(screen.queryByRole("button", { name: "Asteroid Belt" })).not.toBeInTheDocument();
   });
 
-  it("lets the player pick Moons mode from the menu", () => {
+  it("opens a Moons setup screen from the menu", async () => {
+    const user = userEvent.setup();
     render(<App />);
-    expect(screen.getByRole("button", { name: "Moons" })).toBeEnabled();
+    await user.click(screen.getByRole("button", { name: "Moons" }));
+    expect(screen.getByRole("heading", { name: "Moons" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "All planet moons" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Mars" })).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
   });
 
   it("starts a FIND round with moons lit and planets grayed", async () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole("button", { name: "Moons" }));
+    await user.click(screen.getByRole("button", { name: "All planet moons" }));
     expect(screen.getByTestId("find-prompt").textContent).toMatch(/^Click on /);
     expect(screen.getByRole("button", { name: "Europa" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Phobos" })).toBeEnabled();
@@ -87,6 +95,7 @@ describe("Cosmica prototype", () => {
 
     await user.click(screen.getByRole("button", { name: "Menu" }));
     await user.click(screen.getByRole("button", { name: "Moons" }));
+    await user.click(screen.getByRole("button", { name: "All planet moons" }));
     const heliocentric = [...document.querySelectorAll("circle.orbit")].filter(
       (node) => !node.classList.contains("orbit-local"),
     );
@@ -97,10 +106,9 @@ describe("Cosmica prototype", () => {
   it("lets players choose planets and quiz only those moons", async () => {
     const user = userEvent.setup();
     render(<App />);
-    for (const name of ["Earth", "Jupiter", "Saturn", "Uranus", "Neptune"]) {
-      await user.click(screen.getByRole("checkbox", { name }));
-    }
     await user.click(screen.getByRole("button", { name: "Moons" }));
+    await user.click(screen.getByRole("button", { name: "Mars" }));
+    await user.click(screen.getByRole("button", { name: "Play selected (2 moons)" }));
     expect(screen.getByTestId("score")).toHaveTextContent("0 / 2");
     expect(screen.getByRole("button", { name: "Phobos" })).toBeEnabled();
     expect(screen.queryByRole("button", { name: "Europa" })).not.toBeInTheDocument();

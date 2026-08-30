@@ -1,5 +1,11 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from "react";
-import { catalog, objectById, parentsWithMoons, type GameMode } from "./catalog";
+import {
+  catalog,
+  moonsOf,
+  objectById,
+  parentsWithMoons,
+  type GameMode,
+} from "./catalog";
 import {
   applyClick,
   formatElapsed,
@@ -18,6 +24,12 @@ type PlayConfig = {
   parentIds?: string[];
 };
 
+type Screen = "menu" | "moons-setup" | PlayConfig;
+
+function isPlayConfig(screen: Screen): screen is PlayConfig {
+  return screen !== "menu" && screen !== "moons-setup";
+}
+
 const PLAYABLE_MODES: {
   id: GameMode;
   label: string;
@@ -28,8 +40,7 @@ const PLAYABLE_MODES: {
   {
     id: "moons",
     label: "Moons",
-    description: "Find the major moons of the outer worlds",
-    hardLabel: "Include all moons",
+    description: "Find moons orbiting the planets",
   },
   {
     id: "celestial",
@@ -45,60 +56,37 @@ const COMING_SOON = [
   { id: "everything", label: "Everything" },
 ] as const;
 
-function Menu({ onPlay }: { onPlay: (config: PlayConfig) => void }) {
+function MenuBackdrop() {
+  return (
+    <div className="menu-backdrop" aria-hidden="true">
+      <div className="starfield" />
+      <div className="menu-glow" />
+      <OrbitBackdrop className="orbit-backdrop-menu" speed={4} />
+    </div>
+  );
+}
+
+function Menu({
+  onPlay,
+  onMoonsSetup,
+}: {
+  onPlay: (config: PlayConfig) => void;
+  onMoonsSetup: () => void;
+}) {
   const [hardByMode, setHardByMode] = useState<Record<GameMode, boolean>>({
     planets: false,
     moons: false,
     celestial: false,
   });
-  const moonParentOptions = useMemo(
-    () => parentsWithMoons({ hardMode: hardByMode.moons }),
-    [hardByMode.moons],
-  );
-  const [moonParents, setMoonParents] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(parentsWithMoons({ hardMode: false }).map((parent) => [parent.id, true])),
-  );
-
-  useEffect(() => {
-    setMoonParents((current) => {
-      const next: Record<string, boolean> = {};
-      for (const parent of moonParentOptions) {
-        next[parent.id] = current[parent.id] ?? true;
-      }
-      return next;
-    });
-  }, [moonParentOptions]);
-
-  const selectedMoonParents = moonParentOptions.filter(
-    (parent) => moonParents[parent.id] ?? true,
-  );
 
   const toggleHard = (mode: GameMode, event: ChangeEvent<HTMLInputElement>) => {
     event.stopPropagation();
     setHardByMode((current) => ({ ...current, [mode]: event.target.checked }));
   };
 
-  const toggleMoonParent = (parentId: string, event: ChangeEvent<HTMLInputElement>) => {
-    event.stopPropagation();
-    setMoonParents((current) => ({ ...current, [parentId]: event.target.checked }));
-  };
-
   const playMode = (mode: (typeof PLAYABLE_MODES)[number]) => {
     if (mode.id === "moons") {
-      if (selectedMoonParents.length === 0) {
-        return;
-      }
-      const allParentIds = moonParentOptions.map((parent) => parent.id);
-      const selectedParentIds = selectedMoonParents.map((parent) => parent.id);
-      const filtered =
-        selectedParentIds.length < allParentIds.length
-          ? selectedParentIds
-          : undefined;
-      onPlay({
-        mode: mode.id,
-        hardMode: hardByMode[mode.id],
-        parentIds: filtered,
-      });
+      onMoonsSetup();
       return;
     }
     onPlay({ mode: mode.id, hardMode: hardByMode[mode.id] });
@@ -106,11 +94,7 @@ function Menu({ onPlay }: { onPlay: (config: PlayConfig) => void }) {
 
   return (
     <main className="menu">
-      <div className="menu-backdrop" aria-hidden="true">
-        <div className="starfield" />
-        <div className="menu-glow" />
-        <OrbitBackdrop className="orbit-backdrop-menu" speed={4} />
-      </div>
+      <MenuBackdrop />
       <div className="menu-panel">
         <header className="menu-brand">
           <p className="eyebrow">Learn the Solar System by navigating it</p>
@@ -126,30 +110,11 @@ function Menu({ onPlay }: { onPlay: (config: PlayConfig) => void }) {
                 type="button"
                 className="mode-card"
                 aria-label={mode.label}
-                disabled={mode.id === "moons" && selectedMoonParents.length === 0}
                 onClick={() => playMode(mode)}
               >
                 <span className="mode-card-label">{mode.label}</span>
                 <span className="mode-card-desc">{mode.description}</span>
               </button>
-              {mode.id === "moons" ? (
-                <fieldset className="mode-moon-parents" aria-label="Choose planets">
-                  <legend className="mode-moon-parents-heading">Planets</legend>
-                  <div className="mode-moon-parents-grid">
-                    {moonParentOptions.map((parent) => (
-                      <label key={parent.id} className="mode-parent-toggle">
-                        <input
-                          type="checkbox"
-                          checked={moonParents[parent.id] ?? true}
-                          onChange={(event) => toggleMoonParent(parent.id, event)}
-                          onClick={(event) => event.stopPropagation()}
-                        />
-                        <span>{parent.name}</span>
-                      </label>
-                    ))}
-                  </div>
-                </fieldset>
-              ) : null}
               {mode.hardLabel ? (
                 <label className="mode-hard-toggle">
                   <input
@@ -171,6 +136,128 @@ function Menu({ onPlay }: { onPlay: (config: PlayConfig) => void }) {
               <li key={mode.id}>{mode.label}</li>
             ))}
           </ul>
+        </section>
+      </div>
+    </main>
+  );
+}
+
+function MoonsSetup({
+  onBack,
+  onPlay,
+}: {
+  onBack: () => void;
+  onPlay: (config: PlayConfig) => void;
+}) {
+  const [hardMode, setHardMode] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(() => new Set());
+
+  const parentOptions = useMemo(
+    () => parentsWithMoons({ hardMode }),
+    [hardMode],
+  );
+
+  useEffect(() => {
+    setSelected((current) => {
+      const valid = new Set(parentOptions.map((parent) => parent.id));
+      return new Set([...current].filter((id) => valid.has(id)));
+    });
+  }, [parentOptions]);
+
+  const selectedIds = [...selected];
+  const moonCount = selectedIds.reduce(
+    (total, parentId) => total + moonsOf(parentId, { hardMode }).length,
+    0,
+  );
+
+  const toggleParent = (parentId: string) => {
+    setSelected((current) => {
+      const next = new Set(current);
+      if (next.has(parentId)) {
+        next.delete(parentId);
+      } else {
+        next.add(parentId);
+      }
+      return next;
+    });
+  };
+
+  const playAll = () => {
+    onPlay({ mode: "moons", hardMode, parentIds: undefined });
+  };
+
+  const playSelected = () => {
+    if (selectedIds.length === 0) {
+      return;
+    }
+    const allParentIds = parentOptions.map((parent) => parent.id);
+    const parentIds =
+      selectedIds.length < allParentIds.length ? selectedIds : undefined;
+    onPlay({ mode: "moons", hardMode, parentIds });
+  };
+
+  return (
+    <main className="menu">
+      <MenuBackdrop />
+      <div className="menu-panel menu-panel-sub">
+        <header className="menu-sub-header">
+          <button type="button" className="ghost menu-back" onClick={onBack}>
+            Back
+          </button>
+          <h2 className="menu-sub-title">Moons</h2>
+          <p className="menu-sub-lede">Pick one planet, mix a few, or play them all.</p>
+        </header>
+        <section className="menu-sub-play" aria-label="Moons options">
+          <button
+            type="button"
+            className="mode-card"
+            aria-label="All planet moons"
+            onClick={playAll}
+          >
+            <span className="mode-card-label">All planet moons</span>
+            <span className="mode-card-desc">
+              Every major moon around Earth through Neptune
+              {hardMode ? " plus obscure moons" : ""}
+            </span>
+          </button>
+          <div className="menu-sub-section">
+            <p className="menu-sub-heading">Pick planets</p>
+            <div className="mode-planet-chips" role="group" aria-label="Planets">
+              {parentOptions.map((parent) => {
+                const on = selected.has(parent.id);
+                return (
+                  <button
+                    key={parent.id}
+                    type="button"
+                    className={`mode-planet-chip${on ? " mode-planet-chip-on" : ""}`}
+                    aria-pressed={on}
+                    aria-label={parent.name}
+                    onClick={() => toggleParent(parent.id)}
+                  >
+                    {parent.name}
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              type="button"
+              className="mode-play menu-sub-play-btn"
+              disabled={selected.size === 0}
+              onClick={playSelected}
+            >
+              {selected.size === 0
+                ? "Play selected"
+                : `Play selected (${moonCount} ${moonCount === 1 ? "moon" : "moons"})`}
+            </button>
+          </div>
+          <button
+            type="button"
+            className={`mode-option-toggle${hardMode ? " mode-option-toggle-on" : ""}`}
+            aria-pressed={hardMode}
+            onClick={() => setHardMode((current) => !current)}
+          >
+            Include obscure moons
+          </button>
         </section>
       </div>
     </main>
@@ -309,9 +396,19 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
 }
 
 export default function App() {
-  const [screen, setScreen] = useState<"menu" | PlayConfig>("menu");
-  if (screen !== "menu") {
+  const [screen, setScreen] = useState<Screen>("menu");
+  if (isPlayConfig(screen)) {
     return <Play config={screen} onMenu={() => setScreen("menu")} />;
   }
-  return <Menu onPlay={setScreen} />;
+  if (screen === "moons-setup") {
+    return (
+      <MoonsSetup onBack={() => setScreen("menu")} onPlay={(config) => setScreen(config)} />
+    );
+  }
+  return (
+    <Menu
+      onPlay={(config) => setScreen(config)}
+      onMoonsSetup={() => setScreen("moons-setup")}
+    />
+  );
 }

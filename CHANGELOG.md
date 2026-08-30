@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.16.1] - 2026-08-30
+
+### Changed
+- Moons mode opens a setup screen: pick any combination of planets, play selected moons, or use All planet moons.
+
 ## [0.16.0] - 2026-08-30
 
 ### Added
