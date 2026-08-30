@@ -156,6 +156,27 @@ h1 {
   fill: transparent;
 }
 
+.try-ring {
+  pointer-events: none;
+  stroke-width: 3;
+}
+
+.try-ring-green {
+  stroke: #5dff9a;
+}
+
+.try-ring-yellow {
+  stroke: #ffe566;
+}
+
+.try-ring-orange {
+  stroke: #ff9a3d;
+}
+
+.try-ring-red {
+  stroke: #ff5a5a;
+}
+
 .corona {
   opacity: 0.32;
   pointer-events: none;

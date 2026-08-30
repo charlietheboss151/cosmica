@@ -81,6 +81,7 @@ function Play({ mode, onMenu }: { mode: GameMode; onMenu: () => void }) {
         objects={objects}
         mode={mode}
         foundIds={quiz.foundIds}
+        marks={quiz.marks}
         onSelect={choose}
       />
       <header className="hud">

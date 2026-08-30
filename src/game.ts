@@ -8,6 +8,8 @@ import {
 
 export type Rng = () => number;
 
+export type TryMark = "green" | "yellow" | "orange" | "red";
+
 export type QuizState = {
   mode: GameMode;
   currentId: string | null;
@@ -16,6 +18,8 @@ export type QuizState = {
   placed: number;
   total: number;
   mistakes: number;
+  triesOnCurrent: number;
+  marks: Record<string, TryMark>;
   startedAt: number;
   finishedAt: number | null;
   lastResult: "correct" | "incorrect" | null;
@@ -50,6 +54,18 @@ function promptFor(id: string | null): string {
   return object ? `Click on ${object.name}` : "Round complete";
 }
 
+export function markForTries(tries: number): TryMark {
+  if (tries <= 1) {
+    return "green";
+  }
+  if (tries === 2) {
+    return "yellow";
+  }
+  if (tries === 3) {
+    return "orange";
+  }
+  return "red";
+}
 export function formatElapsed(ms: number): string {
   const totalSeconds = Math.max(0, Math.floor(ms / 1000));
   const minutes = Math.floor(totalSeconds / 60);
@@ -76,6 +92,8 @@ export function startQuiz(
     placed: 0,
     total: ids.length,
     mistakes: 0,
+    triesOnCurrent: 0,
+    marks: {},
     startedAt: now,
     finishedAt: currentId ? null : now,
     lastResult: null,
@@ -96,17 +114,26 @@ export function applyClick(
     return state;
   }
   if (objectId !== state.currentId) {
-    return { ...state, mistakes: state.mistakes + 1, lastResult: "incorrect" };
+    return {
+      ...state,
+      mistakes: state.mistakes + 1,
+      triesOnCurrent: state.triesOnCurrent + 1,
+      marks: { ...state.marks, [objectId]: "red" },
+      lastResult: "incorrect",
+    };
   }
   const foundIds = [...state.foundIds, objectId];
   const [currentId, ...remainingIds] = state.remainingIds;
   const finished = !currentId;
+  const tries = state.triesOnCurrent + 1;
   return {
     ...state,
     currentId: currentId ?? null,
     remainingIds,
     foundIds,
     placed: foundIds.length,
+    triesOnCurrent: 0,
+    marks: { ...state.marks, [objectId]: markForTries(tries) },
     finishedAt: finished ? now : null,
     lastResult: "correct",
     prompt: promptFor(currentId ?? null),

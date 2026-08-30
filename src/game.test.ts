@@ -72,4 +72,39 @@ describe("Seterra-style quiz", () => {
     expect(formatElapsed(5_000)).toBe("0:05");
     expect(formatElapsed(65_000)).toBe("1:05");
   });
+
+  it("marks a first-try find with green, then yellow, orange, and red", () => {
+    const other = (id: string) => (id === "venus" ? "mars" : "venus");
+    let quiz = startQuiz("planets", alwaysFirst, 0);
+    const first = quiz.currentId!;
+    quiz = applyClick(quiz, first, 1);
+    expect(quiz.marks[first]).toBe("green");
+
+    const second = quiz.currentId!;
+    quiz = applyClick(quiz, other(second), 2);
+    quiz = applyClick(quiz, second, 3);
+    expect(quiz.marks[second]).toBe("yellow");
+
+    const third = quiz.currentId!;
+    quiz = applyClick(quiz, other(third), 4);
+    quiz = applyClick(quiz, other(third), 5);
+    quiz = applyClick(quiz, third, 6);
+    expect(quiz.marks[third]).toBe("orange");
+
+    const fourth = quiz.currentId!;
+    quiz = applyClick(quiz, other(fourth), 7);
+    quiz = applyClick(quiz, other(fourth), 8);
+    quiz = applyClick(quiz, other(fourth), 9);
+    quiz = applyClick(quiz, fourth, 10);
+    expect(quiz.marks[fourth]).toBe("red");
+  });
+
+  it("puts a red ring on a planet clicked by mistake", () => {
+    const quiz = startQuiz("planets", alwaysFirst, 0);
+    const target = quiz.currentId!;
+    const wrong = target === "venus" ? "mars" : "venus";
+    const after = applyClick(quiz, wrong, 1);
+    expect(after.marks[wrong]).toBe("red");
+    expect(after.marks[target]).toBeUndefined();
+  });
 });

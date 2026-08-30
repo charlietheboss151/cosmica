@@ -69,6 +69,7 @@ describe("Cosmica prototype", () => {
     await user.click(screen.getByRole("button", { name }));
     expect(screen.getByTestId("score")).toHaveTextContent("1 / 8");
     expect(screen.getByTestId("find-prompt").textContent).not.toBe(prompt);
+    expect(document.querySelector(".try-ring-green")).not.toBeNull();
     expect(screen.queryByRole("radio")).not.toBeInTheDocument();
   });
 });

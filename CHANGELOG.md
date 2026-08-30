@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-08-30
+
+### Added
+
+- Placed bodies get a small ring: green on the first try, yellow on the second, orange on the third, and red after that or when you click the wrong body.
+
 ## [0.8.0] - 2026-08-30
 
 ### Changed
