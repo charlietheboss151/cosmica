@@ -474,17 +474,20 @@ export function isQuizTarget(
   return isLitInMode(object, mode, options);
 }
 
-/** Orbit rings only for lit bodies in the active mode (not grayed scenery). */
+/** Orbit rings for lit quiz bodies; in Moons mode grayed planets keep solar orbit guides. */
 export function showsOrbitLine(
   object: SolarObject,
   mode: GameMode,
   options: ModeOptions = { hardMode: false },
 ): boolean {
+  if (object.type === "moon") {
+    return mode === "moons" && isShownLit(object, mode, options);
+  }
+  if (mode === "moons" && object.type === "planet" && object.au > 0) {
+    return true;
+  }
   if (!isShownLit(object, mode, options)) {
     return false;
-  }
-  if (object.type === "moon") {
-    return mode === "moons";
   }
   return isHeliocentric(object) && object.au > 0;
 }

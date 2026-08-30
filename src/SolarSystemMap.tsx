@@ -438,7 +438,11 @@ export default function SolarSystemMap({
           {heliocentricOrbits.map((object) => (
             <circle
               key={`${object.id}-orbit`}
-              className="orbit"
+              className={
+                mode === "moons" && object.type === "planet"
+                  ? "orbit orbit-dim"
+                  : "orbit"
+              }
               r={visualOrbit(object.au, layoutProfile)}
               cx={0}
               cy={0}

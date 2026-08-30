@@ -85,15 +85,16 @@ describe("solar system catalog", () => {
     expect(isLitInMode(sedna, "celestial", { hardMode: true })).toBe(true);
   });
 
-  it("draws orbit lines only for lit bodies in the active group", () => {
+  it("draws orbit lines for lit bodies and planet guides in Moons mode", () => {
     const mercury = catalog.find((object) => object.id === "mercury")!;
     const europa = catalog.find((object) => object.id === "europa")!;
     const ceres = catalog.find((object) => object.id === "ceres")!;
     const belt = catalog.find((object) => object.id === "asteroid-belt")!;
     expect(showsOrbitLine(mercury, "planets")).toBe(true);
     expect(showsOrbitLine(europa, "planets")).toBe(false);
-    expect(showsOrbitLine(mercury, "moons")).toBe(false);
+    expect(showsOrbitLine(mercury, "moons")).toBe(true);
     expect(showsOrbitLine(europa, "moons")).toBe(true);
+    expect(showsOrbitLine(ceres, "moons")).toBe(false);
     expect(showsOrbitLine(ceres, "celestial")).toBe(true);
     expect(showsOrbitLine(mercury, "celestial")).toBe(false);
     expect(showsOrbitLine(belt, "celestial")).toBe(false);
