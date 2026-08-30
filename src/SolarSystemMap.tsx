@@ -7,6 +7,7 @@ import {
   zoomCamera,
   type Camera,
 } from "./camera";
+import { BodyArt } from "./BodyArt";
 import { isHeliocentric, isLitInMode, type GameMode, type SolarObject } from "./catalog";
 import { beltDust, cameraFitRadius, layoutAll, layoutObject, regionBand, visualOrbit } from "./layout";
 
@@ -210,51 +211,14 @@ export default function SolarSystemMap({ objects, mode, onSelect }: Props) {
                   }
                 }}
               >
-                {object.type === "star" ? (
-                  <circle
-                    className="corona"
-                    r={laid.radius * 1.24}
-                    fill={object.color}
-                  />
-                ) : null}
-                {object.id === "saturn" ? (
-                  <ellipse
-                    className="ring"
-                    rx={laid.radius * 2.15}
-                    ry={laid.radius * 0.62}
-                  />
-                ) : null}
                 <circle
                   className="hit"
                   r={Math.max(laid.radius, 12)}
                 />
-                <circle
-                  className="disc"
-                  r={laid.radius}
-                  fill={object.color}
-                />
-                {object.id === "jupiter" ? (
-                  <>
-                    <ellipse
-                      className="band"
-                      cy={-laid.radius * 0.18}
-                      rx={laid.radius * 0.94}
-                      ry={laid.radius * 0.16}
-                    />
-                    <ellipse
-                      className="band band-dark"
-                      cy={laid.radius * 0.22}
-                      rx={laid.radius * 0.9}
-                      ry={laid.radius * 0.13}
-                    />
-                  </>
-                ) : null}
-                <ellipse
-                  className="shine"
-                  cx={-laid.radius * 0.28}
-                  cy={-laid.radius * 0.34}
-                  rx={laid.radius * 0.36}
-                  ry={laid.radius * 0.24}
+                <BodyArt
+                  id={object.id}
+                  radius={laid.radius}
+                  color={object.color}
                 />
                 <text className="label" y={laid.radius + 22}>
                   {object.name}

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-08-30
+
+### Changed
+
+- Sun and eight planets use cartoon sticker drawings (craters, continents, bands, rings, storms) instead of flat colored circles.
+
 ## [0.5.1] - 2026-08-30
 
 ### Fixed

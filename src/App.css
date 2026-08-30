@@ -190,6 +190,11 @@ h1 {
   opacity: 0.35;
 }
 
+.body-dim .body-art {
+  filter: grayscale(1) brightness(0.7);
+  opacity: 0.55;
+}
+
 .body-dim .disc {
   fill: #6a7384 !important;
   stroke: #3d4658;
