@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { catalog } from "./catalog";
-import { cameraFitRadius, layoutObject, regionBand, visualOrbit } from "./layout";
+import { cameraFitRadius, layoutObject, randomizeOrbitalPositions, regionBand, visualOrbit } from "./layout";
 
 describe("compressed visual layout", () => {
   it("pins the Sun at the origin", () => {
@@ -74,5 +74,61 @@ describe("compressed visual layout", () => {
     expect(fit).toBeGreaterThan(visualOrbit(mars.au));
     expect(fit).toBeGreaterThan(visualOrbit(jupiter.au));
     expect(fit).toBeLessThan(visualOrbit(saturn.au));
+  });
+});
+
+describe("randomizeOrbitalPositions", () => {
+  it("leaves the Sun and belt regions unchanged", () => {
+    const randomized = randomizeOrbitalPositions(catalog, Math.random);
+    const sun = randomized.find((object) => object.id === "sun")!;
+    const belt = randomized.find((object) => object.id === "asteroid-belt")!;
+    const catalogBelt = catalog.find((object) => object.id === "asteroid-belt")!;
+    expect(sun.longitudeDeg).toBe(0);
+    expect(belt.longitudeDeg).toBe(catalogBelt.longitudeDeg);
+  });
+
+  it("randomizes at least one planet away from its catalog angle", () => {
+    const randomized = randomizeOrbitalPositions(catalog, Math.random);
+    const planets = randomized.filter((object) => object.type === "planet");
+    const moved = planets.some((object) => {
+      const original = catalog.find((entry) => entry.id === object.id)!;
+      return object.longitudeDeg !== original.longitudeDeg;
+    });
+    expect(moved).toBe(true);
+  });
+
+  it("places randomized planets on their orbit rings without overlapping", () => {
+    const randomized = randomizeOrbitalPositions(catalog, () => 0.37);
+    const worlds = randomized.filter(
+      (object) => object.type === "star" || object.type === "planet",
+    );
+    const laid = worlds.map((object) => ({
+      object,
+      at: layoutObject(object, randomized),
+    }));
+    for (let i = 0; i < laid.length; i += 1) {
+      for (let j = i + 1; j < laid.length; j += 1) {
+        const a = laid[i]!;
+        const b = laid[j]!;
+        const distance = Math.hypot(a.at.x - b.at.x, a.at.y - b.at.y);
+        expect(
+          distance,
+          `${a.object.name} vs ${b.object.name}`,
+        ).toBeGreaterThan(a.at.radius + b.at.radius + 12);
+      }
+    }
+  });
+
+  it("changes planet angles between rounds with a different rng sequence", () => {
+    let seed = 1;
+    const rng = () => {
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      return seed / 0x1_0000_0000;
+    };
+    const first = randomizeOrbitalPositions(catalog, rng);
+    const second = randomizeOrbitalPositions(catalog, rng);
+    const firstEarth = first.find((object) => object.id === "earth")!.longitudeDeg;
+    const secondEarth = second.find((object) => object.id === "earth")!.longitudeDeg;
+    expect(firstEarth).not.toBe(secondEarth);
   });
 });

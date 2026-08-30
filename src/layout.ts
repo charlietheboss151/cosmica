@@ -1,4 +1,8 @@
 import { catalog, isHeliocentric, type SolarObject } from "./catalog";
+import type { Rng } from "./game";
+
+const MIN_BODY_GAP = 12;
+const MAX_SPAWN_ATTEMPTS = 200;
 
 export type LaidOutObject = {
   x: number;
@@ -99,4 +103,64 @@ export function layoutObject(
   bodies: SolarObject[] = catalog,
 ): LaidOutObject {
   return layoutAll(bodies).get(object.id) ?? heliocentricLayout(object);
+}
+
+function shouldCheckOverlap(a: SolarObject, b: SolarObject): boolean {
+  if (a.type === "region" || b.type === "region") {
+    return false;
+  }
+  if (a.parentId === b.id || b.parentId === a.id) {
+    return false;
+  }
+  return true;
+}
+
+function hasBodyOverlaps(bodies: SolarObject[]): boolean {
+  const laid = layoutAll(bodies);
+  const physical = bodies.filter((object) => object.type !== "region");
+  for (let i = 0; i < physical.length; i += 1) {
+    for (let j = i + 1; j < physical.length; j += 1) {
+      const first = physical[i]!;
+      const second = physical[j]!;
+      if (!shouldCheckOverlap(first, second)) {
+        continue;
+      }
+      const a = laid.get(first.id);
+      const b = laid.get(second.id);
+      if (!a || !b) {
+        continue;
+      }
+      const distance = Math.hypot(a.x - b.x, a.y - b.y);
+      if (distance <= a.radius + b.radius + MIN_BODY_GAP) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+export function randomizeOrbitalPositions(
+  bodies: SolarObject[] = catalog,
+  rng: Rng,
+): SolarObject[] {
+  const orbital = bodies.filter(
+    (object) => object.type !== "star" && object.type !== "region",
+  );
+  if (orbital.length === 0) {
+    return bodies;
+  }
+
+  for (let attempt = 0; attempt < MAX_SPAWN_ATTEMPTS; attempt += 1) {
+    const randomized = bodies.map((object) => {
+      if (object.type === "star" || object.type === "region") {
+        return object;
+      }
+      return { ...object, longitudeDeg: rng() * 360 };
+    });
+    if (!hasBodyOverlaps(randomized)) {
+      return randomized;
+    }
+  }
+
+  return bodies;
 }

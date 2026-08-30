@@ -6,6 +6,7 @@ import {
   startQuiz,
   type QuizState,
 } from "./game";
+import { randomizeOrbitalPositions } from "./layout";
 import SolarSystemMap from "./SolarSystemMap";
 import "./App.css";
 
@@ -52,11 +53,18 @@ function Menu({ onPlay }: { onPlay: (mode: GameMode) => void }) {
 }
 
 function Play({ mode, onMenu }: { mode: GameMode; onMenu: () => void }) {
-  const objects = catalog;
+  const [objects, setObjects] = useState(() =>
+    randomizeOrbitalPositions(catalog, Math.random),
+  );
   const [quiz, setQuiz] = useState<QuizState>(() =>
     startQuiz(mode, Math.random),
   );
   const [now, setNow] = useState(() => Date.now());
+
+  const replay = () => {
+    setObjects(randomizeOrbitalPositions(catalog, Math.random));
+    setQuiz(startQuiz(mode, Math.random));
+  };
 
   useEffect(() => {
     if (quiz.finishedAt !== null) {
@@ -123,7 +131,7 @@ function Play({ mode, onMenu }: { mode: GameMode; onMenu: () => void }) {
             <button
               type="button"
               className="mode-play"
-              onClick={() => setQuiz(startQuiz(mode, Math.random))}
+              onClick={replay}
             >
               Play again
             </button>

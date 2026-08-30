@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-08-30
+
+### Changed
+- Planets and moons spawn at a random point along their orbit each round so players learn positions, not memorized spots.
+
 ## [0.8.1] - 2026-08-30
 
 ### Added
