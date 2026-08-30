@@ -78,6 +78,22 @@ describe("Cosmica prototype", () => {
     expect(screen.getByRole("button", { name: "Kuiper Belt" })).toBeInTheDocument();
   });
 
+  it("draws orbit lines only for lit bodies in the active group", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole("button", { name: "Planets" }));
+    expect(document.querySelectorAll(".belt-orbit").length).toBe(0);
+    expect(document.querySelectorAll("circle.orbit").length).toBe(8);
+
+    await user.click(screen.getByRole("button", { name: "Menu" }));
+    await user.click(screen.getByRole("button", { name: "Moons" }));
+    const heliocentric = [...document.querySelectorAll("circle.orbit")].filter(
+      (node) => !node.classList.contains("orbit-local"),
+    );
+    expect(heliocentric.length).toBe(0);
+    expect(document.querySelectorAll("circle.orbit-local").length).toBeGreaterThan(0);
+  });
+
   it("shows the clicked planet name after a wrong click", async () => {
     const user = userEvent.setup();
     render(<App />);

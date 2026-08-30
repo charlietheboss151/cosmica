@@ -14,10 +14,10 @@ import { AsteroidBeltArt } from "./AsteroidBeltArt";
 import {
   displayRadius,
   isDecorativeMoon,
-  isHeliocentric,
   isQuizTarget,
   isShownLit,
   isVisibleInMode,
+  showsOrbitLine,
   type GameMode,
   type SolarObject,
 } from "./catalog";
@@ -188,19 +188,15 @@ export default function SolarSystemMap({
   const visible = displayObjects.filter((object) => isVisibleInMode(object, mode));
   const positions = layoutAll(displayObjects, layoutProfile);
   const heliocentricOrbits = visible.filter(
-    (object) =>
-      isHeliocentric(object) &&
-      object.au > 0 &&
-      isQuizTarget(object, mode, modeOptions),
+    (object) => showsOrbitLine(object, mode, modeOptions) && object.type !== "moon",
   );
   const moonOrbits = visible.filter(
-    (object) =>
-      object.type === "moon" &&
-      mode !== "planets" &&
-      mode !== "celestial" &&
-      isQuizTarget(object, mode, modeOptions),
+    (object) => object.type === "moon" && showsOrbitLine(object, mode, modeOptions),
   );
   const regions = visible.filter((object) => object.type === "region");
+  const litRegions = regions.filter((object) =>
+    isShownLit(object, mode, modeOptions),
+  );
   const bodies = [...visible.filter((object) => object.type !== "region")].sort(
     (a, b) =>
       Number(isShownLit(a, mode, modeOptions)) -
@@ -460,7 +456,7 @@ export default function SolarSystemMap({
               />
             );
           })}
-          {regions.map(renderRegionVisual)}
+          {litRegions.map(renderRegionVisual)}
           {regions.map(renderRegionHit)}
           {bodies.map(renderBody)}
         </g>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { catalog, displayRadius, isLitInMode, isShownLit, isVisibleInMode } from "./catalog";
+import { catalog, displayRadius, isLitInMode, isShownLit, isVisibleInMode, showsOrbitLine } from "./catalog";
 
 describe("solar system catalog", () => {
   it("includes the Sun, eight planets, and other bodies on the same map", () => {
@@ -83,6 +83,21 @@ describe("solar system catalog", () => {
     const sedna = catalog.find((object) => object.id === "sedna")!;
     expect(isLitInMode(sedna, "celestial")).toBe(false);
     expect(isLitInMode(sedna, "celestial", { hardMode: true })).toBe(true);
+  });
+
+  it("draws orbit lines only for lit bodies in the active group", () => {
+    const mercury = catalog.find((object) => object.id === "mercury")!;
+    const europa = catalog.find((object) => object.id === "europa")!;
+    const ceres = catalog.find((object) => object.id === "ceres")!;
+    const belt = catalog.find((object) => object.id === "asteroid-belt")!;
+    expect(showsOrbitLine(mercury, "planets")).toBe(true);
+    expect(showsOrbitLine(europa, "planets")).toBe(false);
+    expect(showsOrbitLine(mercury, "moons")).toBe(false);
+    expect(showsOrbitLine(europa, "moons")).toBe(true);
+    expect(showsOrbitLine(ceres, "celestial")).toBe(true);
+    expect(showsOrbitLine(mercury, "celestial")).toBe(false);
+    expect(showsOrbitLine(belt, "celestial")).toBe(false);
+    expect(showsOrbitLine(belt, "planets")).toBe(false);
   });
 
   it("adds every moon in hard Moons mode", () => {

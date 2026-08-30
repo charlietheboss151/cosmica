@@ -474,6 +474,21 @@ export function isQuizTarget(
   return isLitInMode(object, mode, options);
 }
 
+/** Orbit rings only for lit bodies in the active mode (not grayed scenery). */
+export function showsOrbitLine(
+  object: SolarObject,
+  mode: GameMode,
+  options: ModeOptions = { hardMode: false },
+): boolean {
+  if (!isShownLit(object, mode, options)) {
+    return false;
+  }
+  if (object.type === "moon") {
+    return mode === "moons";
+  }
+  return isHeliocentric(object) && object.au > 0;
+}
+
 export function isLitInMode(
   object: SolarObject,
   mode: GameMode,

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.7] - 2026-08-30
+
+### Changed
+- Orbit lines appear only for lit bodies in the active mode. Grayed scenery and belt regions no longer draw orbit rings.
+
 ## [0.15.6] - 2026-08-30
 
 ### Added
