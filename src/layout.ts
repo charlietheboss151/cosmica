@@ -36,6 +36,11 @@ export function layoutAll(bodies: SolarObject[] = catalog): Map<string, LaidOutO
     if (!object) {
       return { x: 0, y: 0, radius: 0 };
     }
+    if (object.type === "region") {
+      const position = { x: 0, y: 0, radius: 0 };
+      laid.set(id, position);
+      return position;
+    }
     if (isHeliocentric(object)) {
       const position = heliocentricLayout(object);
       laid.set(id, position);
@@ -56,6 +61,39 @@ export function layoutAll(bodies: SolarObject[] = catalog): Map<string, LaidOutO
     place(object.id);
   }
   return laid;
+}
+
+export function regionBand(object: SolarObject): { inner: number; outer: number } {
+  return {
+    inner: visualOrbit(object.innerAu),
+    outer: visualOrbit(object.au),
+  };
+}
+
+export function cameraFitRadius(objects: SolarObject[]): number {
+  const radii = objects
+    .filter((object) => object.type === "planet" && object.au > 0)
+    .map((object) => visualOrbit(object.au));
+  return Math.max(...radii, 1);
+}
+
+export function beltDust(
+  inner: number,
+  outer: number,
+  count: number,
+): { x: number; y: number; r: number }[] {
+  const dots = [];
+  for (let i = 0; i < count; i += 1) {
+    const angle = i * 2.399;
+    const t = (Math.sin(i * 12.989) + 1) / 2;
+    const radius = inner + (outer - inner) * t;
+    dots.push({
+      x: Math.cos(angle) * radius,
+      y: Math.sin(angle) * radius,
+      r: 0.7 + (i % 4) * 0.35,
+    });
+  }
+  return dots;
 }
 
 export function layoutObject(

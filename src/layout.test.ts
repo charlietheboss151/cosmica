@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { catalog } from "./catalog";
-import { layoutObject } from "./layout";
+import { cameraFitRadius, layoutObject, regionBand, visualOrbit } from "./layout";
 
 describe("compressed visual layout", () => {
   it("pins the Sun at the origin", () => {
@@ -31,6 +31,24 @@ describe("compressed visual layout", () => {
     const e = layoutObject(europa);
     const separation = Math.hypot(e.x - j.x, e.y - j.y);
     expect(separation).toBeGreaterThan(14);
-    expect(separation).toBeLessThan(70);
+    expect(separation).toBeLessThan(110);
+  });
+
+  it("places the Asteroid Belt between Mars and Jupiter", () => {
+    const belt = catalog.find((object) => object.id === "asteroid-belt")!;
+    const mars = visualOrbit(catalog.find((object) => object.id === "mars")!.au);
+    const jupiter = visualOrbit(
+      catalog.find((object) => object.id === "jupiter")!.au,
+    );
+    const { inner, outer } = regionBand(belt);
+    expect(inner).toBeGreaterThan(mars);
+    expect(outer).toBeLessThan(jupiter);
+  });
+
+  it("fits the first view to the planets so they stay large on screen", () => {
+    const neptune = catalog.find((object) => object.id === "neptune")!;
+    const kuiper = catalog.find((object) => object.id === "kuiper-belt")!;
+    expect(cameraFitRadius(catalog)).toBeCloseTo(visualOrbit(neptune.au));
+    expect(cameraFitRadius(catalog)).toBeLessThan(visualOrbit(kuiper.au));
   });
 });

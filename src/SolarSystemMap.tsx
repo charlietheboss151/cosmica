@@ -8,7 +8,7 @@ import {
   type Camera,
 } from "./camera";
 import { isHeliocentric, isLitInMode, type GameMode, type SolarObject } from "./catalog";
-import { layoutAll, layoutObject, visualOrbit } from "./layout";
+import { beltDust, cameraFitRadius, layoutAll, layoutObject, regionBand, visualOrbit } from "./layout";
 
 type Props = {
   objects: SolarObject[];
@@ -41,12 +41,7 @@ export default function SolarSystemMap({ objects, mode, onSelect }: Props) {
     if (fitted.current || size.width < 2 || size.height < 2) {
       return;
     }
-    const maxRadius = Math.max(
-      ...objects
-        .filter((object) => isHeliocentric(object) && object.au > 0)
-        .map((object) => visualOrbit(object.au)),
-      1,
-    );
+    const maxRadius = cameraFitRadius(objects);
     fitted.current = true;
     setCamera(fitCamera(maxRadius, size.width, size.height));
   }, [objects, size]);
@@ -141,6 +136,52 @@ export default function SolarSystemMap({ objects, mode, onSelect }: Props) {
           {drawOrder.map((object) => {
             const laid = positions.get(object.id) ?? layoutObject(object, objects);
             const lit = isLitInMode(object, mode);
+            if (object.type === "region") {
+              const { inner, outer } = regionBand(object);
+              const mid = (inner + outer) / 2;
+              const width = Math.max(outer - inner, 6);
+              const dust = beltDust(
+                inner,
+                outer,
+                object.id === "asteroid-belt" ? 64 : object.id === "kuiper-belt" ? 40 : 28,
+              );
+              return (
+                <g
+                  key={object.id}
+                  className={`body body-region ${lit ? "body-lit" : "body-dim"}`}
+                  role="button"
+                  aria-label={object.name}
+                  aria-disabled={lit ? undefined : true}
+                  tabIndex={lit ? 0 : -1}
+                >
+                  <circle
+                    className={`belt belt-${object.id}`}
+                    r={mid}
+                    cx={0}
+                    cy={0}
+                    fill="none"
+                    stroke={object.color}
+                    strokeWidth={width}
+                  />
+                  {dust.map((dot, index) => (
+                    <circle
+                      key={`${object.id}-dust-${index}`}
+                      className="dust"
+                      cx={dot.x}
+                      cy={dot.y}
+                      r={dot.r}
+                    />
+                  ))}
+                  <text
+                    className="belt-label"
+                    transform={`rotate(-18) translate(${mid} 0)`}
+                    dy="4"
+                  >
+                    {object.name}
+                  </text>
+                </g>
+              );
+            }
             return (
               <g
                 key={object.id}

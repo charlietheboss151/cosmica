@@ -24,6 +24,10 @@ describe("Cosmica prototype", () => {
       "aria-disabled",
       "true",
     );
+    expect(screen.getByRole("button", { name: "Asteroid Belt" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
   });
 
   it("does not score a grayed-out moon in Planets mode", async () => {

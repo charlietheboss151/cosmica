@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-08-30
+
+### Added
+
+- Asteroid Belt, Kuiper Belt, and Oort Cloud as grayed map regions in Planets mode.
+
+### Changed
+
+- Planets (and the Sun) are drawn larger so the map is easier to read at a glance.
+
 ## [0.3.0] - 2026-08-30
 
 ### Changed

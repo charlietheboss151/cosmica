@@ -19,6 +19,9 @@ describe("solar system catalog", () => {
       "Titan",
       "Ceres",
       "Pluto",
+      "Asteroid Belt",
+      "Kuiper Belt",
+      "Oort Cloud",
     ]));
   });
 
@@ -47,10 +50,20 @@ describe("solar system catalog", () => {
     ]);
   });
 
-  it("keeps moons and dwarf planets on the map but unlit in Planets mode", () => {
+  it("keeps moons, dwarf planets, and regions on the map but unlit in Planets mode", () => {
     const europa = catalog.find((object) => object.id === "europa")!;
     const ceres = catalog.find((object) => object.id === "ceres")!;
+    const belt = catalog.find((object) => object.id === "asteroid-belt")!;
     expect(isLitInMode(europa, "planets")).toBe(false);
     expect(isLitInMode(ceres, "planets")).toBe(false);
+    expect(isLitInMode(belt, "planets")).toBe(false);
+  });
+
+  it("draws planets large enough to read at a glance", () => {
+    const earth = catalog.find((object) => object.id === "earth")!;
+    const jupiter = catalog.find((object) => object.id === "jupiter")!;
+    expect(earth.displaySize).toBeGreaterThanOrEqual(16);
+    expect(jupiter.displaySize).toBeGreaterThanOrEqual(32);
+    expect(jupiter.displaySize).toBeGreaterThan(earth.displaySize);
   });
 });

@@ -185,9 +185,57 @@ h1 {
   stroke-width: 1.5;
 }
 
+.belt {
+  fill: none;
+  opacity: 0.35;
+}
+
+.belt-asteroid-belt {
+  opacity: 0.4;
+}
+
+.belt-kuiper-belt {
+  opacity: 0.28;
+}
+
+.belt-oort-cloud {
+  opacity: 0.16;
+}
+
+.body-dim .belt {
+  opacity: 0.32;
+}
+
+.body-dim .belt-oort-cloud {
+  opacity: 0.12;
+}
+
+.dust {
+  fill: #d8d0c4;
+  opacity: 0.4;
+}
+
+.body-dim .dust {
+  fill: #b9b0a4;
+  opacity: 0.45;
+}
+
+.belt-label {
+  fill: #c5cddc;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+.body-dim .belt-label {
+  fill: #6d788c;
+}
+
 .label {
-  fill: #d5deee;
-  font-size: 11px;
+  fill: #e8eef8;
+  font-size: 13px;
+  font-weight: 600;
   text-anchor: middle;
   pointer-events: none;
 }
