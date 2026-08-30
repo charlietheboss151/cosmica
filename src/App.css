@@ -124,8 +124,8 @@ h1 {
 .orbit {
   fill: none;
   stroke: #7aa2ff;
-  stroke-opacity: 0.28;
-  stroke-width: 1.2;
+  stroke-opacity: 0.35;
+  stroke-width: 2.2;
 }
 
 .orbit-dim,
@@ -137,9 +137,9 @@ h1 {
 
 .ring {
   fill: none;
-  stroke: #ead29a;
-  stroke-opacity: 0.7;
-  stroke-width: 2;
+  stroke: #f4d27a;
+  stroke-opacity: 1;
+  stroke-width: 7;
 }
 
 .body {
@@ -156,18 +156,52 @@ h1 {
   fill: transparent;
 }
 
+.corona {
+  opacity: 0.32;
+  pointer-events: none;
+}
+
 .body-lit .disc {
-  filter: drop-shadow(0 0 10px currentColor);
+  stroke: #241833;
+  stroke-width: 4;
+  filter: none;
 }
 
 .body-star.body-lit .disc {
-  filter: drop-shadow(0 0 18px #ffd36a);
+  stroke: #ff8a2a;
+  stroke-width: 5;
+  filter: none;
+}
+
+.shine {
+  fill: #fff;
+  opacity: 0.42;
+  pointer-events: none;
+}
+
+.band {
+  fill: #c56b32;
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.band-dark {
+  fill: #8a4a24;
+  opacity: 0.35;
 }
 
 .body-dim .disc {
   fill: #6a7384 !important;
+  stroke: #3d4658;
+  stroke-width: 3;
   filter: none;
-  opacity: 0.45;
+  opacity: 0.5;
+}
+
+.body-dim .corona,
+.body-dim .shine,
+.body-dim .band {
+  opacity: 0;
 }
 
 .body-dim .ring {
@@ -182,7 +216,7 @@ h1 {
 .body-lit:hover .disc,
 .body-lit:focus-visible .disc {
   stroke: #fff;
-  stroke-width: 1.5;
+  stroke-width: 5;
 }
 
 .belt {
@@ -233,11 +267,14 @@ h1 {
 }
 
 .label {
-  fill: #e8eef8;
-  font-size: 13px;
-  font-weight: 600;
+  fill: #fff;
+  font-size: 15px;
+  font-weight: 700;
   text-anchor: middle;
   pointer-events: none;
+  paint-order: stroke fill;
+  stroke: #1a1428;
+  stroke-width: 4px;
 }
 
 .hud {

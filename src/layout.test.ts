@@ -30,8 +30,8 @@ describe("compressed visual layout", () => {
     const j = layoutObject(jupiter);
     const e = layoutObject(europa);
     const separation = Math.hypot(e.x - j.x, e.y - j.y);
-    expect(separation).toBeGreaterThan(14);
-    expect(separation).toBeLessThan(110);
+    expect(separation).toBeGreaterThan(jupiter.displaySize);
+    expect(separation).toBeLessThan(jupiter.displaySize + 90);
   });
 
   it("places the Asteroid Belt between Mars and Jupiter", () => {
@@ -45,10 +45,10 @@ describe("compressed visual layout", () => {
     expect(outer).toBeLessThan(jupiter);
   });
 
-  it("fits the first view to the planets so they stay large on screen", () => {
-    const neptune = catalog.find((object) => object.id === "neptune")!;
-    const kuiper = catalog.find((object) => object.id === "kuiper-belt")!;
-    expect(cameraFitRadius(catalog)).toBeCloseTo(visualOrbit(neptune.au));
-    expect(cameraFitRadius(catalog)).toBeLessThan(visualOrbit(kuiper.au));
+  it("starts zoomed in so the cartoon Sun fills the view", () => {
+    const sun = catalog.find((object) => object.id === "sun")!;
+    const mars = catalog.find((object) => object.id === "mars")!;
+    expect(cameraFitRadius(catalog)).toBeCloseTo(sun.displaySize * 2.4);
+    expect(cameraFitRadius(catalog)).toBeGreaterThan(visualOrbit(mars.au) * 0.9);
   });
 });

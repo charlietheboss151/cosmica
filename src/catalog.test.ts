@@ -59,11 +59,13 @@ describe("solar system catalog", () => {
     expect(isLitInMode(belt, "planets")).toBe(false);
   });
 
-  it("draws planets large enough to read at a glance", () => {
+  it("draws the Sun and planets at cartoon overscale", () => {
+    const sun = catalog.find((object) => object.id === "sun")!;
     const earth = catalog.find((object) => object.id === "earth")!;
     const jupiter = catalog.find((object) => object.id === "jupiter")!;
-    expect(earth.displaySize).toBeGreaterThanOrEqual(16);
-    expect(jupiter.displaySize).toBeGreaterThanOrEqual(32);
-    expect(jupiter.displaySize).toBeGreaterThan(earth.displaySize);
+    expect(sun.displaySize).toBeGreaterThanOrEqual(70);
+    expect(earth.displaySize).toBeGreaterThanOrEqual(36);
+    expect(jupiter.displaySize).toBeGreaterThanOrEqual(55);
+    expect(sun.displaySize).toBeGreaterThan(jupiter.displaySize);
   });
 });

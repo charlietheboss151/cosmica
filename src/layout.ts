@@ -71,10 +71,8 @@ export function regionBand(object: SolarObject): { inner: number; outer: number 
 }
 
 export function cameraFitRadius(objects: SolarObject[]): number {
-  const radii = objects
-    .filter((object) => object.type === "planet" && object.au > 0)
-    .map((object) => visualOrbit(object.au));
-  return Math.max(...radii, 1);
+  const sun = objects.find((object) => object.type === "star");
+  return (sun?.displaySize ?? 80) * 2.4;
 }
 
 export function beltDust(
