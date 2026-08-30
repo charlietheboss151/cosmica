@@ -1,0 +1,22 @@
+:root {
+  font-family: "Segoe UI", system-ui, sans-serif;
+  color: #e8eef8;
+  background: radial-gradient(1200px 700px at 50% -10%, #1a2a4a 0%, #070b14 55%);
+  line-height: 1.45;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+}
