@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { catalog, isLitInMode, isVisibleInMode } from "./catalog";
+import { catalog, displayRadius, isLitInMode, isShownLit, isVisibleInMode } from "./catalog";
 
 describe("solar system catalog", () => {
   it("includes the Sun, eight planets, and other bodies on the same map", () => {
@@ -50,14 +50,55 @@ describe("solar system catalog", () => {
     ]);
   });
 
-  it("hides moons in Planets mode and keeps other bodies grayed", () => {
+  it("shows tiny decorative moons in Planets mode and keeps other bodies grayed", () => {
     const europa = catalog.find((object) => object.id === "europa")!;
     const ceres = catalog.find((object) => object.id === "ceres")!;
     const belt = catalog.find((object) => object.id === "asteroid-belt")!;
-    expect(isVisibleInMode(europa, "planets")).toBe(false);
-    expect(isVisibleInMode(ceres, "planets")).toBe(true);
+    expect(isVisibleInMode(europa, "planets")).toBe(true);
+    expect(isLitInMode(europa, "planets")).toBe(false);
+    expect(displayRadius(europa, "planets")).toBeLessThan(europa.displaySize);
     expect(isLitInMode(ceres, "planets")).toBe(false);
     expect(isLitInMode(belt, "planets")).toBe(false);
+  });
+
+  it("lights dwarf planets, asteroids, comets, and regions in Celestial mode", () => {
+    expect(isLitInMode(catalog.find((object) => object.id === "eris")!, "celestial")).toBe(
+      true,
+    );
+    expect(isLitInMode(catalog.find((object) => object.id === "vesta")!, "celestial")).toBe(
+      true,
+    );
+    expect(isLitInMode(catalog.find((object) => object.id === "halley")!, "celestial")).toBe(
+      true,
+    );
+    expect(
+      isLitInMode(catalog.find((object) => object.id === "scattered-disc")!, "celestial"),
+    ).toBe(true);
+    expect(isLitInMode(catalog.find((object) => object.id === "earth")!, "celestial")).toBe(
+      false,
+    );
+  });
+
+  it("keeps hard-only objects out of Celestial mode until hard mode is on", () => {
+    const sedna = catalog.find((object) => object.id === "sedna")!;
+    expect(isLitInMode(sedna, "celestial")).toBe(false);
+    expect(isLitInMode(sedna, "celestial", { hardMode: true })).toBe(true);
+  });
+
+  it("adds every moon in hard Moons mode", () => {
+    const base = catalog.filter((object) => isLitInMode(object, "moons")).length;
+    const all = catalog.filter((object) =>
+      isLitInMode(object, "moons", { hardMode: true }),
+    ).length;
+    expect(all).toBeGreaterThan(base);
+    expect(isLitInMode(catalog.find((object) => object.id === "charon")!, "moons")).toBe(
+      false,
+    );
+    expect(
+      isLitInMode(catalog.find((object) => object.id === "charon")!, "moons", {
+        hardMode: true,
+      }),
+    ).toBe(true);
   });
 
   it("includes each planet's main moons", () => {
@@ -70,7 +111,9 @@ describe("solar system catalog", () => {
     expect(moonsOf("venus")).toEqual([]);
     expect(moonsOf("earth")).toEqual(["moon"]);
     expect(moonsOf("mars")).toEqual(["deimos", "phobos"]);
+    expect(moonsOf("pluto")).toEqual(["charon", "hydra", "kerberos", "nix", "styx"]);
     expect(moonsOf("jupiter")).toEqual([
+      "amalthea",
       "callisto",
       "europa",
       "ganymede",
@@ -79,8 +122,10 @@ describe("solar system catalog", () => {
     expect(moonsOf("saturn")).toEqual([
       "dione",
       "enceladus",
+      "hyperion",
       "iapetus",
       "mimas",
+      "phoebe",
       "rhea",
       "tethys",
       "titan",
@@ -89,10 +134,11 @@ describe("solar system catalog", () => {
       "ariel",
       "miranda",
       "oberon",
+      "puck",
       "titania",
       "umbriel",
     ]);
-    expect(moonsOf("neptune")).toEqual(["triton"]);
+    expect(moonsOf("neptune")).toEqual(["nereid", "proteus", "triton"]);
   });
 
   it("lights only moons in Moons mode and keeps planets visible but gray", () => {
@@ -122,5 +168,12 @@ describe("solar system catalog", () => {
     expect(earth.displaySize).toBeGreaterThanOrEqual(22);
     expect(jupiter.displaySize).toBeGreaterThanOrEqual(36);
     expect(sun.displaySize).toBeGreaterThan(jupiter.displaySize);
+  });
+
+  it("keeps the Sun full color in every mode", () => {
+    const sun = catalog.find((object) => object.id === "sun")!;
+    expect(isShownLit(sun, "moons")).toBe(true);
+    expect(isShownLit(sun, "celestial")).toBe(true);
+    expect(isLitInMode(sun, "moons")).toBe(false);
   });
 });

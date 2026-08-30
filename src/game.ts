@@ -1,7 +1,7 @@
 import {
-  catalog,
   isLitInMode,
   objectById,
+  playableInMode,
   type GameMode,
   type SolarObject,
 } from "./catalog";
@@ -10,8 +10,11 @@ export type Rng = () => number;
 
 export type TryMark = "green" | "yellow" | "orange" | "red";
 
+export const MAX_GUESSES_PER_BODY = 3;
+
 export type QuizState = {
   mode: GameMode;
+  hardMode: boolean;
   currentId: string | null;
   remainingIds: string[];
   foundIds: string[];
@@ -20,19 +23,16 @@ export type QuizState = {
   mistakes: number;
   triesOnCurrent: number;
   marks: Record<string, TryMark>;
+  wrongFlashId: string | null;
+  lastResolvedId: string | null;
   startedAt: number;
   finishedAt: number | null;
-  lastResult: "correct" | "incorrect" | null;
+  lastResult: "correct" | "incorrect" | "revealed" | null;
   prompt: string;
 };
 
-function playable(mode: GameMode): SolarObject[] {
-  return catalog.filter(
-    (object) =>
-      isLitInMode(object, mode) &&
-      object.type !== "star" &&
-      object.type !== "region",
-  );
+function playable(mode: GameMode, hardMode: boolean): SolarObject[] {
+  return playableInMode(mode, { hardMode });
 }
 
 function shuffle<T>(items: T[], rng: Rng): T[] {
@@ -61,10 +61,7 @@ export function markForTries(tries: number): TryMark {
   if (tries === 2) {
     return "yellow";
   }
-  if (tries === 3) {
-    return "orange";
-  }
-  return "red";
+  return "orange";
 }
 export function formatElapsed(ms: number): string {
   const totalSeconds = Math.max(0, Math.floor(ms / 1000));
@@ -77,15 +74,17 @@ export function startQuiz(
   mode: GameMode,
   rng: Rng,
   now: number = Date.now(),
+  hardMode: boolean = false,
 ): QuizState {
   const ids = shuffle(
-    playable(mode).map((object) => object.id),
+    playable(mode, hardMode).map((object) => object.id),
     rng,
   );
   const currentId = ids[0] ?? null;
   const remainingIds = ids.slice(1);
   return {
     mode,
+    hardMode,
     currentId,
     remainingIds,
     foundIds: [],
@@ -94,10 +93,38 @@ export function startQuiz(
     mistakes: 0,
     triesOnCurrent: 0,
     marks: {},
+    wrongFlashId: null,
+    lastResolvedId: null,
     startedAt: now,
     finishedAt: currentId ? null : now,
     lastResult: null,
     prompt: promptFor(currentId),
+  };
+}
+
+function advanceFromBody(
+  state: QuizState,
+  resolvedId: string,
+  mark: TryMark,
+  now: number,
+  lastResult: QuizState["lastResult"],
+): QuizState {
+  const [currentId, ...remainingIds] = state.remainingIds;
+  const finished = !currentId;
+  const foundIds = [...state.foundIds, resolvedId];
+  return {
+    ...state,
+    currentId: currentId ?? null,
+    remainingIds,
+    foundIds,
+    placed: foundIds.length,
+    triesOnCurrent: 0,
+    wrongFlashId: null,
+    lastResolvedId: resolvedId,
+    marks: { ...state.marks, [resolvedId]: mark },
+    finishedAt: finished ? now : null,
+    lastResult,
+    prompt: promptFor(currentId ?? null),
   };
 }
 
@@ -110,32 +137,35 @@ export function applyClick(
     return state;
   }
   const clicked = objectById(objectId);
-  if (!clicked || !isLitInMode(clicked, state.mode)) {
+  if (
+    !clicked ||
+    !isLitInMode(clicked, state.mode, { hardMode: state.hardMode })
+  ) {
     return state;
   }
   if (objectId !== state.currentId) {
+    const tries = state.triesOnCurrent + 1;
+    if (tries >= MAX_GUESSES_PER_BODY) {
+      return {
+        ...advanceFromBody(state, state.currentId, "red", now, "revealed"),
+        mistakes: state.mistakes + 1,
+        wrongFlashId: objectId,
+      };
+    }
     return {
       ...state,
       mistakes: state.mistakes + 1,
-      triesOnCurrent: state.triesOnCurrent + 1,
-      marks: { ...state.marks, [objectId]: "red" },
+      triesOnCurrent: tries,
+      wrongFlashId: objectId,
       lastResult: "incorrect",
     };
   }
-  const foundIds = [...state.foundIds, objectId];
-  const [currentId, ...remainingIds] = state.remainingIds;
-  const finished = !currentId;
   const tries = state.triesOnCurrent + 1;
-  return {
-    ...state,
-    currentId: currentId ?? null,
-    remainingIds,
-    foundIds,
-    placed: foundIds.length,
-    triesOnCurrent: 0,
-    marks: { ...state.marks, [objectId]: markForTries(tries) },
-    finishedAt: finished ? now : null,
-    lastResult: "correct",
-    prompt: promptFor(currentId ?? null),
-  };
+  return advanceFromBody(
+    state,
+    objectId,
+    markForTries(tries),
+    now,
+    "correct",
+  );
 }

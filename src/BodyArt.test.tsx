@@ -1,21 +1,68 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { BODY_ART } from "./bodyArtAssets";
+import { BODY_ART, MOON_ART_IDS } from "./bodyArtAssets";
 import { BodyArt } from "./BodyArt";
 
 describe("cartoon body art", () => {
-  it("has a drawing for the Sun and every planet", () => {
+  it("has a drawing for the Sun, every planet, and every playable moon", () => {
     expect(Object.keys(BODY_ART).sort()).toEqual([
+      "67p",
+      "ariel",
+      "bennu",
+      "callisto",
+      "ceres",
+      "deimos",
+      "dione",
       "earth",
+      "enceladus",
+      "eris",
+      "eros",
+      "europa",
+      "ganymede",
+      "gaspra",
+      "hale-bopp",
+      "halley",
+      "haumea",
+      "iapetus",
+      "ida",
+      "io",
+      "itokawa",
       "jupiter",
+      "lutetia",
+      "makemake",
       "mars",
+      "mathilde",
       "mercury",
+      "mimas",
+      "miranda",
+      "moon",
       "neptune",
+      "oberon",
+      "pallas",
+      "phobos",
+      "pluto",
+      "psyche",
+      "quaoar",
+      "rhea",
+      "ryugu",
       "saturn",
+      "sedna",
+      "shoemaker-levy-9",
       "sun",
+      "tempel-1",
+      "tethys",
+      "titan",
+      "titania",
+      "triton",
+      "umbriel",
       "uranus",
       "venus",
+      "vesta",
+      "wild-2",
     ]);
+    for (const id of MOON_ART_IDS) {
+      expect(BODY_ART[id]).toBe(`/bodies/${id}.png`);
+    }
   });
 
   it("draws Earth from its cartoon sticker, not a flat blue disc", () => {
@@ -54,13 +101,62 @@ describe("cartoon body art", () => {
     expect(outer).toBeGreaterThan(inner);
   });
 
-  it("falls back to a simple disc for moons", () => {
+  it("draws moons from NASA photos instead of flat discs", () => {
     const { container } = render(
       <svg>
         <BodyArt id="europa" radius={10} color="#c9ddd8" />
       </svg>,
     );
+    expect(container.querySelector("image")).toHaveAttribute(
+      "href",
+      "/bodies/europa.png",
+    );
+    expect(container.querySelector("circle.disc")).toBeNull();
+  });
+
+  it("falls back to a simple disc for bodies without art", () => {
+    const { container } = render(
+      <svg>
+        <BodyArt id="unknown-body" radius={10} color="#3d6fff" type="planet" />
+      </svg>,
+    );
     expect(container.querySelector("image")).toBeNull();
     expect(container.querySelector("circle.disc")).not.toBeNull();
+  });
+
+  it("draws dwarf planets from NASA photos when available", () => {
+    const { container } = render(
+      <svg>
+        <BodyArt id="ceres" radius={10} color="#9a9a9a" type="dwarf-planet" />
+      </svg>,
+    );
+    expect(container.querySelector("image")).toHaveAttribute("href", "/bodies/ceres.png");
+    expect(container.querySelector(".celestial-globe")).toBeNull();
+  });
+
+  it("draws hard-mode dwarf planets with textured globe fallbacks", () => {
+    const { container } = render(
+      <svg>
+        <BodyArt id="orcus" radius={10} color="#909090" type="dwarf-planet" />
+      </svg>,
+    );
+    expect(container.querySelector(".celestial-globe")).not.toBeNull();
+    expect(container.querySelectorAll(".globe-crater").length).toBeGreaterThan(0);
+  });
+
+  it("draws comets with a tail and asteroids with rock sprites", () => {
+    const comet = render(
+      <svg>
+        <BodyArt id="halley" radius={10} color="#c8e8ff" type="comet" />
+      </svg>,
+    );
+    expect(comet.container.querySelector("image")).toHaveAttribute("href", "/bodies/halley.png");
+
+    const asteroid = render(
+      <svg>
+        <BodyArt id="vesta" radius={10} color="#d8d0c0" type="asteroid" />
+      </svg>,
+    );
+    expect(asteroid.container.querySelector("image")).toHaveAttribute("href", "/bodies/vesta.png");
   });
 });

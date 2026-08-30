@@ -22,10 +22,7 @@ describe("Cosmica prototype", () => {
     expect(screen.getByRole("button", { name: "Mercury" })).toBeEnabled();
     expect(document.querySelectorAll("text.label")).toHaveLength(0);
     expect(screen.queryByRole("button", { name: "Europa" })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Asteroid Belt" })).toHaveAttribute(
-      "aria-disabled",
-      "true",
-    );
+    expect(screen.queryByRole("button", { name: "Asteroid Belt" })).not.toBeInTheDocument();
   });
 
   it("lets the player pick Moons mode from the menu", () => {
@@ -50,14 +47,48 @@ describe("Cosmica prototype", () => {
     );
   });
 
-  it("does not show moons to click in Planets mode", async () => {
+  it("shows tiny decorative moons in Planets mode without making them clickable", async () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole("button", { name: "Planets" }));
     expect(screen.queryByRole("button", { name: "Europa" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Moon" })).not.toBeInTheDocument();
+    expect(document.querySelectorAll(".body-moon-decor").length).toBeGreaterThan(0);
     expect(screen.getByTestId("score")).toHaveTextContent("0 / 8");
     expect(screen.getByTestId("timer")).toHaveTextContent(/^\d+:\d{2}$/);
+  });
+
+  it("starts Celestial bodies mode from the menu", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole("button", { name: "Celestial bodies" }));
+    expect(screen.getByTestId("find-prompt").textContent).toMatch(/^Click on /);
+    expect(screen.getByRole("button", { name: "Mercury" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+  });
+
+  it("lets players click dwarf planets inside a belt region in Celestial mode", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole("button", { name: "Celestial bodies" }));
+    const pluto = screen.getByRole("button", { name: "Pluto" });
+    expect(pluto).not.toHaveAttribute("aria-disabled", "true");
+    expect(screen.getByRole("button", { name: "Kuiper Belt" })).toBeInTheDocument();
+  });
+
+  it("shows the clicked planet name after a wrong click", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole("button", { name: "Planets" }));
+    const prompt = screen.getByTestId("find-prompt").textContent ?? "";
+    const target = prompt.replace("Click on ", "");
+    const decoy = target === "Venus" ? "Mars" : "Venus";
+    await user.click(screen.getByRole("button", { name: decoy }));
+    expect(screen.getByTestId("feedback")).toHaveTextContent(decoy);
+    expect(document.querySelector(".try-ring-flash")).not.toBeNull();
+    expect(document.querySelector(".try-ring-red")).toBeNull();
   });
 
   it("scores a correct planet click and keeps the map as the answer", async () => {

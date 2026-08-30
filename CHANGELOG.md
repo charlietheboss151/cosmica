@@ -7,6 +7,102 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.3] - 2026-08-30
+
+### Fixed
+- Celestial bodies no longer render as plain colored ovals. NASA photos are fetched for dwarf planets, asteroids, and comets; hard-mode candidates without photos get textured globe fallbacks with craters and bands.
+
+## [0.15.2] - 2026-08-30
+
+### Fixed
+- Bodies inside belt regions (Pluto in the Kuiper Belt, Ceres in the Asteroid Belt, etc.) are clickable again. Belt art is drawn underneath with a separate hit layer so it no longer blocks clicks.
+
+## [0.15.1] - 2026-08-30
+
+### Changed
+- Celestial bodies mode uses proportional spacing so objects sit at the right distance from the Sun (scroll out for the outer Kuiper region).
+- Every dwarf planet, asteroid, and comet has distinct cartoon art (or a NASA photo when available) so they are easier to tell apart.
+- The Sun stays full color in Moons and Celestial modes instead of graying out.
+
+## [0.15.0] - 2026-08-30
+
+### Added
+- **Celestial bodies** mode: all five official dwarf planets, famous asteroids, comets, and solar-system regions (belts, scattered disc, heliosphere, trojans).
+- **Hard mode** checkboxes on Moons and Celestial bodies — optional extra moons, dwarf-planet candidates, and lesser-known asteroids.
+
+### Changed
+- Moons hard mode adds Charon, Amalthea, Hyperion, and other moons beyond the original major set.
+
+## [0.14.3] - 2026-08-30
+
+### Changed
+- Planets mode now shows tiny orbiting moons as scenery. They stay out of the way and are not clickable quiz targets.
+
+## [0.14.2] - 2026-08-30
+
+### Fixed
+- Moons now orbit their parent planets during gameplay instead of staying locked in place.
+
+## [0.14.1] - 2026-08-30
+
+### Changed
+- In-game orbital drift is a bit faster so the real planets and moons are easier to see moving.
+
+## [0.14.0] - 2026-08-30
+
+### Changed
+- Planets and moons now slowly orbit along their paths during gameplay. The decorative in-game backdrop was removed.
+
+## [0.13.0] - 2026-08-30
+
+### Added
+- The orbiting solar-system backdrop also played behind the map in-game, at a slower speed than the menu.
+
+## [0.12.2] - 2026-08-30
+
+### Changed
+- Enlarged the menu solar-system backdrop so more of it is visible behind the panel.
+
+## [0.12.1] - 2026-08-30
+
+### Changed
+- Menu backdrop now shows all eight planets, orbiting moons, and extra drifting moon sprites.
+
+## [0.12.0] - 2026-08-30
+
+### Changed
+- Redesigned the front page with a starfield backdrop, orbiting planet art, and a cleaner glass panel for mode selection.
+
+## [0.11.2] - 2026-08-30
+
+### Fixed
+- Enceladus moon art no longer uses a labeled NASA poster; it now shows a clean Cassini globe photo.
+
+## [0.11.1] - 2026-08-30
+
+### Changed
+- The Asteroid Belt is drawn as scattered cartoon rocks with a soft band wash instead of a flat highlight ring.
+
+## [0.11.0] - 2026-08-30
+
+### Changed
+- Each body allows 3 guesses total. Correct on try 1–3 gets a green, yellow, or orange ring; missing all three reveals the answer with a red ring and shows its name.
+
+## [0.10.0] - 2026-08-30
+
+### Added
+- NASA mission photos for all playable moons, replacing plain colored discs. See `public/bodies/ATTRIBUTION.md` for sources.
+
+## [0.9.1] - 2026-08-30
+
+### Changed
+- Wrong clicks flash a brief red ring instead of leaving it on the map, and show the name of the body you clicked.
+
+## [0.9.0] - 2026-08-30
+
+### Changed
+- Planets and moons spawn at a random point along their orbit each round so players learn positions, not memorized spots.
+
 ## [0.8.1] - 2026-08-30
 
 ### Added

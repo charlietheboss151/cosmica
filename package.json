@@ -1,7 +1,7 @@
 {
   "name": "cosmica",
   "private": true,
-  "version": "0.8.1",
+  "version": "0.15.3",
   "description": "Interactive Solar System map. Modes light up a subset of the full map.",
   "type": "module",
   "scripts": {
@@ -10,7 +10,9 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "fetch-moon-art": "node scripts/fetch-moon-art.mjs",
+    "fetch-celestial-art": "node scripts/fetch-celestial-art.mjs"
   },
   "dependencies": {
     "react": "^19.2.8",
