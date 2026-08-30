@@ -9,9 +9,19 @@ import {
 } from "./camera";
 import { BodyArt } from "./BodyArt";
 import { AsteroidBeltArt } from "./AsteroidBeltArt";
-import { isHeliocentric, isDecorativeMoon, isQuizTarget, isShownLit, isVisibleInMode, displayRadius, type GameMode, type SolarObject } from "./catalog";
+import {
+  displayRadius,
+  isDecorativeMoon,
+  isHeliocentric,
+  isQuizTarget,
+  isShownLit,
+  isVisibleInMode,
+  type GameMode,
+  type SolarObject,
+} from "./catalog";
 import {
   applyOrbitPhase,
+  annulusPath,
   beltDust,
   cameraFitRadius,
   layoutAll,
@@ -133,11 +143,184 @@ export default function SolarSystemMap({
       mode !== "celestial" &&
       isQuizTarget(object, mode, modeOptions),
   );
-  const drawOrder = [...visible].sort(
+  const regions = visible.filter((object) => object.type === "region");
+  const bodies = [...visible.filter((object) => object.type !== "region")].sort(
     (a, b) =>
       Number(isShownLit(a, mode, modeOptions)) -
       Number(isShownLit(b, mode, modeOptions)),
   );
+
+  const renderRegionVisual = (object: SolarObject) => {
+    const shownLit = isShownLit(object, mode, modeOptions);
+    const { inner, outer } = regionBand(object, layoutProfile);
+    const mid = (inner + outer) / 2;
+    if (object.id === "asteroid-belt") {
+      return (
+        <g
+          key={`${object.id}-visual`}
+          className={`body-region-visual ${shownLit ? "body-lit" : "body-dim"}`}
+          aria-hidden="true"
+        >
+          <AsteroidBeltArt inner={inner} outer={outer} label={object.name} />
+        </g>
+      );
+    }
+    const width = Math.max(outer - inner, 6);
+    const dust = beltDust(
+      inner,
+      outer,
+      object.id === "kuiper-belt" ? 40 : 28,
+    );
+    return (
+      <g
+        key={`${object.id}-visual`}
+        className={`body-region-visual ${shownLit ? "body-lit" : "body-dim"}`}
+        aria-hidden="true"
+      >
+        <circle
+          className={`belt belt-${object.id}`}
+          r={mid}
+          cx={0}
+          cy={0}
+          fill="none"
+          stroke={object.color}
+          strokeWidth={width}
+        />
+        {dust.map((dot, index) => (
+          <circle
+            key={`${object.id}-dust-${index}`}
+            className="dust"
+            cx={dot.x}
+            cy={dot.y}
+            r={dot.r}
+          />
+        ))}
+        <text
+          className="belt-label"
+          transform={`rotate(-18) translate(${mid} 0)`}
+          dy="4"
+        >
+          {object.name}
+        </text>
+      </g>
+    );
+  };
+
+  const renderRegionHit = (object: SolarObject) => {
+    if (!isQuizTarget(object, mode, modeOptions)) {
+      return null;
+    }
+    const shownLit = isShownLit(object, mode, modeOptions);
+    const { inner, outer } = regionBand(object, layoutProfile);
+    const choose = () => onSelect(object.id);
+    return (
+      <g
+        key={`${object.id}-hit`}
+        className={`body body-region body-region-hit ${shownLit ? "body-lit" : "body-dim"}`}
+        role="button"
+        aria-label={object.name}
+        tabIndex={0}
+        onPointerDown={(event) => event.stopPropagation()}
+        onClick={choose}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            choose();
+          }
+        }}
+      >
+        <path
+          className="region-hit"
+          d={annulusPath(inner, outer)}
+          fill="transparent"
+          fillRule="evenodd"
+        />
+      </g>
+    );
+  };
+
+  const renderBody = (object: SolarObject) => {
+    const laid =
+      positions.get(object.id) ??
+      layoutObject(object, displayObjects, layoutProfile);
+    const shownLit = isShownLit(object, mode, modeOptions);
+    const quizTarget = isQuizTarget(object, mode, modeOptions);
+    const decorMoon = isDecorativeMoon(object, mode);
+    const radius = displayRadius(object, mode);
+    const passive = decorMoon;
+    const isSun = object.type === "star";
+    return (
+      <g
+        key={object.id}
+        className={`body body-${object.type} ${shownLit ? "body-lit" : "body-dim"}${decorMoon ? " body-moon-decor" : ""}${isSun ? " body-sun-anchor" : ""}`}
+        transform={`translate(${laid.x} ${laid.y})`}
+        role={decorMoon ? "presentation" : isSun ? "img" : "button"}
+        aria-label={decorMoon ? undefined : object.name}
+        aria-hidden={decorMoon ? true : undefined}
+        aria-disabled={decorMoon || isSun ? undefined : quizTarget ? undefined : true}
+        tabIndex={decorMoon || isSun ? undefined : quizTarget ? 0 : -1}
+        onPointerDown={passive || isSun ? undefined : (event) => event.stopPropagation()}
+        onClick={
+          passive || isSun
+            ? undefined
+            : () => {
+                if (quizTarget) {
+                  onSelect(object.id);
+                }
+              }
+        }
+        onKeyDown={
+          passive || isSun
+            ? undefined
+            : (event) => {
+                if (!quizTarget) {
+                  return;
+                }
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  onSelect(object.id);
+                }
+              }
+        }
+      >
+        {passive || isSun ? null : (
+          <circle
+            className="hit"
+            r={
+              object.id === "saturn"
+                ? laid.radius * 2.1
+                : Math.max(laid.radius, 12)
+            }
+          />
+        )}
+        {marks[object.id] ? (
+          <circle
+            className={`try-ring try-ring-${marks[object.id]}`}
+            r={radius + 6}
+            fill="none"
+          />
+        ) : null}
+        {flashId === object.id ? (
+          <circle
+            className="try-ring try-ring-flash"
+            r={radius + 6}
+            fill="none"
+          />
+        ) : null}
+        <BodyArt
+          id={object.id}
+          radius={radius}
+          color={object.color}
+          type={object.type}
+        />
+        {foundIds.includes(object.id) ? (
+          <text className="label" y={radius + 18}>
+            {object.name}
+          </text>
+        ) : null}
+      </g>
+    );
+  };
 
   const onPointerDown = (event: PointerEvent<SVGSVGElement>) => {
     if (event.button !== 0) {
@@ -215,178 +398,9 @@ export default function SolarSystemMap({
               />
             );
           })}
-          {drawOrder.map((object) => {
-            const laid =
-              positions.get(object.id) ??
-              layoutObject(object, displayObjects, layoutProfile);
-            const shownLit = isShownLit(object, mode, modeOptions);
-            const quizTarget = isQuizTarget(object, mode, modeOptions);
-            const decorMoon = isDecorativeMoon(object, mode);
-            const radius = displayRadius(object, mode);
-            if (object.type === "region") {
-              const { inner, outer } = regionBand(object, layoutProfile);
-              const mid = (inner + outer) / 2;
-              if (object.id === "asteroid-belt") {
-                return (
-                  <g
-                    key={object.id}
-                    className={`body body-region ${shownLit ? "body-lit" : "body-dim"}`}
-                    role="button"
-                    aria-label={object.name}
-                    aria-disabled={quizTarget ? undefined : true}
-                    tabIndex={quizTarget ? 0 : -1}
-                    onPointerDown={(event) => event.stopPropagation()}
-                    onClick={() => {
-                      if (quizTarget) {
-                        onSelect(object.id);
-                      }
-                    }}
-                    onKeyDown={(event) => {
-                      if (!quizTarget) {
-                        return;
-                      }
-                      if (event.key === "Enter" || event.key === " ") {
-                        event.preventDefault();
-                        onSelect(object.id);
-                      }
-                    }}
-                  >
-                    <AsteroidBeltArt inner={inner} outer={outer} label={object.name} />
-                  </g>
-                );
-              }
-              const width = Math.max(outer - inner, 6);
-              const dust = beltDust(
-                inner,
-                outer,
-                object.id === "kuiper-belt" ? 40 : 28,
-              );
-              return (
-                <g
-                  key={object.id}
-                  className={`body body-region ${shownLit ? "body-lit" : "body-dim"}`}
-                  role="button"
-                  aria-label={object.name}
-                  aria-disabled={quizTarget ? undefined : true}
-                  tabIndex={quizTarget ? 0 : -1}
-                  onPointerDown={(event) => event.stopPropagation()}
-                  onClick={() => {
-                    if (quizTarget) {
-                      onSelect(object.id);
-                    }
-                  }}
-                  onKeyDown={(event) => {
-                    if (!quizTarget) {
-                      return;
-                    }
-                    if (event.key === "Enter" || event.key === " ") {
-                      event.preventDefault();
-                      onSelect(object.id);
-                    }
-                  }}
-                >
-                  <circle
-                    className={`belt belt-${object.id}`}
-                    r={mid}
-                    cx={0}
-                    cy={0}
-                    fill="none"
-                    stroke={object.color}
-                    strokeWidth={width}
-                  />
-                  {dust.map((dot, index) => (
-                    <circle
-                      key={`${object.id}-dust-${index}`}
-                      className="dust"
-                      cx={dot.x}
-                      cy={dot.y}
-                      r={dot.r}
-                    />
-                  ))}
-                  <text
-                    className="belt-label"
-                    transform={`rotate(-18) translate(${mid} 0)`}
-                    dy="4"
-                  >
-                    {object.name}
-                  </text>
-                </g>
-              );
-            }
-            const passive = decorMoon;
-            const isSun = object.type === "star";
-            return (
-              <g
-                key={object.id}
-                className={`body body-${object.type} ${shownLit ? "body-lit" : "body-dim"}${decorMoon ? " body-moon-decor" : ""}${isSun ? " body-sun-anchor" : ""}`}
-                transform={`translate(${laid.x} ${laid.y})`}
-                role={decorMoon ? "presentation" : isSun ? "img" : "button"}
-                aria-label={decorMoon ? undefined : object.name}
-                aria-hidden={decorMoon ? true : undefined}
-                aria-disabled={decorMoon || isSun ? undefined : quizTarget ? undefined : true}
-                tabIndex={decorMoon || isSun ? undefined : quizTarget ? 0 : -1}
-                onPointerDown={passive || isSun ? undefined : (event) => event.stopPropagation()}
-                onClick={
-                  passive || isSun
-                    ? undefined
-                    : () => {
-                        if (quizTarget) {
-                          onSelect(object.id);
-                        }
-                      }
-                }
-                onKeyDown={
-                  passive || isSun
-                    ? undefined
-                    : (event) => {
-                        if (!quizTarget) {
-                          return;
-                        }
-                        if (event.key === "Enter" || event.key === " ") {
-                          event.preventDefault();
-                          onSelect(object.id);
-                        }
-                      }
-                }
-              >
-                {passive || isSun ? null : (
-                  <circle
-                    className="hit"
-                    r={
-                      object.id === "saturn"
-                        ? laid.radius * 2.1
-                        : Math.max(laid.radius, 12)
-                    }
-                  />
-                )}
-                {marks[object.id] ? (
-                  <circle
-                    className={`try-ring try-ring-${marks[object.id]}`}
-                    r={radius + 6}
-                    fill="none"
-                  />
-                ) : null}
-                {flashId === object.id ? (
-                  <circle
-                    className="try-ring try-ring-flash"
-                    r={radius + 6}
-                    fill="none"
-                  />
-                ) : null}
-                <BodyArt
-                  id={object.id}
-                  radius={radius}
-                  color={object.color}
-                  type={object.type}
-                />
-                {foundIds.includes(object.id) ? (
-                  <text className="label" y={radius + 18}>
-                    {object.name}
-                  </text>
-                ) : null}
-              </g>
-            );
-          })}
+          {regions.map(renderRegionVisual)}
+          {regions.map(renderRegionHit)}
+          {bodies.map(renderBody)}
         </g>
       </svg>
     </div>

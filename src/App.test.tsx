@@ -22,10 +22,7 @@ describe("Cosmica prototype", () => {
     expect(screen.getByRole("button", { name: "Mercury" })).toBeEnabled();
     expect(document.querySelectorAll("text.label")).toHaveLength(0);
     expect(screen.queryByRole("button", { name: "Europa" })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Asteroid Belt" })).toHaveAttribute(
-      "aria-disabled",
-      "true",
-    );
+    expect(screen.queryByRole("button", { name: "Asteroid Belt" })).not.toBeInTheDocument();
   });
 
   it("lets the player pick Moons mode from the menu", () => {
@@ -70,6 +67,15 @@ describe("Cosmica prototype", () => {
       "aria-disabled",
       "true",
     );
+  });
+
+  it("lets players click dwarf planets inside a belt region in Celestial mode", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole("button", { name: "Celestial bodies" }));
+    const pluto = screen.getByRole("button", { name: "Pluto" });
+    expect(pluto).not.toHaveAttribute("aria-disabled", "true");
+    expect(screen.getByRole("button", { name: "Kuiper Belt" })).toBeInTheDocument();
   });
 
   it("shows the clicked planet name after a wrong click", async () => {

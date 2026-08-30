@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.1] - 2026-08-30
+
+### Changed
+- Celestial bodies mode uses proportional spacing so objects sit at the right distance from the Sun (scroll out for the outer Kuiper region).
+- Every dwarf planet, asteroid, and comet has distinct cartoon art (or a NASA photo when available) so they are easier to tell apart.
+- The Sun stays full color in Moons and Celestial modes instead of graying out.
+
 ## [0.15.0] - 2026-08-30
 
 ### Added

@@ -463,9 +463,16 @@ h1 {
   opacity: 1;
 }
 
-.body-dim .celestial-art {
-  filter: grayscale(0.15) brightness(0.92);
-  opacity: 0.88;
+.body-region-visual {
+  pointer-events: none;
+}
+
+.body-region-hit {
+  cursor: pointer;
+}
+
+.body-region-hit .region-hit {
+  pointer-events: visiblePainted;
 }
 
 .body-lit:hover .disc,
