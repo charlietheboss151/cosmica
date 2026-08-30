@@ -23,4 +23,14 @@ describe("compressed visual layout", () => {
     const { x, y } = layoutObject(mercury);
     expect(Math.hypot(x, y)).toBeGreaterThan(40);
   });
+
+  it("places Europa around Jupiter instead of on a solar orbit", () => {
+    const jupiter = catalog.find((object) => object.id === "jupiter")!;
+    const europa = catalog.find((object) => object.id === "europa")!;
+    const j = layoutObject(jupiter);
+    const e = layoutObject(europa);
+    const separation = Math.hypot(e.x - j.x, e.y - j.y);
+    expect(separation).toBeGreaterThan(14);
+    expect(separation).toBeLessThan(70);
+  });
 });

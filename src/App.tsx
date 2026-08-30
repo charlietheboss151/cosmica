@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { objectsForMode } from "./catalog";
+import { useState } from "react";
+import { catalog } from "./catalog";
 import { applyClick, startRound, type RoundState } from "./game";
 import SolarSystemMap from "./SolarSystemMap";
 import "./App.css";
@@ -36,7 +36,7 @@ function Menu({ onPlay }: { onPlay: () => void }) {
 }
 
 function Play({ onMenu }: { onMenu: () => void }) {
-  const objects = useMemo(() => objectsForMode("planets"), []);
+  const objects = catalog;
   const [round, setRound] = useState<RoundState>(() => startRound(Math.random));
 
   const choose = (id: string) => {
@@ -46,7 +46,7 @@ function Play({ onMenu }: { onMenu: () => void }) {
   return (
     <div className="play">
       <div className="starfield" aria-hidden="true" />
-      <SolarSystemMap objects={objects} onSelect={choose} />
+      <SolarSystemMap objects={objects} mode="planets" onSelect={choose} />
       <header className="hud">
         <button type="button" className="ghost" onClick={onMenu}>
           Menu
@@ -69,7 +69,7 @@ function Play({ onMenu }: { onMenu: () => void }) {
           {round.feedback === "correct" ? "CORRECT" : "INCORRECT"}
         </p>
       ) : null}
-      <p className="hint">Scroll to zoom · drag to pan · click the map</p>
+      <p className="hint">Lit bodies are in play · gray is the rest of the map · scroll to zoom</p>
     </div>
   );
 }

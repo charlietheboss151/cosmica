@@ -1,8 +1,9 @@
-import { objectsForMode, type SolarObject } from "./catalog";
+import { catalog, isLitInMode, objectById, type SolarObject } from "./catalog";
 
 export type Rng = () => number;
 
 export type RoundState = {
+  mode: "planets";
   targetId: string;
   prompt: string;
   score: number;
@@ -11,7 +12,9 @@ export type RoundState = {
 };
 
 function planets(): SolarObject[] {
-  return objectsForMode("planets").filter((object) => object.type === "planet");
+  return catalog.filter(
+    (object) => object.type === "planet" && isLitInMode(object, "planets"),
+  );
 }
 
 function promptFor(object: SolarObject): string {
@@ -32,6 +35,7 @@ function pickPlanet(rng: Rng, excludeId?: string): SolarObject {
 export function startRound(rng: Rng): RoundState {
   const target = pickPlanet(rng);
   return {
+    mode: "planets",
     targetId: target.id,
     prompt: promptFor(target),
     score: 0,
@@ -45,11 +49,16 @@ export function applyClick(
   objectId: string,
   rng: Rng,
 ): RoundState {
+  const clicked = objectById(objectId);
+  if (!clicked || !isLitInMode(clicked, state.mode)) {
+    return state;
+  }
   if (objectId !== state.targetId) {
     return { ...state, streak: 0, feedback: "incorrect" };
   }
   const next = pickPlanet(rng, state.targetId);
   return {
+    ...state,
     targetId: next.id,
     prompt: promptFor(next),
     score: state.score + 100,
@@ -57,4 +66,3 @@ export function applyClick(
     feedback: "correct",
   };
 }
-

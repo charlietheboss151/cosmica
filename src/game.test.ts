@@ -20,6 +20,12 @@ describe("FIND round", () => {
     expect(after.targetId).not.toBe("mercury");
   });
 
+  it("ignores clicks on bodies that are grayed out in this mode", () => {
+    const round = startRound(alwaysFirst);
+    const after = applyClick(round, "europa", alwaysFirst);
+    expect(after).toEqual(round);
+  });
+
   it("resets the streak when the wrong object is clicked", () => {
     const afterCorrect = applyClick(
       startRound(alwaysFirst),

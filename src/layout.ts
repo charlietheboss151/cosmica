@@ -1,4 +1,4 @@
-import type { SolarObject } from "./catalog";
+import { catalog, isHeliocentric, type SolarObject } from "./catalog";
 
 export type LaidOutObject = {
   x: number;
@@ -13,7 +13,7 @@ export function visualOrbit(au: number): number {
   return 55 + Math.pow(au, 0.58) * 105;
 }
 
-export function layoutObject(object: SolarObject): LaidOutObject {
+function heliocentricLayout(object: SolarObject): LaidOutObject {
   const orbit = visualOrbit(object.au);
   const radians = (object.longitudeDeg * Math.PI) / 180;
   return {
@@ -21,4 +21,46 @@ export function layoutObject(object: SolarObject): LaidOutObject {
     y: Math.sin(radians) * orbit,
     radius: object.displaySize,
   };
+}
+
+export function layoutAll(bodies: SolarObject[] = catalog): Map<string, LaidOutObject> {
+  const byId = new Map(bodies.map((object) => [object.id, object]));
+  const laid = new Map<string, LaidOutObject>();
+
+  const place = (id: string): LaidOutObject => {
+    const existing = laid.get(id);
+    if (existing) {
+      return existing;
+    }
+    const object = byId.get(id);
+    if (!object) {
+      return { x: 0, y: 0, radius: 0 };
+    }
+    if (isHeliocentric(object)) {
+      const position = heliocentricLayout(object);
+      laid.set(id, position);
+      return position;
+    }
+    const parent = object.parentId ? place(object.parentId) : { x: 0, y: 0, radius: 0 };
+    const radians = (object.longitudeDeg * Math.PI) / 180;
+    const position = {
+      x: parent.x + Math.cos(radians) * object.localOrbit,
+      y: parent.y + Math.sin(radians) * object.localOrbit,
+      radius: object.displaySize,
+    };
+    laid.set(id, position);
+    return position;
+  };
+
+  for (const object of bodies) {
+    place(object.id);
+  }
+  return laid;
+}
+
+export function layoutObject(
+  object: SolarObject,
+  bodies: SolarObject[] = catalog,
+): LaidOutObject {
+  return layoutAll(bodies).get(object.id) ?? heliocentricLayout(object);
 }

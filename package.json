@@ -1,8 +1,8 @@
 {
   "name": "cosmica",
   "private": true,
-  "version": "0.2.0",
-  "description": "Interactive Solar System map game. Planets mode prototype.",
+  "version": "0.3.0",
+  "description": "Interactive Solar System map. Modes light up a subset of the full map.",
   "type": "module",
   "scripts": {
     "dev": "vite",

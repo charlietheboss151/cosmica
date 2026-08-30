@@ -14,13 +14,26 @@ describe("Cosmica prototype", () => {
     ).toBeInTheDocument();
   });
 
-  it("starts a FIND round on the solar system map", async () => {
+  it("starts a FIND round on the full map with only planets lit", async () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole("button", { name: "Planets" }));
     expect(screen.getByTestId("find-prompt").textContent).toMatch(/^FIND: /);
-    expect(screen.getByRole("button", { name: "Mercury" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Neptune" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Mercury" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Europa" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+  });
+
+  it("does not score a grayed-out moon in Planets mode", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole("button", { name: "Planets" }));
+    const prompt = screen.getByTestId("find-prompt").textContent;
+    await user.click(screen.getByRole("button", { name: "Europa" }));
+    expect(screen.getByTestId("find-prompt").textContent).toBe(prompt);
+    expect(screen.getByTestId("score")).toHaveTextContent("0");
   });
 
   it("scores a correct planet click and keeps the map as the answer", async () => {

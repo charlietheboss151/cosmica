@@ -128,6 +128,13 @@ h1 {
   stroke-width: 1.2;
 }
 
+.orbit-dim,
+.orbit-local {
+  stroke: #8a93a6;
+  stroke-opacity: 0.16;
+  stroke-width: 0.9;
+}
+
 .ring {
   fill: none;
   stroke: #ead29a;
@@ -140,20 +147,40 @@ h1 {
   outline: none;
 }
 
+.body-dim {
+  cursor: default;
+  pointer-events: none;
+}
+
 .body .hit {
   fill: transparent;
 }
 
-.body .disc {
-  filter: drop-shadow(0 0 8px currentColor);
+.body-lit .disc {
+  filter: drop-shadow(0 0 10px currentColor);
 }
 
-.body-star .disc {
+.body-star.body-lit .disc {
   filter: drop-shadow(0 0 18px #ffd36a);
 }
 
-.body:hover .disc,
-.body:focus-visible .disc {
+.body-dim .disc {
+  fill: #6a7384 !important;
+  filter: none;
+  opacity: 0.45;
+}
+
+.body-dim .ring {
+  stroke: #6a7384;
+  stroke-opacity: 0.25;
+}
+
+.body-dim .label {
+  fill: #5e6a7e;
+}
+
+.body-lit:hover .disc,
+.body-lit:focus-visible .disc {
   stroke: #fff;
   stroke-width: 1.5;
 }

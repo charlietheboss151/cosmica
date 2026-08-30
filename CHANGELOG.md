@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-08-30
+
+### Changed
+
+- Planets mode now keeps the full map on screen: planets (and the Sun) light up, moons and dwarf planets stay visible but grayed out.
+
+### Added
+
+- Moons and dwarf planets on the shared map (Moon, Galilean moons, Titan and others, Ceres, Pluto) so mode highlighting has something to dim.
+
 ## [0.2.0] - 2026-08-30
 
 ### Added

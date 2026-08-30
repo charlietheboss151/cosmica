@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { catalog, objectsForMode } from "./catalog";
+import { catalog, isLitInMode } from "./catalog";
 
 describe("solar system catalog", () => {
-  it("includes the Sun and eight planets", () => {
+  it("includes the Sun, eight planets, and other bodies on the same map", () => {
     const names = catalog.map((object) => object.name);
-    expect(names).toEqual([
+    expect(names).toEqual(expect.arrayContaining([
       "Sun",
       "Mercury",
       "Venus",
@@ -14,7 +14,12 @@ describe("solar system catalog", () => {
       "Saturn",
       "Uranus",
       "Neptune",
-    ]);
+      "Moon",
+      "Europa",
+      "Titan",
+      "Ceres",
+      "Pluto",
+    ]));
   });
 
   it("keeps planets parented to the Sun", () => {
@@ -25,9 +30,11 @@ describe("solar system catalog", () => {
     });
   });
 
-  it("shows only the Sun and planets in planets mode", () => {
-    const names = objectsForMode("planets").map((object) => object.name);
-    expect(names).toEqual([
+  it("lights only the Sun and planets in Planets mode", () => {
+    const lit = catalog
+      .filter((object) => isLitInMode(object, "planets"))
+      .map((object) => object.name);
+    expect(lit).toEqual([
       "Sun",
       "Mercury",
       "Venus",
@@ -38,5 +45,12 @@ describe("solar system catalog", () => {
       "Uranus",
       "Neptune",
     ]);
+  });
+
+  it("keeps moons and dwarf planets on the map but unlit in Planets mode", () => {
+    const europa = catalog.find((object) => object.id === "europa")!;
+    const ceres = catalog.find((object) => object.id === "ceres")!;
+    expect(isLitInMode(europa, "planets")).toBe(false);
+    expect(isLitInMode(ceres, "planets")).toBe(false);
   });
 });
