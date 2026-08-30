@@ -25,6 +25,8 @@ Planet sticker art is original to Cosmica. Moon photos are public-domain NASA / 
 | Oberon | Oberon map JPL USGS.jpg |
 | Triton | Triton moon mosaic Voyager 2 (large).jpg |
 
+Cartoon asteroid sprite: `asteroid-rock.svg` / `asteroid-rock.png` from [OpenClipart #323535](https://openclipart.org/detail/323535/asteroid) (public domain).
+
 Regenerate PNGs with:
 
 ```bash

@@ -8,6 +8,7 @@ import {
   type Camera,
 } from "./camera";
 import { BodyArt } from "./BodyArt";
+import { AsteroidBeltArt } from "./AsteroidBeltArt";
 import { isHeliocentric, isLitInMode, isVisibleInMode, type GameMode, type SolarObject } from "./catalog";
 import { beltDust, cameraFitRadius, layoutAll, layoutObject, regionBand, visualOrbit } from "./layout";
 
@@ -154,11 +155,25 @@ export default function SolarSystemMap({
             if (object.type === "region") {
               const { inner, outer } = regionBand(object);
               const mid = (inner + outer) / 2;
+              if (object.id === "asteroid-belt") {
+                return (
+                  <g
+                    key={object.id}
+                    className={`body body-region ${lit ? "body-lit" : "body-dim"}`}
+                    role="button"
+                    aria-label={object.name}
+                    aria-disabled={lit ? undefined : true}
+                    tabIndex={lit ? 0 : -1}
+                  >
+                    <AsteroidBeltArt inner={inner} outer={outer} label={object.name} />
+                  </g>
+                );
+              }
               const width = Math.max(outer - inner, 6);
               const dust = beltDust(
                 inner,
                 outer,
-                object.id === "asteroid-belt" ? 64 : object.id === "kuiper-belt" ? 40 : 28,
+                object.id === "kuiper-belt" ? 40 : 28,
               );
               return (
                 <g

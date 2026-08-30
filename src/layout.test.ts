@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { catalog } from "./catalog";
-import { cameraFitRadius, layoutObject, randomizeOrbitalPositions, regionBand, visualOrbit } from "./layout";
+import { annulusPath, beltAsteroids, cameraFitRadius, layoutObject, randomizeOrbitalPositions, regionBand, visualOrbit } from "./layout";
 
 describe("compressed visual layout", () => {
   it("pins the Sun at the origin", () => {
@@ -43,6 +43,20 @@ describe("compressed visual layout", () => {
     const { inner, outer } = regionBand(belt);
     expect(inner).toBeGreaterThan(mars);
     expect(outer).toBeLessThan(jupiter);
+  });
+
+  it("scatters cartoon asteroids inside the belt band", () => {
+    const { inner, outer } = regionBand(
+      catalog.find((object) => object.id === "asteroid-belt")!,
+    );
+    const rocks = beltAsteroids(inner, outer, 48);
+    expect(rocks.length).toBe(48);
+    for (const rock of rocks) {
+      const distance = Math.hypot(rock.x, rock.y);
+      expect(distance).toBeGreaterThanOrEqual(inner * 0.95);
+      expect(distance).toBeLessThanOrEqual(outer * 1.05);
+    }
+    expect(annulusPath(inner, outer)).toContain("M");
   });
 
   it("keeps the Sun and planets from overlapping", () => {

@@ -98,6 +98,49 @@ export function beltDust(
   return dots;
 }
 
+export type BeltAsteroid = {
+  x: number;
+  y: number;
+  size: number;
+  rotation: number;
+  variant: number;
+  sprite: boolean;
+};
+
+export function beltAsteroids(
+  inner: number,
+  outer: number,
+  count: number,
+): BeltAsteroid[] {
+  const rocks: BeltAsteroid[] = [];
+  for (let i = 0; i < count; i += 1) {
+    const angle = i * 2.399963 + Math.sin(i * 7.13) * 0.35;
+    const t = (Math.sin(i * 12.9898 + 0.17) + 1) / 2;
+    const radius = inner + (outer - inner) * (0.06 + t * 0.88);
+    const size = 2.4 + (i % 5) * 1.6 + (i % 3) * 2.2;
+    rocks.push({
+      x: Math.cos(angle) * radius,
+      y: Math.sin(angle) * radius,
+      size,
+      rotation: (i * 47.31) % 360,
+      variant: i % 6,
+      sprite: i % 4 === 0 && size > 5,
+    });
+  }
+  return rocks;
+}
+
+export function annulusPath(inner: number, outer: number): string {
+  return [
+    `M ${outer} 0`,
+    `A ${outer} ${outer} 0 1 1 ${-outer} 0`,
+    `A ${outer} ${outer} 0 1 1 ${outer} 0`,
+    `M ${inner} 0`,
+    `A ${inner} ${inner} 0 1 0 ${-inner} 0`,
+    `A ${inner} ${inner} 0 1 0 ${inner} 0`,
+  ].join(" ");
+}
+
 export function layoutObject(
   object: SolarObject,
   bodies: SolarObject[] = catalog,

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.1] - 2026-08-30
+
+### Changed
+- The Asteroid Belt is drawn as scattered cartoon rocks with a soft band wash instead of a flat highlight ring.
+
 ## [0.11.0] - 2026-08-30
 
 ### Changed

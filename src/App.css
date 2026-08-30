@@ -276,6 +276,67 @@ h1 {
   opacity: 0.4;
 }
 
+.asteroid-belt-art .belt-orbit {
+  fill: none;
+  stroke: #8a7355;
+  stroke-opacity: 0.28;
+  stroke-width: 1.2;
+  stroke-dasharray: 5 7;
+}
+
+.asteroid-belt-art .belt-fill {
+  pointer-events: none;
+}
+
+.asteroid-belt-art .belt-grain {
+  fill: #c9b08a;
+  opacity: 0.35;
+}
+
+.asteroid-belt-art .belt-rock path {
+  fill: #b8946a;
+  stroke: #5c4330;
+  stroke-width: 0.12;
+  stroke-linejoin: round;
+}
+
+.asteroid-belt-art .belt-rock-1 path {
+  fill: #a88462;
+}
+
+.asteroid-belt-art .belt-rock-2 path {
+  fill: #c8a070;
+}
+
+.asteroid-belt-art .belt-rock-shine {
+  fill: #ffeacc;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.body-dim .asteroid-belt-art .belt-rock path {
+  fill: #7a7068;
+  stroke: #4a4540;
+}
+
+.body-dim .asteroid-belt-art .belt-rock-shine {
+  opacity: 0.12;
+}
+
+.body-dim .asteroid-belt-art .belt-grain {
+  fill: #9a9088;
+  opacity: 0.3;
+}
+
+.body-dim .asteroid-belt-art .belt-orbit {
+  stroke: #6a7384;
+  stroke-opacity: 0.2;
+}
+
+.body-dim .asteroid-belt-art .belt-fill {
+  opacity: 0.45;
+}
+
 .belt-kuiper-belt {
   opacity: 0.28;
 }
