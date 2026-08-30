@@ -94,6 +94,19 @@ describe("Cosmica prototype", () => {
     expect(document.querySelectorAll("circle.orbit-local").length).toBeGreaterThan(0);
   });
 
+  it("lets players choose planets and quiz only those moons", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    for (const name of ["Earth", "Jupiter", "Saturn", "Uranus", "Neptune"]) {
+      await user.click(screen.getByRole("checkbox", { name }));
+    }
+    await user.click(screen.getByRole("button", { name: "Moons" }));
+    expect(screen.getByTestId("score")).toHaveTextContent("0 / 2");
+    expect(screen.getByRole("button", { name: "Phobos" })).toBeEnabled();
+    expect(screen.queryByRole("button", { name: "Europa" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Mercury" })).not.toBeInTheDocument();
+  });
+
   it("shows the clicked planet name after a wrong click", async () => {
     const user = userEvent.setup();
     render(<App />);

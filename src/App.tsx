@@ -1,5 +1,5 @@
-import { useEffect, useState, type ChangeEvent } from "react";
-import { catalog, objectById, type GameMode } from "./catalog";
+import { useEffect, useMemo, useState, type ChangeEvent } from "react";
+import { catalog, objectById, parentsWithMoons, type GameMode } from "./catalog";
 import {
   applyClick,
   formatElapsed,
@@ -15,6 +15,7 @@ import "./App.css";
 type PlayConfig = {
   mode: GameMode;
   hardMode: boolean;
+  parentIds?: string[];
 };
 
 const PLAYABLE_MODES: {
@@ -50,10 +51,57 @@ function Menu({ onPlay }: { onPlay: (config: PlayConfig) => void }) {
     moons: false,
     celestial: false,
   });
+  const moonParentOptions = useMemo(
+    () => parentsWithMoons({ hardMode: hardByMode.moons }),
+    [hardByMode.moons],
+  );
+  const [moonParents, setMoonParents] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(parentsWithMoons({ hardMode: false }).map((parent) => [parent.id, true])),
+  );
+
+  useEffect(() => {
+    setMoonParents((current) => {
+      const next: Record<string, boolean> = {};
+      for (const parent of moonParentOptions) {
+        next[parent.id] = current[parent.id] ?? true;
+      }
+      return next;
+    });
+  }, [moonParentOptions]);
+
+  const selectedMoonParents = moonParentOptions.filter(
+    (parent) => moonParents[parent.id] ?? true,
+  );
 
   const toggleHard = (mode: GameMode, event: ChangeEvent<HTMLInputElement>) => {
     event.stopPropagation();
     setHardByMode((current) => ({ ...current, [mode]: event.target.checked }));
+  };
+
+  const toggleMoonParent = (parentId: string, event: ChangeEvent<HTMLInputElement>) => {
+    event.stopPropagation();
+    setMoonParents((current) => ({ ...current, [parentId]: event.target.checked }));
+  };
+
+  const playMode = (mode: (typeof PLAYABLE_MODES)[number]) => {
+    if (mode.id === "moons") {
+      if (selectedMoonParents.length === 0) {
+        return;
+      }
+      const allParentIds = moonParentOptions.map((parent) => parent.id);
+      const selectedParentIds = selectedMoonParents.map((parent) => parent.id);
+      const filtered =
+        selectedParentIds.length < allParentIds.length
+          ? selectedParentIds
+          : undefined;
+      onPlay({
+        mode: mode.id,
+        hardMode: hardByMode[mode.id],
+        parentIds: filtered,
+      });
+      return;
+    }
+    onPlay({ mode: mode.id, hardMode: hardByMode[mode.id] });
   };
 
   return (
@@ -78,13 +126,30 @@ function Menu({ onPlay }: { onPlay: (config: PlayConfig) => void }) {
                 type="button"
                 className="mode-card"
                 aria-label={mode.label}
-                onClick={() =>
-                  onPlay({ mode: mode.id, hardMode: hardByMode[mode.id] })
-                }
+                disabled={mode.id === "moons" && selectedMoonParents.length === 0}
+                onClick={() => playMode(mode)}
               >
                 <span className="mode-card-label">{mode.label}</span>
                 <span className="mode-card-desc">{mode.description}</span>
               </button>
+              {mode.id === "moons" ? (
+                <fieldset className="mode-moon-parents" aria-label="Choose planets">
+                  <legend className="mode-moon-parents-heading">Planets</legend>
+                  <div className="mode-moon-parents-grid">
+                    {moonParentOptions.map((parent) => (
+                      <label key={parent.id} className="mode-parent-toggle">
+                        <input
+                          type="checkbox"
+                          checked={moonParents[parent.id] ?? true}
+                          onChange={(event) => toggleMoonParent(parent.id, event)}
+                          onClick={(event) => event.stopPropagation()}
+                        />
+                        <span>{parent.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+              ) : null}
               {mode.hardLabel ? (
                 <label className="mode-hard-toggle">
                   <input
@@ -113,12 +178,12 @@ function Menu({ onPlay }: { onPlay: (config: PlayConfig) => void }) {
 }
 
 function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
-  const { mode, hardMode } = config;
+  const { mode, hardMode, parentIds } = config;
   const [objects, setObjects] = useState(() =>
     randomizeOrbitalPositions(catalog, Math.random, layoutProfileForMode(mode)),
   );
   const [quiz, setQuiz] = useState<QuizState>(() =>
-    startQuiz(mode, Math.random, Date.now(), hardMode),
+    startQuiz(mode, Math.random, Date.now(), { hardMode, parentIds }),
   );
   const [now, setNow] = useState(() => Date.now());
 
@@ -126,7 +191,7 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
     setObjects(
       randomizeOrbitalPositions(catalog, Math.random, layoutProfileForMode(mode)),
     );
-    setQuiz(startQuiz(mode, Math.random, Date.now(), hardMode));
+    setQuiz(startQuiz(mode, Math.random, Date.now(), { hardMode, parentIds }));
   };
 
   useEffect(() => {
@@ -176,6 +241,7 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
         objects={objects}
         mode={mode}
         hardMode={hardMode}
+        parentIds={parentIds}
         foundIds={quiz.foundIds}
         marks={quiz.marks}
         flashId={quiz.wrongFlashId}

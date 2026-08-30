@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-08-30
+
+### Added
+- Moons mode planet picker: choose one or more planets and quiz only their moons.
+
 ## [0.15.11] - 2026-08-30
 
 ### Changed

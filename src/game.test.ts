@@ -152,4 +152,18 @@ describe("Seterra-style quiz", () => {
     const hard = startQuiz("celestial", alwaysFirst, 0, true).total;
     expect(hard).toBeGreaterThan(base);
   });
+
+  it("limits Moons mode to selected parent planets", () => {
+    const jupiterOnly = startQuiz("moons", alwaysFirst, 0, {
+      parentIds: ["jupiter"],
+    });
+    expect(jupiterOnly.total).toBe(4);
+    expect(
+      playableInMode("moons", { hardMode: false, parentIds: ["jupiter"] }).map(
+        (object) => object.id,
+      ),
+    ).toEqual(expect.arrayContaining(["io", "europa", "ganymede", "callisto"]));
+    const after = applyClick(jupiterOnly, "phobos", 10);
+    expect(after).toEqual(jupiterOnly);
+  });
 });

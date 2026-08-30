@@ -42,6 +42,7 @@ type Props = {
   objects: SolarObject[];
   mode: GameMode;
   hardMode?: boolean;
+  parentIds?: string[];
   foundIds?: string[];
   marks?: Record<string, string>;
   flashId?: string | null;
@@ -54,6 +55,7 @@ export default function SolarSystemMap({
   objects,
   mode,
   hardMode = false,
+  parentIds,
   foundIds = [],
   marks = {},
   flashId = null,
@@ -118,7 +120,7 @@ export default function SolarSystemMap({
     return () => observer.disconnect();
   }, []);
 
-  const modeOptions = { hardMode };
+  const modeOptions = { hardMode, parentIds };
   const layoutProfile = layoutProfileForMode(mode);
 
   useEffect(() => {
@@ -187,7 +189,9 @@ export default function SolarSystemMap({
     };
   }, []);
 
-  const visible = displayObjects.filter((object) => isVisibleInMode(object, mode));
+  const visible = displayObjects.filter((object) =>
+    isVisibleInMode(object, mode, modeOptions),
+  );
   const positions = layoutAll(displayObjects, layoutProfile);
   const heliocentricOrbits = visible.filter(
     (object) => showsOrbitLine(object, mode, modeOptions) && object.type !== "moon",

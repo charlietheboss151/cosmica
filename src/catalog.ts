@@ -10,6 +10,8 @@ export type GameMode = "planets" | "moons" | "celestial";
 
 export type ModeOptions = {
   hardMode: boolean;
+  /** When set in Moons mode, only moons of these parent bodies are lit. */
+  parentIds?: string[];
 };
 
 export type SolarObject = {
@@ -429,8 +431,24 @@ export function isHeliocentric(object: SolarObject): boolean {
   );
 }
 
-export function isVisibleInMode(_object: SolarObject, _mode: GameMode): boolean {
-  return true;
+export function isVisibleInMode(
+  object: SolarObject,
+  mode: GameMode,
+  options: ModeOptions = { hardMode: false },
+): boolean {
+  if (mode !== "moons" || !options.parentIds?.length) {
+    return true;
+  }
+  if (object.type === "star") {
+    return true;
+  }
+  if (object.type === "moon") {
+    return options.parentIds.includes(object.parentId ?? "");
+  }
+  if (object.type === "planet" || object.type === "dwarf-planet") {
+    return options.parentIds.includes(object.id);
+  }
+  return false;
 }
 
 /** Moons in Planets mode are tiny scenery, not quiz targets. */
@@ -484,6 +502,9 @@ export function showsOrbitLine(
     return mode === "moons" && isShownLit(object, mode, options);
   }
   if (mode === "moons" && object.type === "planet" && object.au > 0) {
+    if (options.parentIds?.length) {
+      return options.parentIds.includes(object.id);
+    }
     return true;
   }
   if (!isShownLit(object, mode, options)) {
@@ -504,7 +525,13 @@ export function isLitInMode(
     return object.type === "star" || object.type === "planet";
   }
   if (mode === "moons") {
-    return object.type === "moon";
+    if (object.type !== "moon") {
+      return false;
+    }
+    if (options.parentIds?.length) {
+      return options.parentIds.includes(object.parentId ?? "");
+    }
+    return true;
   }
   if (mode === "celestial") {
     return (
@@ -523,6 +550,27 @@ export function playableInMode(
 ): SolarObject[] {
   return catalog.filter(
     (object) => isLitInMode(object, mode, options) && object.type !== "star",
+  );
+}
+
+/** Parent bodies that have at least one playable moon in the current options. */
+export function parentsWithMoons(
+  options: ModeOptions = { hardMode: false },
+): SolarObject[] {
+  const parentIds = new Set(
+    playableInMode("moons", options)
+      .map((object) => object.parentId)
+      .filter((id): id is string => id !== null),
+  );
+  return catalog.filter((object) => parentIds.has(object.id));
+}
+
+export function moonsOf(
+  parentId: string,
+  options: ModeOptions = { hardMode: false },
+): SolarObject[] {
+  return playableInMode("moons", options).filter(
+    (object) => object.parentId === parentId,
   );
 }
 

@@ -1,5 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { catalog, displayRadius, isLitInMode, isShownLit, isVisibleInMode, showsOrbitLine } from "./catalog";
+import {
+  catalog,
+  displayRadius,
+  isLitInMode,
+  isShownLit,
+  isVisibleInMode,
+  moonsOf,
+  parentsWithMoons,
+  playableInMode,
+  showsOrbitLine,
+} from "./catalog";
 
 describe("solar system catalog", () => {
   it("includes the Sun, eight planets, and other bodies on the same map", () => {
@@ -162,18 +172,50 @@ describe("solar system catalog", () => {
       .filter((object) => isLitInMode(object, "moons"))
       .map((object) => object.type);
     expect(new Set(lit)).toEqual(new Set(["moon"]));
-    expect(isVisibleInMode(catalog.find((object) => object.id === "earth")!, "moons")).toBe(
-      true,
-    );
+    expect(
+      isVisibleInMode(catalog.find((object) => object.id === "earth")!, "moons"),
+    ).toBe(true);
     expect(isLitInMode(catalog.find((object) => object.id === "earth")!, "moons")).toBe(
       false,
     );
-    expect(isVisibleInMode(catalog.find((object) => object.id === "europa")!, "moons")).toBe(
-      true,
-    );
+    expect(
+      isVisibleInMode(catalog.find((object) => object.id === "europa")!, "moons"),
+    ).toBe(true);
     expect(isLitInMode(catalog.find((object) => object.id === "europa")!, "moons")).toBe(
       true,
     );
+  });
+
+  it("limits Moons mode to selected parent planets", () => {
+    const jupiterOnly = { hardMode: false, parentIds: ["jupiter"] };
+    expect(isLitInMode(catalog.find((object) => object.id === "europa")!, "moons", jupiterOnly)).toBe(
+      true,
+    );
+    expect(isLitInMode(catalog.find((object) => object.id === "phobos")!, "moons", jupiterOnly)).toBe(
+      false,
+    );
+    expect(
+      isVisibleInMode(catalog.find((object) => object.id === "mars")!, "moons", jupiterOnly),
+    ).toBe(false);
+    expect(
+      isVisibleInMode(catalog.find((object) => object.id === "jupiter")!, "moons", jupiterOnly),
+    ).toBe(true);
+    expect(showsOrbitLine(catalog.find((object) => object.id === "mars")!, "moons", jupiterOnly)).toBe(
+      false,
+    );
+    expect(showsOrbitLine(catalog.find((object) => object.id === "jupiter")!, "moons", jupiterOnly)).toBe(
+      true,
+    );
+    expect(playableInMode("moons", jupiterOnly).every((object) => object.parentId === "jupiter")).toBe(
+      true,
+    );
+    expect(parentsWithMoons(jupiterOnly).map((object) => object.id)).toEqual(["jupiter"]);
+    expect(moonsOf("jupiter", jupiterOnly).map((object) => object.id).sort()).toEqual([
+      "callisto",
+      "europa",
+      "ganymede",
+      "io",
+    ]);
   });
 
   it("draws the Sun and planets at cartoon overscale", () => {

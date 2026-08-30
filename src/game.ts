@@ -12,9 +12,15 @@ export type TryMark = "green" | "yellow" | "orange" | "red";
 
 export const MAX_GUESSES_PER_BODY = 3;
 
+export type QuizOptions = {
+  hardMode?: boolean;
+  parentIds?: string[];
+};
+
 export type QuizState = {
   mode: GameMode;
   hardMode: boolean;
+  parentIds?: string[];
   currentId: string | null;
   remainingIds: string[];
   foundIds: string[];
@@ -31,8 +37,21 @@ export type QuizState = {
   prompt: string;
 };
 
-function playable(mode: GameMode, hardMode: boolean): SolarObject[] {
-  return playableInMode(mode, { hardMode });
+function modeOptions(state: Pick<QuizState, "hardMode" | "parentIds">): {
+  hardMode: boolean;
+  parentIds?: string[];
+} {
+  return { hardMode: state.hardMode, parentIds: state.parentIds };
+}
+
+function playable(
+  mode: GameMode,
+  options: QuizOptions = {},
+): SolarObject[] {
+  return playableInMode(mode, {
+    hardMode: options.hardMode ?? false,
+    parentIds: options.parentIds,
+  });
 }
 
 function shuffle<T>(items: T[], rng: Rng): T[] {
@@ -74,10 +93,14 @@ export function startQuiz(
   mode: GameMode,
   rng: Rng,
   now: number = Date.now(),
-  hardMode: boolean = false,
+  options: QuizOptions | boolean = {},
 ): QuizState {
+  const resolved: QuizOptions =
+    typeof options === "boolean" ? { hardMode: options } : options;
+  const hardMode = resolved.hardMode ?? false;
+  const parentIds = resolved.parentIds;
   const ids = shuffle(
-    playable(mode, hardMode).map((object) => object.id),
+    playable(mode, { hardMode, parentIds }).map((object) => object.id),
     rng,
   );
   const currentId = ids[0] ?? null;
@@ -85,6 +108,7 @@ export function startQuiz(
   return {
     mode,
     hardMode,
+    parentIds,
     currentId,
     remainingIds,
     foundIds: [],
@@ -139,7 +163,7 @@ export function applyClick(
   const clicked = objectById(objectId);
   if (
     !clicked ||
-    !isLitInMode(clicked, state.mode, { hardMode: state.hardMode })
+    !isLitInMode(clicked, state.mode, modeOptions(state))
   ) {
     return state;
   }
