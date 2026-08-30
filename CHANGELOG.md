@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.10] - 2026-08-30
+
+### Added
+- NASA photos for all 35 moons in the catalog, including hard-mode moons (Charon, Amalthea, Hyperion, Pluto's small moons, and more).
+
 ## [0.15.9] - 2026-08-30
 
 ### Changed

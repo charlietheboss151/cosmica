@@ -4,6 +4,7 @@ import { accessSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+/** Wikimedia Commons filenames verified via the Commons API (Aug 2026). */
 const MOON_FILES = {
   moon: "Full_Moon_Luc_Viatour.jpg",
   phobos: "Phobos_colour_2008.jpg",
@@ -25,11 +26,27 @@ const MOON_FILES = {
   titania: "Titania (moon) color, cropped.jpg",
   oberon: "Oberon map JPL USGS.jpg",
   triton: "Triton moon mosaic Voyager 2 (large).jpg",
+  charon: "Charon in True Color - High-Res.jpg",
+  nix: "Nix and Hydra viewed from New Horizons 2015-07-14.jpg",
+  hydra: "Hydra, Charon and Pluto (19540320858).jpg",
+  kerberos: "Kerberos (moon).jpg",
+  styx: "Styx (moon).jpg",
+  amalthea: "Jupiter's moon Amalthea photographed by Galileo.jpg",
+  hyperion: "Hyperion false color.jpg",
+  phoebe: "Phoebe closeup cassini NASA.jpg",
+  puck: "Puck, moon of Uranus (1986).png",
+  proteus: "Proteus (Voyager 2).jpg",
+  nereid: "Nereid - Voyager 2.jpg",
+  dysnomia: "Eris and moon Dysnomia JWST NIRCam.jpg",
+  hiiaka: "Hi'iakaMoon.png",
+  namaka: "NamakaMoon.png",
+  mk2: "Makemake moon Hubble image only.jpg",
 };
 
 const OUT_DIR = join(dirname(fileURLToPath(import.meta.url)), "../public/bodies");
 const SIZE = 1024;
-const USER_AGENT = "CosmicaGame/0.9.2 (educational; charlietheboss151/cosmica)";
+const USER_AGENT = "CosmicaGame/0.15.10 (educational; charlietheboss151/cosmica)";
+const API_DELAY_MS = 2200;
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -42,7 +59,7 @@ async function fetchWithRetry(url, label, attempts = 6) {
       return response;
     }
     if (response.status === 429 && attempt < attempts) {
-      await sleep(1500 * attempt);
+      await sleep(2000 * attempt);
       continue;
     }
     throw new Error(`${label} failed: ${response.status}`);
@@ -95,6 +112,8 @@ function toPng(id, inputBuffer) {
 
 mkdirSync(OUT_DIR, { recursive: true });
 
+const failures = [];
+
 for (const [id, filename] of Object.entries(MOON_FILES)) {
   const outPath = join(OUT_DIR, `${id}.png`);
   if (!process.argv.includes("--force")) {
@@ -106,11 +125,20 @@ for (const [id, filename] of Object.entries(MOON_FILES)) {
       // fetch missing file
     }
   }
-  process.stdout.write(`Fetching ${id} (${filename})... `);
-  const bytes = await download(filename);
-  toPng(id, bytes);
-  process.stdout.write("ok\n");
-  await sleep(1200);
+  try {
+    process.stdout.write(`Fetching ${id} (${filename})... `);
+    const bytes = await download(filename);
+    toPng(id, bytes);
+    process.stdout.write("ok\n");
+    await sleep(API_DELAY_MS);
+  } catch (error) {
+    failures.push(`${id}: ${error.message}`);
+    process.stdout.write(`failed (${error.message})\n`);
+  }
 }
 
-console.log(`Wrote ${Object.keys(MOON_FILES).length} moon images to ${OUT_DIR}`);
+if (failures.length > 0) {
+  console.warn("Some images failed:\n" + failures.join("\n"));
+  process.exitCode = 1;
+}
+console.log(`Processed ${Object.keys(MOON_FILES).length} moon images in ${OUT_DIR}`);

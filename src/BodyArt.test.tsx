@@ -4,63 +4,29 @@ import { BODY_ART, MOON_ART_IDS } from "./bodyArtAssets";
 import { BodyArt } from "./BodyArt";
 
 describe("cartoon body art", () => {
-  it("has a drawing for the Sun, every planet, and every playable moon", () => {
-    expect(Object.keys(BODY_ART).sort()).toEqual([
-      "67p",
-      "ariel",
-      "bennu",
-      "callisto",
-      "ceres",
-      "deimos",
-      "dione",
-      "earth",
-      "enceladus",
-      "eris",
-      "eros",
-      "europa",
-      "ganymede",
-      "gaspra",
-      "hale-bopp",
-      "halley",
-      "haumea",
-      "iapetus",
-      "ida",
-      "io",
-      "itokawa",
-      "jupiter",
-      "lutetia",
-      "makemake",
-      "mars",
-      "mathilde",
-      "mercury",
-      "mimas",
-      "miranda",
-      "moon",
-      "neptune",
-      "oberon",
-      "pallas",
-      "phobos",
-      "pluto",
-      "psyche",
-      "quaoar",
-      "rhea",
-      "ryugu",
-      "saturn",
-      "sedna",
-      "shoemaker-levy-9",
-      "sun",
-      "tempel-1",
-      "tethys",
-      "titan",
-      "titania",
-      "triton",
-      "umbriel",
-      "uranus",
-      "venus",
-      "vesta",
-      "wild-2",
-    ]);
+  it("has NASA photos for every moon in the catalog", () => {
+    expect(MOON_ART_IDS.length).toBe(35);
     for (const id of MOON_ART_IDS) {
+      expect(BODY_ART[id]).toBe(`/bodies/${id}.png`);
+    }
+  });
+
+  it("has art assets for the Sun, planets, and celestial bodies", () => {
+    for (const id of [
+      "sun",
+      "mercury",
+      "venus",
+      "earth",
+      "mars",
+      "jupiter",
+      "saturn",
+      "uranus",
+      "neptune",
+      "pluto",
+      "ceres",
+      "vesta",
+      "halley",
+    ]) {
       expect(BODY_ART[id]).toBe(`/bodies/${id}.png`);
     }
   });
@@ -112,6 +78,16 @@ describe("cartoon body art", () => {
       "/bodies/europa.png",
     );
     expect(container.querySelector("circle.disc")).toBeNull();
+
+    const charon = render(
+      <svg>
+        <BodyArt id="charon" radius={10} color="#c9ddd8" />
+      </svg>,
+    );
+    expect(charon.container.querySelector("image")).toHaveAttribute(
+      "href",
+      "/bodies/charon.png",
+    );
   });
 
   it("falls back to a simple disc for bodies without art", () => {

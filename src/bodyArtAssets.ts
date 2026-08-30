@@ -1,3 +1,5 @@
+import { catalog } from "./catalog";
+
 export const BODY_ART: Record<string, string> = {
   sun: "/bodies/sun.png",
   mercury: "/bodies/mercury.png",
@@ -28,6 +30,21 @@ export const BODY_ART: Record<string, string> = {
   titania: "/bodies/titania.png",
   oberon: "/bodies/oberon.png",
   triton: "/bodies/triton.png",
+  charon: "/bodies/charon.png",
+  nix: "/bodies/nix.png",
+  hydra: "/bodies/hydra.png",
+  kerberos: "/bodies/kerberos.png",
+  styx: "/bodies/styx.png",
+  amalthea: "/bodies/amalthea.png",
+  hyperion: "/bodies/hyperion.png",
+  phoebe: "/bodies/phoebe.png",
+  puck: "/bodies/puck.png",
+  proteus: "/bodies/proteus.png",
+  nereid: "/bodies/nereid.png",
+  dysnomia: "/bodies/dysnomia.png",
+  hiiaka: "/bodies/hiiaka.png",
+  namaka: "/bodies/namaka.png",
+  mk2: "/bodies/mk2.png",
   pluto: "/bodies/pluto.png",
   ceres: "/bodies/ceres.png",
   eris: "/bodies/eris.png",
@@ -54,25 +71,7 @@ export const BODY_ART: Record<string, string> = {
   "shoemaker-levy-9": "/bodies/shoemaker-levy-9.png",
 };
 
-export const MOON_ART_IDS = [
-  "moon",
-  "phobos",
-  "deimos",
-  "io",
-  "europa",
-  "ganymede",
-  "callisto",
-  "mimas",
-  "enceladus",
-  "tethys",
-  "dione",
-  "rhea",
-  "titan",
-  "iapetus",
-  "miranda",
-  "ariel",
-  "umbriel",
-  "titania",
-  "oberon",
-  "triton",
-] as const;
+export const MOON_ART_IDS = catalog
+  .filter((object) => object.type === "moon")
+  .map((object) => object.id)
+  .sort() as readonly (keyof typeof BODY_ART)[];

@@ -24,6 +24,21 @@ Planet sticker art is original to Cosmica. Moon and celestial-body photos are pu
 | Titania | Titania (moon) color, cropped.jpg |
 | Oberon | Oberon map JPL USGS.jpg |
 | Triton | Triton moon mosaic Voyager 2 (large).jpg |
+| Charon | Charon in True Color - High-Res.jpg |
+| Nix | Nix and Hydra viewed from New Horizons 2015-07-14.jpg |
+| Hydra | Hydra, Charon and Pluto (19540320858).jpg |
+| Kerberos | Kerberos (moon).jpg |
+| Styx | Styx (moon).jpg |
+| Amalthea | Jupiter's moon Amalthea photographed by Galileo.jpg |
+| Hyperion | Hyperion false color.jpg |
+| Phoebe | Phoebe closeup cassini NASA.jpg |
+| Puck | Puck, moon of Uranus (1986).png |
+| Proteus | Proteus (Voyager 2).jpg |
+| Nereid | Nereid - Voyager 2.jpg |
+| Dysnomia | Eris and moon Dysnomia JWST NIRCam.jpg |
+| Hi'iaka | Hi'iakaMoon.png |
+| Namaka | NamakaMoon.png |
+| MK 2 | Makemake moon Hubble image only.jpg |
 
 | Celestial body | Wikimedia file |
 | --- | --- |
