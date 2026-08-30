@@ -45,6 +45,44 @@ export function panCamera(camera: Camera, dx: number, dy: number): Camera {
   };
 }
 
+const KEYBOARD_PAN_KEYS = new Set([
+  "arrowup",
+  "arrowdown",
+  "arrowleft",
+  "arrowright",
+  "w",
+  "a",
+  "s",
+  "d",
+]);
+
+export function isKeyboardPanKey(key: string): boolean {
+  return KEYBOARD_PAN_KEYS.has(key.toLowerCase());
+}
+
+/** Screen-pixel pan delta for held WASD / arrow keys (same axes as drag-to-pan). */
+export function keyboardPanDelta(
+  keys: ReadonlySet<string>,
+  speed: number,
+): { dx: number; dy: number } {
+  const held = new Set([...keys].map((key) => key.toLowerCase()));
+  let dx = 0;
+  let dy = 0;
+  if (held.has("arrowleft") || held.has("a")) {
+    dx += speed;
+  }
+  if (held.has("arrowright") || held.has("d")) {
+    dx -= speed;
+  }
+  if (held.has("arrowup") || held.has("w")) {
+    dy += speed;
+  }
+  if (held.has("arrowdown") || held.has("s")) {
+    dy -= speed;
+  }
+  return { dx, dy };
+}
+
 export function zoomCamera(
   camera: Camera,
   factor: number,

@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   createCamera,
   fitCamera,
+  isKeyboardPanKey,
+  keyboardPanDelta,
   panCamera,
   screenToWorld,
   zoomCamera,
@@ -33,5 +35,20 @@ describe("map camera", () => {
     const camera = fitCamera(400, 800, 600);
     const edge = screenToWorld(camera, 400, 0, 800, 600);
     expect(Math.abs(edge.y)).toBeGreaterThanOrEqual(400);
+  });
+
+  it("recognizes WASD and arrow keys for panning", () => {
+    expect(isKeyboardPanKey("w")).toBe(true);
+    expect(isKeyboardPanKey("ArrowLeft")).toBe(true);
+    expect(isKeyboardPanKey("Enter")).toBe(false);
+  });
+
+  it("maps held keys to the same pan axes as drag", () => {
+    expect(keyboardPanDelta(new Set(["w"]), 10)).toEqual({ dx: 0, dy: 10 });
+    expect(keyboardPanDelta(new Set(["d"]), 10)).toEqual({ dx: -10, dy: 0 });
+    expect(keyboardPanDelta(new Set(["arrowleft", "s"]), 10)).toEqual({
+      dx: 10,
+      dy: -10,
+    });
   });
 });

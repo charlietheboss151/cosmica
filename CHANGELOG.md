@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.6] - 2026-08-30
+
+### Added
+- **WASD** and **arrow keys** pan the map while you play (hold to move; same as drag-to-pan).
+
 ## [0.15.5] - 2026-08-30
 
 ### Changed

@@ -3,6 +3,8 @@ import {
   cameraTransform,
   createCamera,
   fitCamera,
+  isKeyboardPanKey,
+  keyboardPanDelta,
   panCamera,
   zoomCamera,
   type Camera,
@@ -63,6 +65,7 @@ export default function SolarSystemMap({
   const [camera, setCamera] = useState<Camera>(createCamera);
   const [orbitNow, setOrbitNow] = useState(() => Date.now());
   const drag = useRef<{ x: number; y: number } | null>(null);
+  const keysHeld = useRef(new Set<string>());
 
   const orbiting = orbitStartMs !== null;
   const orbitElapsedMs = orbiting
@@ -128,6 +131,59 @@ export default function SolarSystemMap({
       ),
     );
   }, [objects, size, layoutProfile]);
+
+  useEffect(() => {
+    const isTypingTarget = (target: EventTarget | null) => {
+      if (!(target instanceof HTMLElement)) {
+        return false;
+      }
+      const tag = target.tagName;
+      return (
+        tag === "INPUT" ||
+        tag === "TEXTAREA" ||
+        tag === "SELECT" ||
+        target.isContentEditable
+      );
+    };
+
+    const clearKeys = () => {
+      keysHeld.current.clear();
+    };
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (isTypingTarget(event.target) || !isKeyboardPanKey(event.key)) {
+        return;
+      }
+      event.preventDefault();
+      keysHeld.current.add(event.key.toLowerCase());
+    };
+
+    const onKeyUp = (event: KeyboardEvent) => {
+      keysHeld.current.delete(event.key.toLowerCase());
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keyup", onKeyUp);
+    window.addEventListener("blur", clearKeys);
+
+    let frame = 0;
+    const loop = () => {
+      const { dx, dy } = keyboardPanDelta(keysHeld.current, 10);
+      if (dx !== 0 || dy !== 0) {
+        setCamera((current) => panCamera(current, dx, dy));
+      }
+      frame = requestAnimationFrame(loop);
+    };
+    frame = requestAnimationFrame(loop);
+
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("keyup", onKeyUp);
+      window.removeEventListener("blur", clearKeys);
+      cancelAnimationFrame(frame);
+      clearKeys();
+    };
+  }, []);
 
   const visible = displayObjects.filter((object) => isVisibleInMode(object, mode));
   const positions = layoutAll(displayObjects, layoutProfile);
@@ -362,7 +418,12 @@ export default function SolarSystemMap({
   };
 
   return (
-    <div className="map" ref={hostRef}>
+    <div
+      className="map"
+      ref={hostRef}
+      tabIndex={0}
+      aria-label="Solar system map. Drag, scroll, or use WASD and arrow keys to pan."
+    >
       <svg
         className="map-svg"
         width={size.width}
