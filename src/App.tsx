@@ -8,12 +8,17 @@ import {
   type QuizState,
 } from "./game";
 import { randomizeOrbitalPositions } from "./layout";
+import MenuOrbits from "./MenuOrbits";
 import SolarSystemMap from "./SolarSystemMap";
 import "./App.css";
 
-const PLAYABLE_MODES: { id: GameMode; label: string }[] = [
-  { id: "planets", label: "Planets" },
-  { id: "moons", label: "Moons" },
+const PLAYABLE_MODES: {
+  id: GameMode;
+  label: string;
+  description: string;
+}[] = [
+  { id: "planets", label: "Planets", description: "Find all 8 planets on the map" },
+  { id: "moons", label: "Moons", description: "Find the major moons of the outer worlds" },
 ];
 
 const COMING_SOON = [
@@ -26,28 +31,41 @@ const COMING_SOON = [
 function Menu({ onPlay }: { onPlay: (mode: GameMode) => void }) {
   return (
     <main className="menu">
-      <p className="eyebrow">Learn the Solar System by navigating it</p>
-      <h1>COSMICA</h1>
-      <p className="lede">
-        An interactive map of our Solar System — click what you find.
-      </p>
-      <div className="modes">
-        {PLAYABLE_MODES.map((mode) => (
-          <button
-            key={mode.id}
-            type="button"
-            className="mode-play"
-            onClick={() => onPlay(mode.id)}
-          >
-            {mode.label}
-          </button>
-        ))}
-        {COMING_SOON.map((mode) => (
-          <button key={mode.id} type="button" className="mode-soon" disabled>
-            {mode.label}
-            <span>Soon</span>
-          </button>
-        ))}
+      <div className="menu-backdrop" aria-hidden="true">
+        <div className="starfield" />
+        <div className="menu-glow" />
+        <MenuOrbits />
+      </div>
+      <div className="menu-panel">
+        <header className="menu-brand">
+          <p className="eyebrow">Learn the Solar System by navigating it</p>
+          <h1>COSMICA</h1>
+          <p className="lede">
+            An interactive map quiz — click the body named in the prompt.
+          </p>
+        </header>
+        <section className="menu-play" aria-label="Play a mode">
+          {PLAYABLE_MODES.map((mode) => (
+            <button
+              key={mode.id}
+              type="button"
+              className="mode-card"
+              aria-label={mode.label}
+              onClick={() => onPlay(mode.id)}
+            >
+              <span className="mode-card-label">{mode.label}</span>
+              <span className="mode-card-desc">{mode.description}</span>
+            </button>
+          ))}
+        </section>
+        <section className="menu-soon" aria-label="Coming soon">
+          <p className="menu-soon-heading">Coming soon</p>
+          <ul className="menu-soon-list">
+            {COMING_SOON.map((mode) => (
+              <li key={mode.id}>{mode.label}</li>
+            ))}
+          </ul>
+        </section>
       </div>
     </main>
   );
