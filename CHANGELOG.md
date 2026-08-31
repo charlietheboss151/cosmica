@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Drive in-game orbit motion by patching SVG transforms each animation frame instead of re-rendering the React tree.
+
 ## [0.15.3] - 2026-08-30
 
 ### Fixed

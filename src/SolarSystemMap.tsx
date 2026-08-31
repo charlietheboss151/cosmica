@@ -15,12 +15,10 @@ import {
   isHeliocentric,
   isQuizTarget,
   isShownLit,
-  isVisibleInMode,
   type GameMode,
   type SolarObject,
 } from "./catalog";
 import {
-  applyOrbitPhase,
   annulusPath,
   beltDust,
   cameraFitRadius,
@@ -33,6 +31,7 @@ import {
   regionBand,
   visualOrbit,
 } from "./layout";
+import { syncOrbitDom } from "./orbitSync";
 
 type Props = {
   objects: SolarObject[];
@@ -60,37 +59,47 @@ export default function SolarSystemMap({
   const hostRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [camera, setCamera] = useState<Camera>(createCamera);
-  const [orbitNow, setOrbitNow] = useState(() => Date.now());
   const drag = useRef<{ x: number; y: number } | null>(null);
+  const bodyElements = useRef(new Map<string, SVGGElement | null>());
+  const moonOrbitElements = useRef(new Map<string, SVGCircleElement | null>());
 
   const orbiting = orbitStartMs !== null;
-  const orbitElapsedMs = orbiting
-    ? Math.max(0, (orbitFreezeMs ?? orbitNow) - orbitStartMs)
-    : 0;
-  const heliocentricPhase = orbitPhaseDeg(
-    orbitElapsedMs,
-    ORBIT_ANIMATION_PERIOD_MS,
-  );
-  const moonPhase = orbitPhaseDeg(
-    orbitElapsedMs,
-    ORBIT_ANIMATION_PERIOD_MS / MOON_ORBIT_SPEED_MULTIPLIER,
-  );
-  const displayObjects = orbiting
-    ? applyOrbitPhase(objects, heliocentricPhase, moonPhase)
-    : objects;
+  const modeOptions = { hardMode };
+  const layoutProfile = layoutProfileForMode(mode);
+  // React keeps the spawned layout; rAF patches transforms while orbiting.
+  const displayObjects = objects;
 
   useEffect(() => {
-    if (!orbiting || orbitFreezeMs !== null) {
+    if (!orbiting || orbitStartMs === null) {
+      return;
+    }
+    const applyAt = (nowMs: number) => {
+      const elapsedMs = Math.max(0, (orbitFreezeMs ?? nowMs) - orbitStartMs);
+      syncOrbitDom(
+        objects,
+        orbitPhaseDeg(elapsedMs, ORBIT_ANIMATION_PERIOD_MS),
+        orbitPhaseDeg(
+          elapsedMs,
+          ORBIT_ANIMATION_PERIOD_MS / MOON_ORBIT_SPEED_MULTIPLIER,
+        ),
+        layoutProfile,
+        bodyElements.current,
+        moonOrbitElements.current,
+      );
+    };
+    if (orbitFreezeMs !== null) {
+      applyAt(orbitFreezeMs);
       return;
     }
     let frame = 0;
     const loop = () => {
-      setOrbitNow(Date.now());
+      applyAt(Date.now());
       frame = requestAnimationFrame(loop);
     };
+    applyAt(Date.now());
     frame = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(frame);
-  }, [orbiting, orbitFreezeMs, orbitStartMs]);
+  }, [orbiting, orbitFreezeMs, orbitStartMs, objects, layoutProfile]);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -112,9 +121,6 @@ export default function SolarSystemMap({
     return () => observer.disconnect();
   }, []);
 
-  const modeOptions = { hardMode };
-  const layoutProfile = layoutProfileForMode(mode);
-
   useEffect(() => {
     if (size.width < 80 || size.height < 80) {
       return;
@@ -128,23 +134,22 @@ export default function SolarSystemMap({
     );
   }, [objects, size, layoutProfile]);
 
-  const visible = displayObjects.filter((object) => isVisibleInMode(object, mode));
   const positions = layoutAll(displayObjects, layoutProfile);
-  const heliocentricOrbits = visible.filter(
+  const heliocentricOrbits = displayObjects.filter(
     (object) =>
       isHeliocentric(object) &&
       object.au > 0 &&
       isQuizTarget(object, mode, modeOptions),
   );
-  const moonOrbits = visible.filter(
+  const moonOrbits = displayObjects.filter(
     (object) =>
       object.type === "moon" &&
       mode !== "planets" &&
       mode !== "celestial" &&
       isQuizTarget(object, mode, modeOptions),
   );
-  const regions = visible.filter((object) => object.type === "region");
-  const bodies = [...visible.filter((object) => object.type !== "region")].sort(
+  const regions = displayObjects.filter((object) => object.type === "region");
+  const bodies = [...displayObjects.filter((object) => object.type !== "region")].sort(
     (a, b) =>
       Number(isShownLit(a, mode, modeOptions)) -
       Number(isShownLit(b, mode, modeOptions)),
@@ -254,6 +259,9 @@ export default function SolarSystemMap({
         key={object.id}
         className={`body body-${object.type} ${shownLit ? "body-lit" : "body-dim"}${decorMoon ? " body-moon-decor" : ""}${isSun ? " body-sun-anchor" : ""}`}
         transform={`translate(${laid.x} ${laid.y})`}
+        ref={(element) => {
+          bodyElements.current.set(object.id, element);
+        }}
         role={decorMoon ? "presentation" : isSun ? "img" : "button"}
         aria-label={decorMoon ? undefined : object.name}
         aria-hidden={decorMoon ? true : undefined}
@@ -395,6 +403,9 @@ export default function SolarSystemMap({
                 r={moon.localOrbit}
                 cx={at.x}
                 cy={at.y}
+                ref={(element) => {
+                  moonOrbitElements.current.set(moon.id, element);
+                }}
               />
             );
           })}
