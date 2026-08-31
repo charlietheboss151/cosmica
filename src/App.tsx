@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ChangeEvent } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState, type ChangeEvent } from "react";
 import {
   catalog,
   moonsOf,
@@ -14,9 +14,10 @@ import {
   type QuizState,
 } from "./game";
 import { randomizeOrbitalPositions, layoutProfileForMode } from "./layout";
-import OrbitBackdrop from "./OrbitBackdrop";
 import SolarSystemMap from "./SolarSystemMap";
 import "./App.css";
+
+const OrbitBackdrop = lazy(() => import("./OrbitBackdrop"));
 
 type PlayConfig = {
   mode: GameMode;
@@ -61,7 +62,9 @@ function MenuBackdrop() {
     <div className="menu-backdrop" aria-hidden="true">
       <div className="starfield" />
       <div className="menu-glow" />
-      <OrbitBackdrop className="orbit-backdrop-menu" speed={4} />
+      <Suspense fallback={null}>
+        <OrbitBackdrop className="orbit-backdrop-menu" speed={4} />
+      </Suspense>
     </div>
   );
 }

@@ -7,7 +7,23 @@
     <title>Cosmica</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <style>
+        #root:empty {
+          display: grid;
+          place-items: center;
+          min-height: 100vh;
+          margin: 0;
+          background: #070b14;
+          color: #8ea0bc;
+          font-family: system-ui, sans-serif;
+        }
+        #root:empty::after {
+          content: "Loading Cosmica…";
+          letter-spacing: 0.06em;
+        }
+      </style>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
