@@ -1,0 +1,9 @@
+# Copy the lines below into ~/.ssh/config on your machine.
+# Use the private key that matches deploy/cosmica-deploy.pub
+# (generated as ~/.ssh/id_ed25519_cosmica).
+
+Host cosmica
+  HostName 192.64.87.248
+  User charlie
+  IdentityFile ~/.ssh/id_ed25519_cosmica
+  IdentitiesOnly yes

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.17.3] - 2026-08-31
+
+### Changed
+- Production builds use `/cosmica/` base path for hosting at charlietheboss.com/cosmica/.
+- Deploy script defaults to the Elementra server (`charlie@192.64.87.248`) and `~/.ssh/id_ed25519`.
+
 ## [0.17.2] - 2026-08-31
 
 ### Fixed
