@@ -37,4 +37,15 @@ npm test         # Vitest
 npm run build    # typecheck and write production files to dist/
 npm run preview  # serve the dist/ build locally
 npm run lint     # oxlint
+npm run deploy   # publish to charlietheboss.com/cosmica/ (see deploy/README.md)
+```
+
+## Deploy
+
+Production URL: **https://charlietheboss.com/cosmica/**
+
+Uses the same server and SSH key as Elementra (`charlie@192.64.87.248`, `~/.ssh/id_ed25519`). See [`deploy/README.md`](deploy/README.md).
+
+```bash
+npm run deploy
 ```
