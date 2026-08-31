@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.17.2] - 2026-08-31
+
+### Fixed
+- Home page logo is pinned to the viewport center over the solar system backdrop; tagline and Play sit below it.
+
 ## [0.17.1] - 2026-08-31
 
 ### Changed
