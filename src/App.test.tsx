@@ -103,4 +103,57 @@ describe("Cosmica prototype", () => {
     expect(document.querySelector(".try-ring-green")).not.toBeNull();
     expect(screen.queryByRole("radio")).not.toBeInTheDocument();
   });
+
+  it("wires the Moons hard-mode checkbox into the round", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByLabelText("Include all moons"));
+    await user.click(screen.getByRole("button", { name: "Moons" }));
+    const score = screen.getByTestId("score").textContent ?? "";
+    const total = Number(score.split("/")[1]?.trim());
+    expect(total).toBeGreaterThan(20);
+    expect(screen.getByRole("button", { name: "Charon" })).not.toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+  });
+
+  it("keeps hard-only moons disabled until hard mode is on", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole("button", { name: "Moons" }));
+    expect(screen.getByRole("button", { name: "Charon" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+  });
+
+  it("finishes a Planets round, shows results, and can replay", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole("button", { name: "Planets" }));
+    for (let placed = 0; placed < 8; placed += 1) {
+      const prompt = screen.getByTestId("find-prompt").textContent ?? "";
+      const name = prompt.replace("Click on ", "");
+      await user.click(screen.getByRole("button", { name }));
+    }
+    expect(screen.getByRole("dialog", { name: "Round complete" })).toBeInTheDocument();
+    expect(screen.getByTestId("results-score")).toHaveTextContent("8 / 8");
+    await user.click(screen.getByRole("button", { name: "Play again" }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(screen.getByTestId("score")).toHaveTextContent("0 / 8");
+    expect(screen.getByTestId("find-prompt").textContent).toMatch(/^Click on /);
+  });
+
+  it("activates a quiz body with the keyboard", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole("button", { name: "Planets" }));
+    const prompt = screen.getByTestId("find-prompt").textContent ?? "";
+    const name = prompt.replace("Click on ", "");
+    const target = screen.getByRole("button", { name });
+    target.focus();
+    await user.keyboard("{Enter}");
+    expect(screen.getByTestId("score")).toHaveTextContent("1 / 8");
+  });
 });

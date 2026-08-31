@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Extend App and SolarSystemMap tests for hard-mode wiring, full round results/replay, region hits, keyboard activation, and wheel/pan camera interaction.
+
 ## [0.15.3] - 2026-08-30
 
 ### Fixed
