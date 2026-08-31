@@ -37,4 +37,17 @@ npm test         # Vitest
 npm run build    # typecheck and write production files to dist/
 npm run preview  # serve the dist/ build locally
 npm run lint     # oxlint
+npm run deploy   # build on server via SSH (see deploy/README.md)
 ```
+
+## Deploy
+
+Production uses the same host as Elementra (`charlie@192.64.87.248`). SSH setup, the deploy key, and scripts live in [`deploy/`](deploy/README.md).
+
+Quick path after one-time setup:
+
+```bash
+npm run deploy
+```
+
+Publishes to `~/public_html/cosmica/` on the server (adjust in `scripts/deploy.sh` if your vhost differs).

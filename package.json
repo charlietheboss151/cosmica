@@ -1,13 +1,14 @@
 {
   "name": "cosmica",
   "private": true,
-  "version": "0.17.1",
+  "version": "0.17.2",
   "description": "Interactive Solar System map. Modes light up a subset of the full map.",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
+    "deploy": "bash scripts/deploy.sh",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",

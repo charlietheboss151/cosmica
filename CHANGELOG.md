@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.17.2] - 2026-08-31
+
+### Added
+- Cosmica deploy SSH key (`deploy/cosmica-deploy.pub`), SSH config example, server setup script, and `npm run deploy`.
+
 ## [0.17.1] - 2026-08-31
 
 ### Changed
