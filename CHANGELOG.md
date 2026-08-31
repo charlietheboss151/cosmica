@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Clear CORRECT feedback after a short delay, matching how miss and reveal feedback already fade out.
+
 ## [0.15.3] - 2026-08-30
 
 ### Fixed
