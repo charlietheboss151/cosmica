@@ -12,6 +12,8 @@ export type ModeOptions = {
   hardMode: boolean;
   /** When set in Moons mode, only moons of these parent bodies are lit. */
   parentIds?: string[];
+  /** When set in Moons mode, only this parent and its moons are shown. */
+  focusParentId?: string;
 };
 
 export type SolarObject = {
@@ -439,6 +441,18 @@ export function isVisibleInMode(
   if (mode === "moons" && object.hardOnly && !options.hardMode) {
     return false;
   }
+  if (mode === "moons" && options.focusParentId) {
+    if (object.type === "star") {
+      return true;
+    }
+    if (object.id === options.focusParentId) {
+      return true;
+    }
+    if (object.type === "moon" && object.parentId === options.focusParentId) {
+      return true;
+    }
+    return false;
+  }
   if (mode !== "moons" || !options.parentIds?.length) {
     return true;
   }
@@ -457,7 +471,8 @@ export function isVisibleInMode(
 /** Moons in Planets mode are tiny scenery, not quiz targets. */
 export const PLANETS_MODE_MOON_SCALE = 0.32;
 /** Lit moons in Moons mode stay readable even when catalog size is small. */
-export const MOONS_MODE_MIN_RADIUS = 11;
+export const MOONS_MODE_MIN_RADIUS = 28;
+export const MOONS_MODE_DISPLAY_SCALE = 2;
 
 export function isDecorativeMoon(object: SolarObject, mode: GameMode): boolean {
   return (mode === "planets" || mode === "celestial") && object.type === "moon";
@@ -468,7 +483,10 @@ export function displayRadius(object: SolarObject, mode: GameMode): number {
     return Math.max(3, object.displaySize * PLANETS_MODE_MOON_SCALE);
   }
   if (mode === "moons" && object.type === "moon") {
-    return Math.max(object.displaySize, MOONS_MODE_MIN_RADIUS);
+    return Math.max(
+      object.displaySize * MOONS_MODE_DISPLAY_SCALE,
+      MOONS_MODE_MIN_RADIUS,
+    );
   }
   if (
     mode === "celestial" &&

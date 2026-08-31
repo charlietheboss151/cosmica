@@ -119,6 +119,25 @@ export function BodyArt({ id, radius, color, type = "planet" }: Props) {
   const pad = id === "sun" ? 1.32 : 1.12;
   const clipR = id === "sun" ? radius * 1.28 : radius * 1.04;
 
+  const moonShell =
+    type === "moon" ? (
+      <>
+        <circle
+          className="moon-backing"
+          r={radius * 1.04}
+          fill={color}
+          opacity={0.92}
+        />
+        <circle
+          className="moon-shell"
+          r={radius * 1.08}
+          fill="none"
+          stroke="#eef3ff"
+          strokeWidth={Math.max(2.5, radius * 0.1)}
+        />
+      </>
+    ) : null;
+
   return (
     <g className="body-art" data-testid={`art-${id}`}>
       <defs>
@@ -126,9 +145,10 @@ export function BodyArt({ id, radius, color, type = "planet" }: Props) {
           <circle r={clipR} />
         </clipPath>
       </defs>
+      {moonShell}
       <g clipPath={`url(#${clipId})`}>
         {type === "moon" ? (
-          <circle className="moon-backing" r={radius * 1.02} fill={color} />
+          <circle className="moon-fill" r={radius * 1.02} fill={color} />
         ) : null}
         <image
           href={src}

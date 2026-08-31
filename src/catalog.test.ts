@@ -197,7 +197,7 @@ describe("solar system catalog", () => {
   it("keeps small moons readable in Moons mode", () => {
     const kerberos = catalog.find((object) => object.id === "kerberos")!;
     expect(kerberos.displaySize).toBeLessThan(11);
-    expect(displayRadius(kerberos, "moons")).toBe(11);
+    expect(displayRadius(kerberos, "moons")).toBe(28);
     expect(displayRadius(kerberos, "planets")).toBeLessThan(11);
   });
 
@@ -231,6 +231,25 @@ describe("solar system catalog", () => {
       "ganymede",
       "io",
     ]);
+  });
+
+  it("shows only the focused parent system during Moons play", () => {
+    const uranusFocus = { hardMode: false, focusParentId: "uranus" };
+    expect(
+      isVisibleInMode(catalog.find((object) => object.id === "miranda")!, "moons", uranusFocus),
+    ).toBe(true);
+    expect(
+      isVisibleInMode(catalog.find((object) => object.id === "uranus")!, "moons", uranusFocus),
+    ).toBe(true);
+    expect(
+      isVisibleInMode(catalog.find((object) => object.id === "sun")!, "moons", uranusFocus),
+    ).toBe(true);
+    expect(
+      isVisibleInMode(catalog.find((object) => object.id === "europa")!, "moons", uranusFocus),
+    ).toBe(false);
+    expect(
+      isVisibleInMode(catalog.find((object) => object.id === "jupiter")!, "moons", uranusFocus),
+    ).toBe(false);
   });
 
   it("draws the Sun and planets at cartoon overscale", () => {

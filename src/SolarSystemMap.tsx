@@ -26,6 +26,7 @@ import {
   annulusPath,
   beltDust,
   cameraFitRadius,
+  fitCameraOnMoonParent,
   layoutAll,
   layoutObject,
   layoutProfileForMode,
@@ -48,6 +49,8 @@ type Props = {
   flashId?: string | null;
   orbitStartMs?: number | null;
   orbitFreezeMs?: number | null;
+  /** In Moons mode, pans and zooms to the parent of this moon. */
+  focusId?: string | null;
   onSelect: (id: string) => void;
 };
 
@@ -61,6 +64,7 @@ export default function SolarSystemMap({
   flashId = null,
   orbitStartMs = null,
   orbitFreezeMs = null,
+  focusId = null,
   onSelect,
 }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -120,21 +124,41 @@ export default function SolarSystemMap({
     return () => observer.disconnect();
   }, []);
 
-  const modeOptions = { hardMode, parentIds };
+  const focusParentId =
+    mode === "moons" && focusId
+      ? objects.find((object) => object.id === focusId)?.parentId ?? undefined
+      : undefined;
+  const modeOptions = { hardMode, parentIds, focusParentId };
   const layoutProfile = layoutProfileForMode(mode);
 
   useEffect(() => {
     if (size.width < 80 || size.height < 80) {
       return;
     }
+    if (mode === "moons" && focusId) {
+      const moon = objects.find((object) => object.id === focusId);
+      if (moon?.parentId) {
+        setCamera(
+          fitCameraOnMoonParent(
+            objects,
+            moon.parentId,
+            layoutProfile,
+            size.width,
+            size.height,
+            { hardMode, parentIds, focusParentId: moon.parentId },
+          ),
+        );
+        return;
+      }
+    }
     setCamera(
       fitCamera(
-        cameraFitRadius(objects, layoutProfile),
+        cameraFitRadius(objects, layoutProfile, mode, parentIds),
         size.width,
         size.height,
       ),
     );
-  }, [objects, size, layoutProfile]);
+  }, [objects, size, layoutProfile, mode, parentIds, hardMode, focusId, focusParentId]);
 
   useEffect(() => {
     const isTypingTarget = (target: EventTarget | null) => {

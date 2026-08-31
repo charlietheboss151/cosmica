@@ -1,4 +1,13 @@
-import { catalog, isHeliocentric, type SolarObject } from "./catalog";
+import { fitCamera, type Camera } from "./camera";
+import {
+  catalog,
+  displayRadius,
+  isHeliocentric,
+  isLitInMode,
+  type GameMode,
+  type ModeOptions,
+  type SolarObject,
+} from "./catalog";
 import type { Rng } from "./game";
 import {
   minBodyGap,
@@ -93,12 +102,89 @@ export function regionBand(
 export function cameraFitRadius(
   objects: SolarObject[],
   profile: LayoutProfile = "compact",
+  mode?: GameMode,
+  parentIds?: string[],
 ): number {
+  if (mode === "moons") {
+    const laid = layoutAll(objects, profile);
+    const parentIdsToFit = parentIds?.length
+      ? parentIds
+      : objects
+          .filter(
+            (object) =>
+              object.type === "planet" &&
+              objects.some(
+                (candidate) =>
+                  candidate.type === "moon" && candidate.parentId === object.id,
+              ),
+          )
+          .map((object) => object.id);
+    let maxReach = 0;
+    for (const parentId of parentIdsToFit) {
+      for (const object of objects) {
+        if (object.type !== "moon" && object.id !== parentId) {
+          continue;
+        }
+        if (object.type === "moon" && object.parentId !== parentId) {
+          continue;
+        }
+        const position = laid.get(object.id);
+        if (!position) {
+          continue;
+        }
+        const radius =
+          object.type === "moon" ? displayRadius(object, "moons") : position.radius;
+        maxReach = Math.max(
+          maxReach,
+          Math.hypot(position.x, position.y) + radius,
+        );
+      }
+    }
+    if (maxReach > 0) {
+      return maxReach * 1.1;
+    }
+  }
   if (profile === "proportional") {
     return visualOrbit(10, profile) * 1.06;
   }
   const jupiter = objects.find((object) => object.id === "jupiter");
   return visualOrbit(jupiter?.au ?? 5.2, profile) * 1.08;
+}
+
+/** Center and zoom on one parent planet and its lit moons in Moons mode. */
+export function fitCameraOnMoonParent(
+  objects: SolarObject[],
+  parentId: string,
+  profile: LayoutProfile,
+  width: number,
+  height: number,
+  options: ModeOptions = { hardMode: false },
+): Camera {
+  const laid = layoutAll(objects, profile);
+  const parentPos = laid.get(parentId);
+  if (!parentPos) {
+    return fitCamera(
+      cameraFitRadius(objects, profile, "moons", options.parentIds),
+      width,
+      height,
+    );
+  }
+  const parent = objects.find((object) => object.id === parentId);
+  let maxReach = (parent?.displaySize ?? 20) + 10;
+  for (const object of objects) {
+    if (object.type !== "moon" || object.parentId !== parentId) {
+      continue;
+    }
+    if (!isLitInMode(object, "moons", options)) {
+      continue;
+    }
+    const orbit = visualLocalOrbit(object.localOrbit);
+    const radius = displayRadius(object, "moons");
+    maxReach = Math.max(maxReach, orbit + radius + 16);
+  }
+  const span = Math.min(width, height) * 0.48;
+  const zoom = Math.min(8, Math.max(0.22, span / Math.max(maxReach, 1)));
+  return { x: parentPos.x, y: parentPos.y, zoom };
 }
 
 export function beltDust(

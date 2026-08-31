@@ -337,6 +337,7 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
         flashId={quiz.wrongFlashId}
         orbitStartMs={quiz.startedAt}
         orbitFreezeMs={quiz.finishedAt}
+        focusId={mode === "moons" ? quiz.currentId : null}
         onSelect={choose}
       />
       <header className="hud">

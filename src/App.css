@@ -572,6 +572,21 @@ h1 {
   fill: #5e6a7e;
 }
 
+.body-lit.body-moon .body-art {
+  filter: drop-shadow(0 0 6px #ffffff55);
+  opacity: 1;
+}
+
+.body-lit.body-moon .moon-shell {
+  stroke: #ffffff;
+  stroke-opacity: 0.95;
+}
+
+.body-lit.body-moon .moon-backing,
+.body-lit.body-moon .moon-fill {
+  opacity: 1;
+}
+
 .body-moon-decor .body-art {
   filter: none;
   opacity: 0.72;

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.16.5] - 2026-08-31
+
+### Fixed
+- Moons mode now zooms to the active planet and shows only that planet’s moons, with larger minimum sizes, bright ring outlines, and backing discs so dark moon photos stay visible.
+
 ## [0.16.4] - 2026-08-31
 
 ### Fixed

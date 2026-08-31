@@ -83,6 +83,22 @@ export function keyboardPanDelta(
   return { dx, dy };
 }
 
+export function focusCameraOnBody(
+  camera: Camera,
+  x: number,
+  y: number,
+  _width: number,
+  _height: number,
+  zoom = 3,
+): Camera {
+  const nextZoom = Math.min(MAX_ZOOM, Math.max(camera.zoom, zoom));
+  return {
+    x,
+    y,
+    zoom: nextZoom,
+  };
+}
+
 export function zoomCamera(
   camera: Camera,
   factor: number,

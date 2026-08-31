@@ -43,16 +43,13 @@ describe("Cosmica prototype", () => {
     await user.click(screen.getByRole("button", { name: "Moons" }));
     await user.click(screen.getByRole("button", { name: "All planet moons" }));
     expect(screen.getByTestId("find-prompt").textContent).toMatch(/^Click on /);
-    expect(screen.getByRole("button", { name: "Europa" })).toBeEnabled();
-    expect(screen.getByRole("button", { name: "Phobos" })).toBeEnabled();
-    expect(screen.getByRole("button", { name: "Earth" })).toHaveAttribute(
-      "aria-disabled",
-      "true",
+    const target = (screen.getByTestId("find-prompt").textContent ?? "").replace(
+      "Click on ",
+      "",
     );
-    expect(screen.getByRole("button", { name: "Mercury" })).toHaveAttribute(
-      "aria-disabled",
-      "true",
-    );
+    expect(screen.getByRole("button", { name: target })).toBeEnabled();
+    expect(document.querySelectorAll(".body-moon.body-lit").length).toBeGreaterThan(0);
+    expect(screen.queryByRole("button", { name: "Mercury" })).not.toBeInTheDocument();
   });
 
   it("shows tiny decorative moons in Planets mode without making them clickable", async () => {
@@ -99,7 +96,7 @@ describe("Cosmica prototype", () => {
     const heliocentric = [...document.querySelectorAll("circle.orbit")].filter(
       (node) => !node.classList.contains("orbit-local"),
     );
-    expect(heliocentric.length).toBe(8);
+    expect(heliocentric.length).toBe(1);
     expect(document.querySelectorAll("circle.orbit-local").length).toBeGreaterThan(0);
   });
 
