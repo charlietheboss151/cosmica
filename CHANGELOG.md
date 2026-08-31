@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+- Drop unused catalog stubs: `isVisibleInMode`, `isQuizTarget`, and the unused `difficulty` field on solar objects.
+
 ## [0.15.3] - 2026-08-30
 
 ### Fixed

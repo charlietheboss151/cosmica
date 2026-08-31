@@ -1,7 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { catalog, displayRadius, isLitInMode, isShownLit, isVisibleInMode } from "./catalog";
+import * as catalogApi from "./catalog";
+import { catalog, displayRadius, isLitInMode, isShownLit } from "./catalog";
 
 describe("solar system catalog", () => {
+  it("does not export stub visibility helpers", () => {
+    expect(catalogApi).not.toHaveProperty("isVisibleInMode");
+    expect(catalogApi).not.toHaveProperty("isQuizTarget");
+  });
+
+  it("does not store unused difficulty on catalog bodies", () => {
+    for (const object of catalog) {
+      expect(object).not.toHaveProperty("difficulty");
+    }
+  });
   it("includes the Sun, eight planets, and other bodies on the same map", () => {
     const names = catalog.map((object) => object.name);
     expect(names).toEqual(expect.arrayContaining([
@@ -54,7 +65,6 @@ describe("solar system catalog", () => {
     const europa = catalog.find((object) => object.id === "europa")!;
     const ceres = catalog.find((object) => object.id === "ceres")!;
     const belt = catalog.find((object) => object.id === "asteroid-belt")!;
-    expect(isVisibleInMode(europa, "planets")).toBe(true);
     expect(isLitInMode(europa, "planets")).toBe(false);
     expect(displayRadius(europa, "planets")).toBeLessThan(europa.displaySize);
     expect(isLitInMode(ceres, "planets")).toBe(false);
@@ -146,18 +156,13 @@ describe("solar system catalog", () => {
       .filter((object) => isLitInMode(object, "moons"))
       .map((object) => object.type);
     expect(new Set(lit)).toEqual(new Set(["moon"]));
-    expect(isVisibleInMode(catalog.find((object) => object.id === "earth")!, "moons")).toBe(
-      true,
-    );
     expect(isLitInMode(catalog.find((object) => object.id === "earth")!, "moons")).toBe(
       false,
-    );
-    expect(isVisibleInMode(catalog.find((object) => object.id === "europa")!, "moons")).toBe(
-      true,
     );
     expect(isLitInMode(catalog.find((object) => object.id === "europa")!, "moons")).toBe(
       true,
     );
+    expect(catalog.some((object) => object.id === "earth")).toBe(true);
   });
 
   it("draws the Sun and planets at cartoon overscale", () => {

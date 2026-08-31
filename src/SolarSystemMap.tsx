@@ -13,9 +13,8 @@ import {
   displayRadius,
   isDecorativeMoon,
   isHeliocentric,
-  isQuizTarget,
+  isLitInMode,
   isShownLit,
-  isVisibleInMode,
   type GameMode,
   type SolarObject,
 } from "./catalog";
@@ -128,23 +127,22 @@ export default function SolarSystemMap({
     );
   }, [objects, size, layoutProfile]);
 
-  const visible = displayObjects.filter((object) => isVisibleInMode(object, mode));
   const positions = layoutAll(displayObjects, layoutProfile);
-  const heliocentricOrbits = visible.filter(
+  const heliocentricOrbits = displayObjects.filter(
     (object) =>
       isHeliocentric(object) &&
       object.au > 0 &&
-      isQuizTarget(object, mode, modeOptions),
+      isLitInMode(object, mode, modeOptions),
   );
-  const moonOrbits = visible.filter(
+  const moonOrbits = displayObjects.filter(
     (object) =>
       object.type === "moon" &&
       mode !== "planets" &&
       mode !== "celestial" &&
-      isQuizTarget(object, mode, modeOptions),
+      isLitInMode(object, mode, modeOptions),
   );
-  const regions = visible.filter((object) => object.type === "region");
-  const bodies = [...visible.filter((object) => object.type !== "region")].sort(
+  const regions = displayObjects.filter((object) => object.type === "region");
+  const bodies = [...displayObjects.filter((object) => object.type !== "region")].sort(
     (a, b) =>
       Number(isShownLit(a, mode, modeOptions)) -
       Number(isShownLit(b, mode, modeOptions)),
@@ -207,7 +205,7 @@ export default function SolarSystemMap({
   };
 
   const renderRegionHit = (object: SolarObject) => {
-    if (!isQuizTarget(object, mode, modeOptions)) {
+    if (!isLitInMode(object, mode, modeOptions)) {
       return null;
     }
     const shownLit = isShownLit(object, mode, modeOptions);
@@ -244,7 +242,7 @@ export default function SolarSystemMap({
       positions.get(object.id) ??
       layoutObject(object, displayObjects, layoutProfile);
     const shownLit = isShownLit(object, mode, modeOptions);
-    const quizTarget = isQuizTarget(object, mode, modeOptions);
+    const quizTarget = isLitInMode(object, mode, modeOptions);
     const decorMoon = isDecorativeMoon(object, mode);
     const radius = displayRadius(object, mode);
     const passive = decorMoon;

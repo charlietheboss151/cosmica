@@ -23,16 +23,14 @@ export type SolarObject = {
   longitudeDeg: number;
   displaySize: number;
   color: string;
-  difficulty: number;
   hardOnly: boolean;
 };
 
 import { EXTRA_CATALOG } from "./extraCatalog";
 
 function body(
-  partial: Omit<SolarObject, "localOrbit" | "difficulty" | "innerAu" | "hardOnly"> & {
+  partial: Omit<SolarObject, "localOrbit" | "innerAu" | "hardOnly"> & {
     localOrbit?: number;
-    difficulty?: number;
     innerAu?: number;
     hardOnly?: boolean;
   },
@@ -40,7 +38,6 @@ function body(
   return {
     localOrbit: 0,
     innerAu: 0,
-    difficulty: 1,
     hardOnly: false,
     ...partial,
   };
@@ -429,10 +426,6 @@ export function isHeliocentric(object: SolarObject): boolean {
   );
 }
 
-export function isVisibleInMode(_object: SolarObject, _mode: GameMode): boolean {
-  return true;
-}
-
 /** Moons in Planets mode are tiny scenery, not quiz targets. */
 export const PLANETS_MODE_MOON_SCALE = 0.32;
 
@@ -463,14 +456,6 @@ export function isShownLit(
   if (object.type === "star") {
     return true;
   }
-  return isLitInMode(object, mode, options);
-}
-
-export function isQuizTarget(
-  object: SolarObject,
-  mode: GameMode,
-  options: ModeOptions = { hardMode: false },
-): boolean {
   return isLitInMode(object, mode, options);
 }
 
