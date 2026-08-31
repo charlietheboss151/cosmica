@@ -82,14 +82,18 @@ function Home({ onPlay }: { onPlay: () => void }) {
         </Suspense>
       </div>
       <div className="home-content">
-        <img className="home-logo" src={LOGO_SRC} alt={LOGO_ALT} width={360} height={360} />
-        <p className="home-tagline">Learn the Solar System by navigating it.</p>
-        <button type="button" className="mode-play home-play" onClick={onPlay}>
-          Play
-        </button>
-        <p className="home-credit">
-          Designed &amp; created by <span>Charlie Bishop</span>
-        </p>
+        <div className="home-logo-wrap">
+          <img className="home-logo" src={LOGO_SRC} alt={LOGO_ALT} width={360} height={360} />
+        </div>
+        <div className="home-actions">
+          <p className="home-tagline">Learn the Solar System by navigating it.</p>
+          <button type="button" className="mode-play home-play" onClick={onPlay}>
+            Play
+          </button>
+          <p className="home-credit">
+            Designed &amp; created by <span>Charlie Bishop</span>
+          </p>
+        </div>
       </div>
     </main>
   );
