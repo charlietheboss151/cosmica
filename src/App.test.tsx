@@ -103,4 +103,31 @@ describe("Cosmica prototype", () => {
     expect(document.querySelector(".try-ring-green")).not.toBeNull();
     expect(screen.queryByRole("radio")).not.toBeInTheDocument();
   });
+
+  it("exposes prompt, score, and feedback updates to assistive tech", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole("button", { name: "Planets" }));
+    expect(screen.getByTestId("find-prompt")).toHaveAttribute("aria-live", "polite");
+    expect(screen.getByTestId("score")).toHaveAttribute("aria-live", "polite");
+    const prompt = screen.getByTestId("find-prompt").textContent ?? "";
+    const target = prompt.replace("Click on ", "");
+    const decoy = target === "Venus" ? "Mars" : "Venus";
+    await user.click(screen.getByRole("button", { name: decoy }));
+    expect(screen.getByTestId("feedback")).toHaveAttribute("aria-live", "assertive");
+  });
+
+  it("marks the results dialog as modal and moves focus into it", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole("button", { name: "Planets" }));
+    for (let placed = 0; placed < 8; placed += 1) {
+      const prompt = screen.getByTestId("find-prompt").textContent ?? "";
+      const name = prompt.replace("Click on ", "");
+      await user.click(screen.getByRole("button", { name }));
+    }
+    const dialog = screen.getByRole("dialog", { name: "Round complete" });
+    expect(dialog).toHaveAttribute("aria-modal", "true");
+    expect(screen.getByRole("button", { name: "Play again" })).toHaveFocus();
+  });
 });

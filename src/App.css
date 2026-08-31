@@ -481,6 +481,21 @@ h1 {
   stroke-width: 5;
 }
 
+.body-lit:focus-visible {
+  outline: none;
+}
+
+.body-lit:focus-visible .hit {
+  stroke: #fff;
+  stroke-width: 3;
+}
+
+.body-region-hit.body-lit:focus-visible .region-hit {
+  stroke: #fff;
+  stroke-width: 2;
+  stroke-opacity: 0.9;
+}
+
 .belt {
   fill: none;
   opacity: 0.35;
@@ -717,4 +732,11 @@ h1 {
 .results-actions .ghost {
   pointer-events: auto;
   width: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .try-ring-flash {
+    animation: none;
+    opacity: 1;
+  }
 }

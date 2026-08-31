@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Announce prompt, score, and feedback with aria-live; mark the results dialog as aria-modal with a focus trap.
+- Show focus rings on image-based quiz bodies and region hits, not only flat `.disc` art.
+- Honor prefers-reduced-motion for in-game orbit animation, menu backdrop spins, and flash rings.
+- Support arrow-key pan and plus/minus zoom on the focused map.
+
 ## [0.15.3] - 2026-08-30
 
 ### Fixed

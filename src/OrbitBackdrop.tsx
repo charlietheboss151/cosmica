@@ -112,6 +112,8 @@ type Props = {
   /** Higher values spin more slowly. Menu uses 1; gameplay uses ~4. */
   speed?: number;
   className?: string;
+  /** When false, skip SMIL spin animations (e.g. prefers-reduced-motion). */
+  animate?: boolean;
 };
 
 function spin(seconds: number, speed: number): string {
@@ -121,20 +123,24 @@ function spin(seconds: number, speed: number): string {
 function PlanetBody({
   planet,
   speed,
+  animate,
 }: {
   planet: PlanetOrbit;
   speed: number;
+  animate: boolean;
 }) {
   return (
     <g>
-      <animateTransform
-        attributeName="transform"
-        type="rotate"
-        from={`${planet.start} 0 0`}
-        to={`${planet.start + 360} 0 0`}
-        dur={spin(planet.duration, speed)}
-        repeatCount="indefinite"
-      />
+      {animate ? (
+        <animateTransform
+          attributeName="transform"
+          type="rotate"
+          from={`${planet.start} 0 0`}
+          to={`${planet.start + 360} 0 0`}
+          dur={spin(planet.duration, speed)}
+          repeatCount="indefinite"
+        />
+      ) : null}
       <g transform={`translate(${planet.r} 0)`}>
         <image
           href={planet.src}
@@ -145,14 +151,16 @@ function PlanetBody({
         />
         {planet.moons?.map((moon) => (
           <g key={moon.src}>
-            <animateTransform
-              attributeName="transform"
-              type="rotate"
-              from={`${moon.start} 0 0`}
-              to={`${moon.start + 360} 0 0`}
-              dur={spin(moon.duration, speed)}
-              repeatCount="indefinite"
-            />
+            {animate ? (
+              <animateTransform
+                attributeName="transform"
+                type="rotate"
+                from={`${moon.start} 0 0`}
+                to={`${moon.start + 360} 0 0`}
+                dur={spin(moon.duration, speed)}
+                repeatCount="indefinite"
+              />
+            ) : null}
             <g transform={`translate(${moon.localR} 0)`}>
               <image
                 href={moon.src}
@@ -173,21 +181,25 @@ function PlanetBody({
 function DrifterBody({
   body,
   speed,
+  animate,
 }: {
   body: (typeof DRIFTERS)[number];
   speed: number;
+  animate: boolean;
 }) {
   return (
     <g transform={`translate(${body.x} ${body.y})`}>
       <g>
-        <animateTransform
-          attributeName="transform"
-          type="rotate"
-          from={`${body.start} 0 0`}
-          to={`${body.start + 360} 0 0`}
-          dur={spin(body.duration, speed)}
-          repeatCount="indefinite"
-        />
+        {animate ? (
+          <animateTransform
+            attributeName="transform"
+            type="rotate"
+            from={`${body.start} 0 0`}
+            to={`${body.start + 360} 0 0`}
+            dur={spin(body.duration, speed)}
+            repeatCount="indefinite"
+          />
+        ) : null}
         <image
           href={body.src}
           className="orbit-backdrop-drift"
@@ -201,7 +213,19 @@ function DrifterBody({
   );
 }
 
-export default function OrbitBackdrop({ speed = 1, className = "" }: Props) {
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
+export default function OrbitBackdrop({
+  speed = 1,
+  className = "",
+  animate = !prefersReducedMotion(),
+}: Props) {
   return (
     <div className={`orbit-backdrop ${className}`.trim()} aria-hidden="true">
       <svg viewBox="-300 -300 600 600" className="orbit-backdrop-svg">
@@ -220,6 +244,7 @@ export default function OrbitBackdrop({ speed = 1, className = "" }: Props) {
             key={`${body.src}-${body.x}-${body.y}`}
             body={body}
             speed={speed}
+            animate={animate}
           />
         ))}
         <image
@@ -231,7 +256,12 @@ export default function OrbitBackdrop({ speed = 1, className = "" }: Props) {
           className="orbit-backdrop-sun"
         />
         {PLANETS.map((planet) => (
-          <PlanetBody key={planet.id} planet={planet} speed={speed} />
+          <PlanetBody
+            key={planet.id}
+            planet={planet}
+            speed={speed}
+            animate={animate}
+          />
         ))}
       </svg>
     </div>

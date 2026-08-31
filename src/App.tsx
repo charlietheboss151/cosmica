@@ -1,4 +1,4 @@
-import { useEffect, useState, type ChangeEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { catalog, objectById, type GameMode } from "./catalog";
 import {
   applyClick,
@@ -121,6 +121,7 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
     startQuiz(mode, Math.random, Date.now(), hardMode),
   );
   const [now, setNow] = useState(() => Date.now());
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   const replay = () => {
     setObjects(
@@ -162,12 +163,43 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
     return () => window.clearInterval(tick);
   }, [quiz.finishedAt]);
 
+  const done = quiz.finishedAt !== null;
+
+  useEffect(() => {
+    if (!done) {
+      return;
+    }
+    const root = resultsRef.current;
+    if (!root) {
+      return;
+    }
+    const focusable = [
+      ...root.querySelectorAll<HTMLElement>("button:not([disabled])"),
+    ];
+    focusable[0]?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Tab" || focusable.length === 0) {
+        return;
+      }
+      const first = focusable[0]!;
+      const last = focusable[focusable.length - 1]!;
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    root.addEventListener("keydown", onKeyDown);
+    return () => root.removeEventListener("keydown", onKeyDown);
+  }, [done]);
+
   const choose = (id: string) => {
     setQuiz((current) => applyClick(current, id));
   };
 
   const elapsedMs = (quiz.finishedAt ?? now) - quiz.startedAt;
-  const done = quiz.finishedAt !== null;
 
   return (
     <div className="play">
@@ -187,11 +219,11 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
         <button type="button" className="ghost" onClick={onMenu}>
           Menu
         </button>
-        <p className="prompt" data-testid="find-prompt">
+        <p className="prompt" data-testid="find-prompt" aria-live="polite">
           {quiz.prompt}
         </p>
         <div className="stats">
-          <p data-testid="score">
+          <p data-testid="score" aria-live="polite">
             {quiz.placed} / {quiz.total}
           </p>
           <p data-testid="timer">{formatElapsed(elapsedMs)}</p>
@@ -207,6 +239,7 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
         <p
           className={`feedback feedback-${quiz.lastResult}`}
           data-testid="feedback"
+          aria-live="assertive"
         >
           {quiz.lastResult === "correct"
             ? "CORRECT"
@@ -216,7 +249,13 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
         </p>
       ) : null}
       {done ? (
-        <div className="results" role="dialog" aria-labelledby="results-title">
+        <div
+          className="results"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="results-title"
+          ref={resultsRef}
+        >
           <h2 id="results-title">Round complete</h2>
           <p data-testid="results-score">
             {quiz.placed} / {quiz.total}
@@ -236,7 +275,7 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
         </div>
       ) : null}
       <p className="hint">
-        3 guesses per body · click the named body · scroll to zoom
+        3 guesses per body · click the named body · scroll to zoom · arrows pan
       </p>
     </div>
   );

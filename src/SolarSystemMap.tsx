@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type PointerEvent, type WheelEvent } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent, type WheelEvent } from "react";
 import {
   cameraTransform,
   createCamera,
@@ -34,6 +34,18 @@ import {
   visualOrbit,
 } from "./layout";
 
+const KEYBOARD_PAN_PX = 48;
+const KEYBOARD_ZOOM_IN = 1.12;
+const KEYBOARD_ZOOM_OUT = 1 / 1.12;
+
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
 type Props = {
   objects: SolarObject[];
   mode: GameMode;
@@ -61,9 +73,10 @@ export default function SolarSystemMap({
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [camera, setCamera] = useState<Camera>(createCamera);
   const [orbitNow, setOrbitNow] = useState(() => Date.now());
+  const [reduceMotion, setReduceMotion] = useState(prefersReducedMotion);
   const drag = useRef<{ x: number; y: number } | null>(null);
 
-  const orbiting = orbitStartMs !== null;
+  const orbiting = orbitStartMs !== null && !reduceMotion;
   const orbitElapsedMs = orbiting
     ? Math.max(0, (orbitFreezeMs ?? orbitNow) - orbitStartMs)
     : 0;
@@ -78,6 +91,17 @@ export default function SolarSystemMap({
   const displayObjects = orbiting
     ? applyOrbitPhase(objects, heliocentricPhase, moonPhase)
     : objects;
+
+  useEffect(() => {
+    if (typeof window.matchMedia !== "function") {
+      return;
+    }
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => setReduceMotion(media.matches);
+    sync();
+    media.addEventListener("change", sync);
+    return () => media.removeEventListener("change", sync);
+  }, []);
 
   useEffect(() => {
     if (!orbiting || orbitFreezeMs !== null) {
@@ -360,17 +384,72 @@ export default function SolarSystemMap({
     );
   };
 
+  const onKeyDown = (event: KeyboardEvent<SVGSVGElement>) => {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      setCamera((current) => panCamera(current, KEYBOARD_PAN_PX, 0));
+      return;
+    }
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      setCamera((current) => panCamera(current, -KEYBOARD_PAN_PX, 0));
+      return;
+    }
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      setCamera((current) => panCamera(current, 0, KEYBOARD_PAN_PX));
+      return;
+    }
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      setCamera((current) => panCamera(current, 0, -KEYBOARD_PAN_PX));
+      return;
+    }
+    if (event.key === "+" || event.key === "=") {
+      event.preventDefault();
+      setCamera((current) =>
+        zoomCamera(
+          current,
+          KEYBOARD_ZOOM_IN,
+          bounds.width / 2,
+          bounds.height / 2,
+          bounds.width,
+          bounds.height,
+        ),
+      );
+      return;
+    }
+    if (event.key === "-" || event.key === "_") {
+      event.preventDefault();
+      setCamera((current) =>
+        zoomCamera(
+          current,
+          KEYBOARD_ZOOM_OUT,
+          bounds.width / 2,
+          bounds.height / 2,
+          bounds.width,
+          bounds.height,
+        ),
+      );
+    }
+  };
+
   return (
     <div className="map" ref={hostRef}>
       <svg
         className="map-svg"
         width={size.width}
         height={size.height}
+        tabIndex={0}
+        role="application"
+        aria-label="Solar system map. Arrow keys pan, plus and minus zoom."
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={endDrag}
         onPointerCancel={endDrag}
         onWheel={onWheel}
+        onKeyDown={onKeyDown}
       >
         <g transform={cameraTransform(camera, size.width, size.height)}>
           {heliocentricOrbits.map((object) => (
