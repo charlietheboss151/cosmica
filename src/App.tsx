@@ -19,16 +19,19 @@ import "./App.css";
 
 const OrbitBackdrop = lazy(() => import("./OrbitBackdrop"));
 
+const LOGO_SRC = "/cosmica-logo.png";
+const LOGO_ALT = "Cosmica. Learn the Solar System by navigating it.";
+
 type PlayConfig = {
   mode: GameMode;
   hardMode: boolean;
   parentIds?: string[];
 };
 
-type Screen = "menu" | "moons-setup" | PlayConfig;
+type Screen = "home" | "menu" | "moons-setup" | PlayConfig;
 
 function isPlayConfig(screen: Screen): screen is PlayConfig {
-  return screen !== "menu" && screen !== "moons-setup";
+  return screen !== "home" && screen !== "menu" && screen !== "moons-setup";
 }
 
 const PLAYABLE_MODES: {
@@ -69,12 +72,33 @@ function MenuBackdrop() {
   );
 }
 
+function Home({ onPlay }: { onPlay: () => void }) {
+  return (
+    <main className="home">
+      <MenuBackdrop />
+      <div className="home-panel">
+        <h1 className="home-title">Cosmica: the solar system map quiz</h1>
+        <img className="home-logo" src={LOGO_SRC} alt={LOGO_ALT} width={320} height={320} />
+        <p className="home-tagline">Learn the Solar System by navigating it.</p>
+        <button type="button" className="mode-play home-play" onClick={onPlay}>
+          Play
+        </button>
+        <p className="home-credit">
+          Designed &amp; created by <span>Charlie Bishop</span>
+        </p>
+      </div>
+    </main>
+  );
+}
+
 function Menu({
   onPlay,
   onMoonsSetup,
+  onHome,
 }: {
   onPlay: (config: PlayConfig) => void;
   onMoonsSetup: () => void;
+  onHome: () => void;
 }) {
   const [hardByMode, setHardByMode] = useState<Record<GameMode, boolean>>({
     planets: false,
@@ -100,8 +124,10 @@ function Menu({
       <MenuBackdrop />
       <div className="menu-panel">
         <header className="menu-brand">
-          <p className="eyebrow">Learn the Solar System by navigating it</p>
-          <h1>COSMICA</h1>
+          <button type="button" className="menu-logo-btn" onClick={onHome} aria-label="Home">
+            <img className="menu-logo" src={LOGO_SRC} alt="" width={160} height={160} />
+          </button>
+          <p className="eyebrow">Choose a mode</p>
           <p className="lede">
             An interactive map quiz — click the body named in the prompt.
           </p>
@@ -148,9 +174,11 @@ function Menu({
 function MoonsSetup({
   onBack,
   onPlay,
+  onHome,
 }: {
   onBack: () => void;
   onPlay: (config: PlayConfig) => void;
+  onHome: () => void;
 }) {
   const [hardMode, setHardMode] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(() => new Set());
@@ -204,9 +232,15 @@ function MoonsSetup({
       <MenuBackdrop />
       <div className="menu-panel menu-panel-sub">
         <header className="menu-sub-header">
-          <button type="button" className="ghost menu-back" onClick={onBack}>
-            Back
-          </button>
+          <div className="menu-sub-nav">
+            <button type="button" className="ghost menu-back" onClick={onBack}>
+              Back
+            </button>
+            <button type="button" className="ghost menu-home" onClick={onHome}>
+              Home
+            </button>
+          </div>
+          <img className="menu-logo menu-logo-small" src={LOGO_SRC} alt="" width={96} height={96} />
           <h2 className="menu-sub-title">Moons</h2>
           <p className="menu-sub-lede">Pick one planet, mix a few, or play them all.</p>
         </header>
@@ -400,19 +434,27 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
 }
 
 export default function App() {
-  const [screen, setScreen] = useState<Screen>("menu");
+  const [screen, setScreen] = useState<Screen>("home");
   if (isPlayConfig(screen)) {
     return <Play config={screen} onMenu={() => setScreen("menu")} />;
   }
   if (screen === "moons-setup") {
     return (
-      <MoonsSetup onBack={() => setScreen("menu")} onPlay={(config) => setScreen(config)} />
+      <MoonsSetup
+        onBack={() => setScreen("menu")}
+        onHome={() => setScreen("home")}
+        onPlay={(config) => setScreen(config)}
+      />
     );
   }
-  return (
-    <Menu
-      onPlay={(config) => setScreen(config)}
-      onMoonsSetup={() => setScreen("moons-setup")}
-    />
-  );
+  if (screen === "menu") {
+    return (
+      <Menu
+        onPlay={(config) => setScreen(config)}
+        onMoonsSetup={() => setScreen("moons-setup")}
+        onHome={() => setScreen("home")}
+      />
+    );
+  }
+  return <Home onPlay={() => setScreen("menu")} />;
 }

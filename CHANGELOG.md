@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-08-31
+
+### Added
+- Home page with the Cosmica logo, Play button, and “Designed & created by Charlie Bishop” credit (Elementra-style landing).
+
+### Changed
+- Mode menu uses the logo instead of a text title; click the logo or Home to return to the landing page.
+
 ## [0.16.5] - 2026-08-31
 
 ### Fixed

@@ -1,7 +1,69 @@
 .menu,
-.play {
+.play,
+.home {
   min-height: 100vh;
   margin: 0;
+}
+
+.home {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: 32px 20px 48px;
+  background: #05070d;
+}
+
+.home-panel {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(520px, 100%);
+  text-align: center;
+  gap: 18px;
+}
+
+.home-title {
+  margin: 0;
+  font-size: clamp(1.05rem, 3.4vw, 1.42rem);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: #dce6ff;
+}
+
+.home-logo {
+  width: min(320px, 78vw);
+  height: auto;
+  border-radius: 50%;
+  filter:
+    drop-shadow(0 16px 48px #00000088)
+    drop-shadow(0 0 56px #4a78ff55);
+}
+
+.home-tagline {
+  margin: 0;
+  max-width: 24rem;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: #9eb0cc;
+}
+
+.home-play {
+  margin-top: 6px;
+  min-width: 9rem;
+}
+
+.home-credit {
+  margin: 20px 0 0;
+  font-size: 0.82rem;
+  color: #6d7f99;
+}
+
+.home-credit span {
+  color: #c2d0ea;
+  font-weight: 600;
 }
 
 .menu {
@@ -79,6 +141,50 @@
 .menu-brand {
   text-align: center;
   margin-bottom: 28px;
+}
+
+.menu-logo-btn {
+  display: block;
+  margin: 0 auto 16px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.menu-logo-btn:hover .menu-logo,
+.menu-logo-btn:focus-visible .menu-logo {
+  filter:
+    drop-shadow(0 8px 24px #00000066)
+    drop-shadow(0 0 32px #7aa2ff88);
+}
+
+.menu-logo {
+  display: block;
+  width: min(160px, 42vw);
+  height: auto;
+  margin: 0 auto;
+  border-radius: 50%;
+  filter:
+    drop-shadow(0 8px 24px #00000066)
+    drop-shadow(0 0 28px #4a78ff44);
+}
+
+.menu-logo-small {
+  width: 88px;
+  margin-bottom: 4px;
+}
+
+.menu-sub-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.menu-home {
+  padding: 8px 14px;
+  font-size: 0.88rem;
 }
 
 .menu-brand h1 {

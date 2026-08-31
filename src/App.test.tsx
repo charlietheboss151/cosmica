@@ -3,20 +3,40 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import App from "./App";
 
+async function openMenu() {
+  const user = userEvent.setup();
+  render(<App />);
+  await user.click(screen.getByRole("button", { name: "Play" }));
+  return user;
+}
+
 describe("Cosmica prototype", () => {
-  it("lets the player pick Planets mode from the menu", () => {
+  it("shows the home page with logo and creator credit", () => {
     render(<App />);
     expect(
-      screen.getByRole("heading", { name: "COSMICA" }),
+      screen.getByRole("heading", { name: "Cosmica: the solar system map quiz" }),
     ).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /Cosmica\. Learn the Solar System/i })).toHaveAttribute(
+      "src",
+      "/cosmica-logo.png",
+    );
+    expect(screen.getByText(/Designed & created by/i)).toBeInTheDocument();
+    expect(screen.getByText("Charlie Bishop")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Play" })).toBeInTheDocument();
+  });
+
+  it("lets the player pick Planets mode from the menu", async () => {
+    const user = await openMenu();
+    expect(screen.getByRole("button", { name: "Home" })).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "Planets" }),
     ).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Planets" }));
+    expect(screen.getByTestId("find-prompt")).toBeInTheDocument();
   });
 
   it("starts a FIND round on the full map with only planets lit", async () => {
-    const user = userEvent.setup();
-    render(<App />);
+    const user = await openMenu();
     await user.click(screen.getByRole("button", { name: "Planets" }));
     expect(screen.getByTestId("find-prompt").textContent).toMatch(/^Click on /);
     expect(screen.getByRole("button", { name: "Mercury" })).toBeEnabled();
@@ -26,8 +46,7 @@ describe("Cosmica prototype", () => {
   });
 
   it("opens a Moons setup screen from the menu", async () => {
-    const user = userEvent.setup();
-    render(<App />);
+    const user = await openMenu();
     await user.click(screen.getByRole("button", { name: "Moons" }));
     expect(screen.getByRole("heading", { name: "Moons" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "All planet moons" })).toBeEnabled();
@@ -38,8 +57,7 @@ describe("Cosmica prototype", () => {
   });
 
   it("starts a FIND round with moons lit and planets grayed", async () => {
-    const user = userEvent.setup();
-    render(<App />);
+    const user = await openMenu();
     await user.click(screen.getByRole("button", { name: "Moons" }));
     await user.click(screen.getByRole("button", { name: "All planet moons" }));
     expect(screen.getByTestId("find-prompt").textContent).toMatch(/^Click on /);
@@ -53,8 +71,7 @@ describe("Cosmica prototype", () => {
   });
 
   it("shows tiny decorative moons in Planets mode without making them clickable", async () => {
-    const user = userEvent.setup();
-    render(<App />);
+    const user = await openMenu();
     await user.click(screen.getByRole("button", { name: "Planets" }));
     expect(screen.queryByRole("button", { name: "Europa" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Moon" })).not.toBeInTheDocument();
@@ -64,8 +81,7 @@ describe("Cosmica prototype", () => {
   });
 
   it("starts Celestial bodies mode from the menu", async () => {
-    const user = userEvent.setup();
-    render(<App />);
+    const user = await openMenu();
     await user.click(screen.getByRole("button", { name: "Celestial bodies" }));
     expect(screen.getByTestId("find-prompt").textContent).toMatch(/^Click on /);
     expect(screen.getByRole("button", { name: "Mercury" })).toHaveAttribute(
@@ -75,8 +91,7 @@ describe("Cosmica prototype", () => {
   });
 
   it("lets players click dwarf planets inside a belt region in Celestial mode", async () => {
-    const user = userEvent.setup();
-    render(<App />);
+    const user = await openMenu();
     await user.click(screen.getByRole("button", { name: "Celestial bodies" }));
     const pluto = screen.getByRole("button", { name: "Pluto" });
     expect(pluto).not.toHaveAttribute("aria-disabled", "true");
@@ -84,8 +99,7 @@ describe("Cosmica prototype", () => {
   });
 
   it("draws planet orbit guides in Moons mode", async () => {
-    const user = userEvent.setup();
-    render(<App />);
+    const user = await openMenu();
     await user.click(screen.getByRole("button", { name: "Planets" }));
     expect(document.querySelectorAll(".belt-orbit").length).toBe(0);
     expect(document.querySelectorAll("circle.orbit").length).toBe(8);
@@ -101,8 +115,7 @@ describe("Cosmica prototype", () => {
   });
 
   it("lets players choose planets and quiz only those moons", async () => {
-    const user = userEvent.setup();
-    render(<App />);
+    const user = await openMenu();
     await user.click(screen.getByRole("button", { name: "Moons" }));
     await user.click(screen.getByRole("button", { name: "Mars" }));
     await user.click(screen.getByRole("button", { name: "Play selected (2 moons)" }));
@@ -113,8 +126,7 @@ describe("Cosmica prototype", () => {
   });
 
   it("shows the clicked planet name after a wrong click", async () => {
-    const user = userEvent.setup();
-    render(<App />);
+    const user = await openMenu();
     await user.click(screen.getByRole("button", { name: "Planets" }));
     const prompt = screen.getByTestId("find-prompt").textContent ?? "";
     const target = prompt.replace("Click on ", "");
@@ -126,12 +138,11 @@ describe("Cosmica prototype", () => {
   });
 
   it("scores a correct planet click and keeps the map as the answer", async () => {
-    const user = userEvent.setup();
-    render(<App />);
+    const user = await openMenu();
     await user.click(screen.getByRole("button", { name: "Planets" }));
     const prompt = screen.getByTestId("find-prompt").textContent ?? "";
     const name = prompt.replace("Click on ", "");
-    await user.click(screen.getByRole("button", { name }));
+    await user.click(screen.getByRole("button", { name: name }));
     expect(screen.getByTestId("score")).toHaveTextContent("1 / 8");
     expect(screen.getByTestId("find-prompt").textContent).not.toBe(prompt);
     expect(document.querySelector(".try-ring-green")).not.toBeNull();
