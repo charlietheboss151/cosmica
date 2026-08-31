@@ -33,13 +33,14 @@ import {
   regionBand,
   visualOrbit,
 } from "./layout";
+import type { TryMark } from "./game";
 
 type Props = {
   objects: SolarObject[];
   mode: GameMode;
   hardMode?: boolean;
   foundIds?: string[];
-  marks?: Record<string, string>;
+  marks?: Record<string, TryMark>;
   flashId?: string | null;
   orbitStartMs?: number | null;
   orbitFreezeMs?: number | null;

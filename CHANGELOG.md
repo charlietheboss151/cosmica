@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Type `SolarSystemMap` `marks` as `Record<string, TryMark>` so invalid mark strings cannot slip into try-ring CSS classes.
+
 ## [0.15.3] - 2026-08-30
 
 ### Fixed
