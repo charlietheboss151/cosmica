@@ -52,7 +52,7 @@ Planet sticker art is original to Cosmica. Moon and celestial-body photos are pu
 | Wild 2 | Comet Wild2.jpg |
 | Shoemaker-Levy 9 | Comet P-Shoemaker-Levy 9 (1994-43-203).jpg |
 
-Cartoon asteroid sprite: `asteroid-rock.svg` / `asteroid-rock.png` from [OpenClipart #323535](https://openclipart.org/detail/323535/asteroid) (public domain).
+Cartoon asteroid sprite: `asteroid-rock.png` from [OpenClipart #323535](https://openclipart.org/detail/323535/asteroid) (public domain).
 
 Regenerate PNGs with:
 

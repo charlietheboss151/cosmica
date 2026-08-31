@@ -29,7 +29,7 @@ const MOON_FILES = {
 
 const OUT_DIR = join(dirname(fileURLToPath(import.meta.url)), "../public/bodies");
 const SIZE = 1024;
-const USER_AGENT = "CosmicaGame/0.9.2 (educational; charlietheboss151/cosmica)";
+const USER_AGENT = "CosmicaGame/0.15.3 (educational; charlietheboss151/cosmica)";
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));

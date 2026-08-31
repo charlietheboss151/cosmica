@@ -27,7 +27,6 @@
     radial-gradient(280px 220px at 50% 48%, #7aa2ff18 0%, transparent 100%);
 }
 
-.menu-orbits,
 .orbit-backdrop {
   position: absolute;
   inset: 0;

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+- Delete unused Vite scaffold assets (`src/assets`), unused `public/icons.svg`, and unused `asteroid-rock.svg`.
+
+### Fixed
+- Drop the stale `.menu-orbits` CSS selector and the missing `vitest.config.ts` entry from `tsconfig.node.json`.
+- Align the moon-art fetch User-Agent version with the celestial fetch script (0.15.3).
+- Include Node types in the app TypeScript config so tests may use `node:` built-ins.
+
 ## [0.15.3] - 2026-08-30
 
 ### Fixed
