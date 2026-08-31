@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Call `useId` unconditionally in `BodyArt` so React hooks stay in a stable order when celestial cartoon art short-circuits the image path.
+
 ## [0.15.3] - 2026-08-30
 
 ### Fixed

@@ -1,7 +1,13 @@
+import { execFileSync } from "node:child_process";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { BODY_ART, MOON_ART_IDS } from "./bodyArtAssets";
 import { BodyArt } from "./BodyArt";
+
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const oxlintBin = path.join(repoRoot, "node_modules", ".bin", "oxlint");
 
 describe("cartoon body art", () => {
   it("has a drawing for the Sun, every planet, and every playable moon", () => {
@@ -142,6 +148,16 @@ describe("cartoon body art", () => {
     );
     expect(container.querySelector(".celestial-globe")).not.toBeNull();
     expect(container.querySelectorAll(".globe-crater").length).toBeGreaterThan(0);
+  });
+
+  it("keeps useId unconditional so oxlint rules-of-hooks passes", () => {
+    expect(() =>
+      execFileSync(oxlintBin, ["src/BodyArt.tsx"], {
+        cwd: repoRoot,
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+      }),
+    ).not.toThrow();
   });
 
   it("draws comets with a tail and asteroids with rock sprites", () => {

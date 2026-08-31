@@ -42,12 +42,12 @@ function saturnRingFrontPath(
 }
 
 export function BodyArt({ id, radius, color, type = "planet" }: Props) {
+  const clipId = `clip-${id}-${useId().replace(/:/g, "")}`;
   const celestial = celestialStyleFor(id, type);
   if (celestial) {
     return <CelestialCartoon id={id} radius={radius} style={celestial} />;
   }
 
-  const clipId = `clip-${id}-${useId().replace(/:/g, "")}`;
   const src = BODY_ART[id];
   if (!src) {
     return (
