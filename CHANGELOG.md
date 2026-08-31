@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.17.1] - 2026-08-31
+
+### Changed
+- Home page centers the logo over the animated solar system backdrop and drops the subtitle heading.
+
 ## [0.17.0] - 2026-08-31
 
 ### Added

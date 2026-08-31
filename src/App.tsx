@@ -75,10 +75,14 @@ function MenuBackdrop() {
 function Home({ onPlay }: { onPlay: () => void }) {
   return (
     <main className="home">
-      <MenuBackdrop />
-      <div className="home-panel">
-        <h1 className="home-title">Cosmica: the solar system map quiz</h1>
-        <img className="home-logo" src={LOGO_SRC} alt={LOGO_ALT} width={320} height={320} />
+      <div className="home-backdrop" aria-hidden="true">
+        <div className="starfield" />
+        <Suspense fallback={null}>
+          <OrbitBackdrop className="orbit-backdrop-home" speed={4} />
+        </Suspense>
+      </div>
+      <div className="home-content">
+        <img className="home-logo" src={LOGO_SRC} alt={LOGO_ALT} width={360} height={360} />
         <p className="home-tagline">Learn the Solar System by navigating it.</p>
         <button type="button" className="mode-play home-play" onClick={onPlay}>
           Play

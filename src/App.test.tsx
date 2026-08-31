@@ -13,16 +13,15 @@ async function openMenu() {
 describe("Cosmica prototype", () => {
   it("shows the home page with logo and creator credit", () => {
     render(<App />);
-    expect(
-      screen.getByRole("heading", { name: "Cosmica: the solar system map quiz" }),
-    ).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /Cosmica\. Learn the Solar System/i })).toHaveAttribute(
       "src",
       "/cosmica-logo.png",
     );
+    expect(document.querySelector(".home-backdrop")).not.toBeNull();
     expect(screen.getByText(/Designed & created by/i)).toBeInTheDocument();
     expect(screen.getByText("Charlie Bishop")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Play" })).toBeInTheDocument();
+    expect(screen.queryByText(/solar system map quiz/i)).not.toBeInTheDocument();
   });
 
   it("lets the player pick Planets mode from the menu", async () => {
