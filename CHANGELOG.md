@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Add a GitHub Actions CI workflow that runs `npm ci`, lint, test, and build on pushes to main and on pull requests.
+
+### Fixed
+- Include Node types in the app TypeScript config so tests may use `node:` built-ins.
+
 ## [0.15.3] - 2026-08-30
 
 ### Fixed

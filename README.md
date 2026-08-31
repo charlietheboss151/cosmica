@@ -38,3 +38,5 @@ npm run build    # typecheck and write production files to dist/
 npm run preview  # serve the dist/ build locally
 npm run lint     # oxlint
 ```
+
+GitHub Actions (`.github/workflows/ci.yml`) runs `npm ci`, lint, test, and build on pushes to `main` and on pull requests.
