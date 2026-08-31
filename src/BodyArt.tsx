@@ -127,6 +127,9 @@ export function BodyArt({ id, radius, color, type = "planet" }: Props) {
         </clipPath>
       </defs>
       <g clipPath={`url(#${clipId})`}>
+        {type === "moon" ? (
+          <circle className="moon-backing" r={radius * 1.02} fill={color} />
+        ) : null}
         <image
           href={src}
           x={-radius * pad}

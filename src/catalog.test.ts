@@ -184,6 +184,21 @@ describe("solar system catalog", () => {
     expect(isLitInMode(catalog.find((object) => object.id === "europa")!, "moons")).toBe(
       true,
     );
+    expect(
+      isVisibleInMode(catalog.find((object) => object.id === "charon")!, "moons"),
+    ).toBe(false);
+    expect(
+      isVisibleInMode(catalog.find((object) => object.id === "charon")!, "moons", {
+        hardMode: true,
+      }),
+    ).toBe(true);
+  });
+
+  it("keeps small moons readable in Moons mode", () => {
+    const kerberos = catalog.find((object) => object.id === "kerberos")!;
+    expect(kerberos.displaySize).toBeLessThan(11);
+    expect(displayRadius(kerberos, "moons")).toBe(11);
+    expect(displayRadius(kerberos, "planets")).toBeLessThan(11);
   });
 
   it("limits Moons mode to selected parent planets", () => {

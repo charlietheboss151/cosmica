@@ -27,8 +27,8 @@ const MOON_FILES = {
   oberon: "Voyager 2 picture of Oberon.jpg",
   triton: "Triton moon mosaic Voyager 2 (large).jpg",
   charon: "Charon in True Color - High-Res.jpg",
-  nix: "Nix by New Horizons on 13 July 2015.jpg",
-  hydra: "Hydra (moon) 2015-7-15 (raw).jpg",
+  nix: "Nix viewed from New Horizons 2015-07-14 (cropped).jpg",
+  hydra: "Hydra true color map.png",
   kerberos: "Kerberos (moon).jpg",
   styx: "Styx (moon).jpg",
   amalthea: "Jupiter's moon Amalthea photographed by Galileo.jpg",
@@ -37,15 +37,20 @@ const MOON_FILES = {
   puck: "Puck, moon of Uranus (1986).png",
   proteus: "Proteus (Voyager 2).jpg",
   nereid: "Nereid - Voyager 2.jpg",
-  dysnomia: "Dysnomia-moon-transparent.png",
+  dysnomia: "Dysnomia-moon.png",
   hiiaka: "Hi'iakaMoon.png",
-  namaka: "NamakaMoon.png",
+  namaka: "Namaka Hubble.png",
   mk2: "Makemake moon Hubble image only.jpg",
+};
+
+/** Center-crop zoom when the source frame includes a companion object. */
+const CROP_ZOOM = {
+  mk2: 2.8,
 };
 
 const OUT_DIR = join(dirname(fileURLToPath(import.meta.url)), "../public/bodies");
 const SIZE = 1024;
-const USER_AGENT = "CosmicaGame/0.15.11 (educational; charlietheboss151/cosmica)";
+const USER_AGENT = "CosmicaGame/0.16.4 (educational; charlietheboss151/cosmica)";
 const API_DELAY_MS = 2200;
 
 function sleep(ms) {
@@ -93,6 +98,8 @@ async function download(filename) {
 function toPng(id, inputBuffer) {
   const tmpIn = join(OUT_DIR, `.${id}.src`);
   const tmpOut = join(OUT_DIR, `${id}.png`);
+  const zoom = CROP_ZOOM[id] ?? 1;
+  const scaled = Math.round(SIZE * zoom);
   writeFileSync(tmpIn, inputBuffer);
   execFileSync(
     "ffmpeg",
@@ -101,7 +108,7 @@ function toPng(id, inputBuffer) {
       "-i",
       tmpIn,
       "-vf",
-      `scale=${SIZE}:${SIZE}:force_original_aspect_ratio=increase,crop=${SIZE}:${SIZE}`,
+      `scale=${scaled}:${scaled}:force_original_aspect_ratio=increase,crop=${SIZE}:${SIZE}`,
       tmpOut,
     ],
     { stdio: "pipe" },

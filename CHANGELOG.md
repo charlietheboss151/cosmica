@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.16.4] - 2026-08-31
+
+### Fixed
+- Small and hard-to-see moons are easier to spot: minimum size in Moons mode, color backing disc, better images for Nix/Hydra/Dysnomia/Namaka, and obscure moons hidden until hard mode is on.
+
 ## [0.16.3] - 2026-08-30
 
 ### Fixed

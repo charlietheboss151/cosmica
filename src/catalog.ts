@@ -436,6 +436,9 @@ export function isVisibleInMode(
   mode: GameMode,
   options: ModeOptions = { hardMode: false },
 ): boolean {
+  if (mode === "moons" && object.hardOnly && !options.hardMode) {
+    return false;
+  }
   if (mode !== "moons" || !options.parentIds?.length) {
     return true;
   }
@@ -453,6 +456,8 @@ export function isVisibleInMode(
 
 /** Moons in Planets mode are tiny scenery, not quiz targets. */
 export const PLANETS_MODE_MOON_SCALE = 0.32;
+/** Lit moons in Moons mode stay readable even when catalog size is small. */
+export const MOONS_MODE_MIN_RADIUS = 11;
 
 export function isDecorativeMoon(object: SolarObject, mode: GameMode): boolean {
   return (mode === "planets" || mode === "celestial") && object.type === "moon";
@@ -461,6 +466,9 @@ export function isDecorativeMoon(object: SolarObject, mode: GameMode): boolean {
 export function displayRadius(object: SolarObject, mode: GameMode): number {
   if (isDecorativeMoon(object, mode)) {
     return Math.max(3, object.displaySize * PLANETS_MODE_MOON_SCALE);
+  }
+  if (mode === "moons" && object.type === "moon") {
+    return Math.max(object.displaySize, MOONS_MODE_MIN_RADIUS);
   }
   if (
     mode === "celestial" &&
