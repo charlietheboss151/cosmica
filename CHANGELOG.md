@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+All open tracker issues (#5–#13) are resolved on `main`; see releases 0.17.5–0.18.1.
+
 ## [0.18.1] - 2026-09-01
 
 ### Added
