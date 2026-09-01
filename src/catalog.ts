@@ -433,8 +433,8 @@ export function isHeliocentric(object: SolarObject): boolean {
 /** Moons in Planets mode are tiny scenery, not quiz targets. */
 export const PLANETS_MODE_MOON_SCALE = 0.32;
 /** Lit moons in Moons mode stay readable even when catalog size is small. */
-export const MOONS_MODE_MIN_RADIUS = 28;
-export const MOONS_MODE_DISPLAY_SCALE = 2;
+export const MOONS_MODE_MIN_RADIUS = 14;
+export const MOONS_MODE_DISPLAY_SCALE = 1.15;
 
 export function isDecorativeMoon(object: SolarObject, mode: GameMode): boolean {
   return (mode === "planets" || mode === "celestial") && object.type === "moon";

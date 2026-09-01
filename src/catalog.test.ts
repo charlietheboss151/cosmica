@@ -166,7 +166,7 @@ describe("solar system catalog", () => {
   it("keeps small moons readable in Moons mode", () => {
     const kerberos = catalog.find((object) => object.id === "kerberos")!;
     expect(kerberos.displaySize).toBeLessThan(11);
-    expect(displayRadius(kerberos, "moons")).toBe(28);
+    expect(displayRadius(kerberos, "moons")).toBe(14);
     expect(displayRadius(kerberos, "planets")).toBeLessThan(11);
   });
 

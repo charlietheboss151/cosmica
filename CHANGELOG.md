@@ -7,8 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
-- Document Windows deploy paths (GitHub Actions and Git Bash/WSL) in deploy README.
+## [0.18.3] - 2026-09-01
+
+### Fixed
+- Scale down lit moons in Moons mode; they were drawn at 2× catalog size with a 28px floor.
 
 ## [0.18.2] - 2026-09-01
 
