@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.18.4] - 2026-09-01
+
+### Fixed
+- Hovered or focused quiz targets render on top of overlapping bodies so they stay clickable.
+
 ## [0.18.3] - 2026-09-01
 
 ### Fixed

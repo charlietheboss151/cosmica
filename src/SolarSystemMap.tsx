@@ -88,6 +88,7 @@ export default function SolarSystemMap({
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [camera, setCamera] = useState<Camera>(createCamera);
   const [reduceMotion, setReduceMotion] = useState(prefersReducedMotion);
+  const [frontId, setFrontId] = useState<string | null>(null);
   const drag = useRef<{ x: number; y: number } | null>(null);
   const bodyElements = useRef(new Map<string, SVGGElement | null>());
   const moonOrbitElements = useRef(new Map<string, SVGCircleElement | null>());
@@ -208,11 +209,43 @@ export default function SolarSystemMap({
       isLitInMode(object, mode, modeOptions),
   );
   const regions = displayObjects.filter((object) => object.type === "region");
-  const bodies = [...displayObjects.filter((object) => object.type !== "region")].sort(
-    (a, b) =>
-      Number(isShownLit(a, mode, modeOptions)) -
-      Number(isShownLit(b, mode, modeOptions)),
+  const regionHits = regions.filter((object) =>
+    isLitInMode(object, mode, modeOptions),
   );
+  const bodies = [...displayObjects.filter((object) => object.type !== "region")].sort(
+    (a, b) => {
+      const litDiff =
+        Number(isShownLit(a, mode, modeOptions)) -
+        Number(isShownLit(b, mode, modeOptions));
+      if (litDiff !== 0) {
+        return litDiff;
+      }
+      if (a.id === frontId) {
+        return 1;
+      }
+      if (b.id === frontId) {
+        return -1;
+      }
+      return 0;
+    },
+  );
+  const sortedRegionHits = [...regionHits].sort((a, b) => {
+    if (a.id === frontId) {
+      return 1;
+    }
+    if (b.id === frontId) {
+      return -1;
+    }
+    return 0;
+  });
+
+  const promoteFront = (id: string) => {
+    setFrontId(id);
+  };
+
+  const clearFront = (id: string) => {
+    setFrontId((current) => (current === id ? null : current));
+  };
 
   const renderRegionVisual = (object: SolarObject) => {
     const shownLit = isShownLit(object, mode, modeOptions);
@@ -271,9 +304,6 @@ export default function SolarSystemMap({
   };
 
   const renderRegionHit = (object: SolarObject) => {
-    if (!isLitInMode(object, mode, modeOptions)) {
-      return null;
-    }
     const shownLit = isShownLit(object, mode, modeOptions);
     const { inner, outer } = regionBand(object, layoutProfile);
     const choose = () => onSelect(object.id);
@@ -285,6 +315,10 @@ export default function SolarSystemMap({
         aria-label={object.name}
         tabIndex={0}
         onPointerDown={(event) => event.stopPropagation()}
+        onPointerEnter={() => promoteFront(object.id)}
+        onPointerLeave={() => clearFront(object.id)}
+        onFocus={() => promoteFront(object.id)}
+        onBlur={() => clearFront(object.id)}
         onClick={choose}
         onKeyDown={(event) => {
           if (event.key === "Enter" || event.key === " ") {
@@ -313,6 +347,7 @@ export default function SolarSystemMap({
     const radius = displayRadius(object, mode);
     const passive = decorMoon;
     const isSun = object.type === "star";
+    const interactive = !passive && !isSun && quizTarget;
     return (
       <g
         key={object.id}
@@ -326,6 +361,10 @@ export default function SolarSystemMap({
         aria-hidden={decorMoon ? true : undefined}
         aria-disabled={decorMoon || isSun ? undefined : quizTarget ? undefined : true}
         tabIndex={decorMoon || isSun ? undefined : quizTarget ? 0 : -1}
+        onPointerEnter={interactive ? () => promoteFront(object.id) : undefined}
+        onPointerLeave={interactive ? () => clearFront(object.id) : undefined}
+        onFocus={interactive ? () => promoteFront(object.id) : undefined}
+        onBlur={interactive ? () => clearFront(object.id) : undefined}
         onPointerDown={passive || isSun ? undefined : (event) => event.stopPropagation()}
         onClick={
           passive || isSun
@@ -534,7 +573,7 @@ export default function SolarSystemMap({
             );
           })}
           {regions.map(renderRegionVisual)}
-          {regions.map(renderRegionHit)}
+          {sortedRegionHits.map(renderRegionHit)}
           {bodies.map(renderBody)}
         </g>
       </svg>

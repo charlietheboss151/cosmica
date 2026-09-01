@@ -71,4 +71,23 @@ describe("SolarSystemMap interaction", () => {
     const after = world.getAttribute("transform") ?? "";
     expect(after).not.toBe(before);
   });
+
+  it("paints a hovered quiz target above other bodies", () => {
+    const onSelect = vi.fn();
+    const { container } = render(
+      <SolarSystemMap objects={catalog} mode="planets" onSelect={onSelect} />,
+    );
+    const litBodies = () =>
+      Array.from(
+        container.querySelectorAll(".body.body-lit:not(.body-region-hit)"),
+      );
+    const mercury = container.querySelector('[aria-label="Mercury"]');
+    expect(mercury).not.toBeNull();
+    const before = litBodies().at(-1);
+    fireEvent.pointerEnter(mercury!);
+    const after = litBodies().at(-1);
+    expect(after).toBe(mercury);
+    expect(before).not.toBe(mercury);
+    fireEvent.pointerLeave(mercury!);
+  });
 });
