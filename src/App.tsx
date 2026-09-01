@@ -17,6 +17,11 @@ import { randomizeOrbitalPositions, layoutProfileForMode } from "./layout";
 import SolarSystemMap from "./SolarSystemMap";
 import "./App.css";
 
+/** How long CORRECT / miss feedback stays visible. */
+export const FEEDBACK_CLEAR_MS = 750;
+/** How long a reveal (“It was …”) stays visible. */
+export const REVEAL_CLEAR_MS = 1500;
+
 const OrbitBackdrop = lazy(() => import("./OrbitBackdrop"));
 
 const LOGO_SRC = "/cosmica-logo.png";
@@ -327,29 +332,27 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
   };
 
   useEffect(() => {
-    if (!quiz.wrongFlashId && quiz.lastResult !== "revealed") {
+    if (!quiz.lastResult) {
       return;
     }
-    const delay = quiz.lastResult === "revealed" ? 1500 : 750;
+    const delay =
+      quiz.lastResult === "revealed" ? REVEAL_CLEAR_MS : FEEDBACK_CLEAR_MS;
     const timer = window.setTimeout(() => {
-      setQuiz((current) =>
-        current.wrongFlashId || current.lastResult === "revealed"
-          ? {
-              ...current,
-              wrongFlashId: null,
-              lastResolvedId:
-                current.lastResult === "revealed" ? null : current.lastResolvedId,
-              lastResult:
-                current.lastResult === "incorrect" ||
-                current.lastResult === "revealed"
-                  ? null
-                  : current.lastResult,
-            }
-          : current,
-      );
+      setQuiz((current) => {
+        if (!current.lastResult) {
+          return current;
+        }
+        return {
+          ...current,
+          wrongFlashId: null,
+          lastResolvedId:
+            current.lastResult === "revealed" ? null : current.lastResolvedId,
+          lastResult: null,
+        };
+      });
     }, delay);
     return () => window.clearTimeout(timer);
-  }, [quiz.wrongFlashId, quiz.lastResult]);
+  }, [quiz.lastResult]);
 
   useEffect(() => {
     if (quiz.finishedAt !== null) {

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.17.5] - 2026-09-01
+
+### Fixed
+- Call `useId` unconditionally in `BodyArt` so React hooks stay in a stable order when celestial cartoon art short-circuits the image path.
+- Clear CORRECT feedback after a short delay, matching how miss and reveal feedback already fade out.
+
 ## [0.17.4] - 2026-09-01
 
 ### Added

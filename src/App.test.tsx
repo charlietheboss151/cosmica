@@ -1,7 +1,7 @@
-import { render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
-import App from "./App";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import App, { FEEDBACK_CLEAR_MS } from "./App";
 
 async function openMenu() {
   const user = userEvent.setup();
@@ -11,6 +11,10 @@ async function openMenu() {
 }
 
 describe("Cosmica prototype", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it("shows the home page with logo and creator credit", () => {
     render(<App />);
     expect(screen.getByRole("img", { name: /Cosmica\. Learn the Solar System/i })).toHaveAttribute(
@@ -146,5 +150,43 @@ describe("Cosmica prototype", () => {
     expect(screen.getByTestId("find-prompt").textContent).not.toBe(prompt);
     expect(document.querySelector(".try-ring-green")).not.toBeNull();
     expect(screen.queryByRole("radio")).not.toBeInTheDocument();
+  });
+
+  it("clears CORRECT feedback after a short delay", () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Play" }));
+    fireEvent.click(screen.getByRole("button", { name: "Planets" }));
+    const prompt = screen.getByTestId("find-prompt").textContent ?? "";
+    const name = prompt.replace("Click on ", "");
+    fireEvent.click(screen.getByRole("button", { name }));
+    expect(screen.getByTestId("feedback")).toHaveTextContent("CORRECT");
+
+    act(() => {
+      vi.advanceTimersByTime(FEEDBACK_CLEAR_MS - 1);
+    });
+    expect(screen.getByTestId("feedback")).toHaveTextContent("CORRECT");
+
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
+    expect(screen.queryByTestId("feedback")).not.toBeInTheDocument();
+  });
+
+  it("clears miss feedback after the same short delay", () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Play" }));
+    fireEvent.click(screen.getByRole("button", { name: "Planets" }));
+    const prompt = screen.getByTestId("find-prompt").textContent ?? "";
+    const target = prompt.replace("Click on ", "");
+    const decoy = target === "Venus" ? "Mars" : "Venus";
+    fireEvent.click(screen.getByRole("button", { name: decoy }));
+    expect(screen.getByTestId("feedback")).toHaveTextContent(decoy);
+
+    act(() => {
+      vi.advanceTimersByTime(FEEDBACK_CLEAR_MS);
+    });
+    expect(screen.queryByTestId("feedback")).not.toBeInTheDocument();
   });
 });

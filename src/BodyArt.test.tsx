@@ -1,7 +1,13 @@
+import { execFileSync } from "node:child_process";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { BODY_ART, MOON_ART_IDS } from "./bodyArtAssets";
 import { BodyArt } from "./BodyArt";
+
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const oxlintBin = path.join(repoRoot, "node_modules", ".bin", "oxlint");
 
 describe("cartoon body art", () => {
   it("has NASA photos for every moon in the catalog", () => {
@@ -140,5 +146,15 @@ describe("cartoon body art", () => {
       </svg>,
     );
     expect(asteroid.container.querySelector("image")).toHaveAttribute("href", "/bodies/vesta.png");
+  });
+
+  it("keeps useId unconditional so oxlint rules-of-hooks passes", () => {
+    expect(() =>
+      execFileSync(oxlintBin, ["src/BodyArt.tsx"], {
+        cwd: repoRoot,
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+      }),
+    ).not.toThrow();
   });
 });
