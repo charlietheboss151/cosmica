@@ -23,7 +23,7 @@ npm install
 npm run dev
 ```
 
-Open the URL Vite prints (usually **http://localhost:5173**). There are no env files or secrets.
+Open **http://127.0.0.1:5173/cosmica/** (production builds use the `/cosmica/` base path). There are no env files or secrets.
 
 The **home page** shows the Cosmica logo and a **Play** button. Choose **Planets**, **Moons**, or **Celestial bodies** on the mode menu. Toggle hard mode on Moons or Celestial bodies if you want the extra objects. Scroll to zoom, drag to pan, or hold **WASD** / **arrow keys** to look around. Click the body named in the prompt. Gray bodies are still there so you can learn the whole Solar System; they are just not in play. The round ends when every lit body has been found.
 

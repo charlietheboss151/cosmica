@@ -1,0 +1,39 @@
+name: Deploy Cosmica
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+concurrency:
+  group: deploy-cosmica
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.repository == 'charlietheboss151/cosmica'
+    steps:
+      - name: Deploy to charlietheboss.com/cosmica/
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script_stop: true
+          script: |
+            set -euo pipefail
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+            mkdir -p ~/src/cosmica ~/public_html/cosmica
+            if [ ! -d ~/src/cosmica/.git ]; then
+              git clone https://github.com/charlietheboss151/cosmica.git ~/src/cosmica
+            fi
+            cd ~/src/cosmica
+            git fetch origin main
+            git checkout main
+            git pull --ff-only origin main
+            npm ci
+            npm run build
+            rsync -a --delete dist/ ~/public_html/cosmica/
+            echo "Deployed $(git rev-parse --short HEAD) to ~/public_html/cosmica/"
