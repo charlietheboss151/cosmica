@@ -46,7 +46,9 @@ GitHub Actions runs `npm ci`, lint, test, and build on pushes to `main` and on p
 
 Production URL: **https://charlietheboss.com/cosmica/**
 
-Uses the same server and SSH key as Elementra (`charlie@192.64.87.248`, `~/.ssh/id_ed25519`). See [`deploy/README.md`](deploy/README.md).
+**From Windows (no Mac needed):** add the `DEPLOY_SSH_KEY` GitHub secret in the repo settings, then run the **Deploy Cosmica** workflow. See [`deploy/GITHUB-ACTIONS.md`](deploy/GITHUB-ACTIONS.md) and [`deploy/README.md`](deploy/README.md).
+
+Local deploy (Git Bash or WSL on Windows):
 
 ```bash
 npm run deploy

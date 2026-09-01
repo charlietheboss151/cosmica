@@ -1,5 +1,7 @@
 # GitHub Actions deploy
 
+**Works from any OS (including Windows)** — no local terminal required after setup.
+
 One-time setup in **GitHub → charlietheboss151/cosmica → Settings → Secrets and variables → Actions**:
 
 | Secret | Value |
@@ -8,8 +10,15 @@ One-time setup in **GitHub → charlietheboss151/cosmica → Settings → Secret
 
 Use either:
 
-- **Elementra key** — `~/.ssh/id_ed25519` (same key used for Elementra deploy), or
-- **Cosmica deploy key** — private half of `deploy/cosmica-deploy.pub` (see `deploy/README.md` to install on the server)
+- **Elementra key** — same key you use for charlietheboss.com deploy. On Windows PowerShell:
+
+  ```powershell
+  Get-Content $env:USERPROFILE\.ssh\id_ed25519 -Raw
+  ```
+
+  Paste the full output (including `BEGIN` / `END` lines) into the GitHub secret.
+
+- **Cosmica deploy key** — private half of `deploy/cosmica-deploy.pub` (see `deploy/README.md` to authorize on the server).
 
 Then either push to `main` (auto-deploy) or **Actions → Deploy Cosmica → Run workflow**.
 

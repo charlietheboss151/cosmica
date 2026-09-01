@@ -2,6 +2,50 @@
 
 One-time setup to deploy Cosmica to the same server as Elementra (`charlie@192.64.87.248`).
 
+## Deploy from Windows
+
+You do **not** need a Mac. Pick one path:
+
+### Easiest: GitHub Actions (browser only)
+
+1. Open **https://github.com/charlietheboss151/cosmica/settings/secrets/actions**
+2. **New repository secret** → name: `DEPLOY_SSH_KEY`
+3. Value: the **full private key** you use for Elementra (the same key that deploys charlietheboss.com). In **PowerShell**:
+
+   ```powershell
+   Get-Content $env:USERPROFILE\.ssh\id_ed25519 -Raw
+   ```
+
+   Copy everything, including the `-----BEGIN … KEY-----` / `-----END … KEY-----` lines, and paste into the secret.
+
+4. **Actions** → **Deploy Cosmica** → **Run workflow** (or push to `main`).
+
+Live site: **https://charlietheboss.com/cosmica/**
+
+See also [`deploy/GITHUB-ACTIONS.md`](GITHUB-ACTIONS.md).
+
+### Local deploy on Windows (optional)
+
+Use **Git Bash** (installed with [Git for Windows](https://git-scm.com/download/win)) or **WSL**:
+
+```bash
+cd /c/path/to/cosmica
+npm install
+npm run deploy
+```
+
+Put your private key at `C:\Users\You\.ssh\id_ed25519` (OpenSSH) or set:
+
+```bash
+export COSMICA_SSH_IDENTITY="$HOME/.ssh/id_ed25519"
+```
+
+In **PowerShell**, OpenSSH one-liner test:
+
+```powershell
+ssh -i $env:USERPROFILE\.ssh\id_ed25519 charlie@192.64.87.248 "echo ok"
+```
+
 ## 1. Install the SSH key (your machine)
 
 The **public** key is in this repo:
