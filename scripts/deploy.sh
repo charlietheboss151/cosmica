@@ -4,26 +4,27 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-HOST="${COSMICA_SSH_HOST:-charlie@192.64.87.248}"
-if [ -n "${COSMICA_SSH_IDENTITY:-}" ]; then
-  SSH_ID="$COSMICA_SSH_IDENTITY"
-elif [ -f "$HOME/.ssh/id_ed25519" ]; then
-  SSH_ID="$HOME/.ssh/id_ed25519"
-elif [ -f "$HOME/.ssh/id_ed25519_cosmica" ]; then
-  SSH_ID="$HOME/.ssh/id_ed25519_cosmica"
-else
-  SSH_ID=""
-fi
-BRANCH="${COSMICA_DEPLOY_BRANCH:-main}"
-REMOTE_SRC="${COSMICA_REMOTE_SRC:-~/src/cosmica}"
+HOST="${COSMICA_SSH_HOST:-charlie@charlietheboss.com}"
 REMOTE_WEB="${COSMICA_REMOTE_WEB:-~/public_html/cosmica}"
+REMOTE_SRC="${COSMICA_REMOTE_SRC:-~/src/cosmica}"
+BRANCH="${COSMICA_DEPLOY_BRANCH:-main}"
+REMOTE_BUILD="${COSMICA_REMOTE_BUILD:-0}"
 
 SSH_OPTS=(-o BatchMode=yes)
-if [ -n "$SSH_ID" ] && [ -f "$SSH_ID" ]; then
-  SSH_OPTS+=(-i "$SSH_ID")
+if [ -n "${COSMICA_SSH_IDENTITY:-}" ] && [ -f "$COSMICA_SSH_IDENTITY" ]; then
+  SSH_OPTS+=(-i "$COSMICA_SSH_IDENTITY")
+elif [ -f "$HOME/.ssh/id_ed25519" ]; then
+  SSH_OPTS+=(-i "$HOME/.ssh/id_ed25519")
+elif [ -f "$HOME/.ssh/id_ed25519_cosmica" ]; then
+  SSH_OPTS+=(-i "$HOME/.ssh/id_ed25519_cosmica")
 fi
 
-ssh "${SSH_OPTS[@]}" "$HOST" bash -s <<EOF
+ssh_cmd() {
+  ssh "${SSH_OPTS[@]}" "$HOST" "$@"
+}
+
+if [ "$REMOTE_BUILD" = "1" ]; then
+  ssh_cmd bash -s <<EOF
 set -euo pipefail
 export NVM_DIR="\$HOME/.nvm"
 # shellcheck disable=SC1090
@@ -40,6 +41,12 @@ npm ci
 npm run build
 rsync -a --delete dist/ "$REMOTE_WEB/"
 EOF
+else
+  npm ci
+  npm run build
+  ssh_cmd "mkdir -p $REMOTE_WEB"
+  rsync -a --delete -e "ssh ${SSH_OPTS[*]}" dist/ "$HOST:$REMOTE_WEB/"
+fi
 
 COMMIT="$(git rev-parse --short HEAD)"
 echo "Deployed commit $COMMIT to https://charlietheboss.com/cosmica/"
