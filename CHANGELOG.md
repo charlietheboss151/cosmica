@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Document Windows deploy paths (GitHub Actions and Git Bash/WSL) in deploy README.
+- SSH deploy defaults to `charlie@charlietheboss.com`, builds locally, and rsyncs `dist/` (set `COSMICA_REMOTE_BUILD=1` to build on the server).
 
 ## [0.18.2] - 2026-09-01
 
