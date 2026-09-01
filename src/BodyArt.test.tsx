@@ -5,6 +5,7 @@ import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { BODY_ART, MOON_ART_IDS } from "./bodyArtAssets";
 import { BodyArt } from "./BodyArt";
+import { publicUrl } from "./publicUrl";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const oxlintBin = path.join(repoRoot, "node_modules", ".bin", "oxlint");
@@ -13,7 +14,7 @@ describe("cartoon body art", () => {
   it("has NASA photos for every moon in the catalog", () => {
     expect(MOON_ART_IDS.length).toBe(35);
     for (const id of MOON_ART_IDS) {
-      expect(BODY_ART[id]).toBe(`/bodies/${id}.png`);
+      expect(BODY_ART[id]).toBe(publicUrl(`bodies/${id}.png`));
     }
   });
 
@@ -39,7 +40,7 @@ describe("cartoon body art", () => {
       "orcus",
       "varuna",
     ]) {
-      expect(BODY_ART[id]).toBe(`/bodies/${id}.png`);
+      expect(BODY_ART[id]).toBe(publicUrl(`bodies/${id}.png`));
     }
   });
 
@@ -50,7 +51,7 @@ describe("cartoon body art", () => {
       </svg>,
     );
     const image = container.querySelector("image");
-    expect(image).toHaveAttribute("href", "/bodies/earth.png");
+    expect(image).toHaveAttribute("href", publicUrl("bodies/earth.png"));
   });
 
   it("draws Saturn with a ring behind the globe and a ring in front", () => {
@@ -70,7 +71,7 @@ describe("cartoon body art", () => {
     expect(front?.getAttribute("d")).toMatch(/0 0 1 /);
     expect(container.querySelector("image")).toHaveAttribute(
       "href",
-      "/bodies/saturn.png",
+      publicUrl("bodies/saturn.png"),
     );
     const inner = Number(back?.getAttribute("data-inner-rx"));
     const outer = Number(back?.getAttribute("data-outer-rx"));
@@ -87,7 +88,7 @@ describe("cartoon body art", () => {
     );
     expect(container.querySelector("image")).toHaveAttribute(
       "href",
-      "/bodies/europa.png",
+      publicUrl("bodies/europa.png"),
     );
     expect(container.querySelector("circle.disc")).toBeNull();
 
@@ -98,7 +99,7 @@ describe("cartoon body art", () => {
     );
     expect(charon.container.querySelector("image")).toHaveAttribute(
       "href",
-      "/bodies/charon.png",
+      publicUrl("bodies/charon.png"),
     );
   });
 
@@ -118,7 +119,7 @@ describe("cartoon body art", () => {
         <BodyArt id="ceres" radius={10} color="#9a9a9a" type="dwarf-planet" />
       </svg>,
     );
-    expect(container.querySelector("image")).toHaveAttribute("href", "/bodies/ceres.png");
+    expect(container.querySelector("image")).toHaveAttribute("href", publicUrl("bodies/ceres.png"));
     expect(container.querySelector(".celestial-globe")).toBeNull();
   });
 
@@ -128,7 +129,7 @@ describe("cartoon body art", () => {
         <BodyArt id="orcus" radius={10} color="#909090" type="dwarf-planet" />
       </svg>,
     );
-    expect(container.querySelector("image")).toHaveAttribute("href", "/bodies/orcus.png");
+    expect(container.querySelector("image")).toHaveAttribute("href", publicUrl("bodies/orcus.png"));
     expect(container.querySelector(".celestial-globe")).toBeNull();
   });
 
@@ -138,14 +139,14 @@ describe("cartoon body art", () => {
         <BodyArt id="halley" radius={10} color="#c8e8ff" type="comet" />
       </svg>,
     );
-    expect(comet.container.querySelector("image")).toHaveAttribute("href", "/bodies/halley.png");
+    expect(comet.container.querySelector("image")).toHaveAttribute("href", publicUrl("bodies/halley.png"));
 
     const asteroid = render(
       <svg>
         <BodyArt id="vesta" radius={10} color="#d8d0c0" type="asteroid" />
       </svg>,
     );
-    expect(asteroid.container.querySelector("image")).toHaveAttribute("href", "/bodies/vesta.png");
+    expect(asteroid.container.querySelector("image")).toHaveAttribute("href", publicUrl("bodies/vesta.png"));
   });
 
   it("keeps useId unconditional so oxlint rules-of-hooks passes", () => {

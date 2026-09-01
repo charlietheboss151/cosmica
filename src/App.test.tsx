@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import App, { FEEDBACK_CLEAR_MS } from "./App";
+import { publicUrl } from "./publicUrl";
 
 async function openMenu() {
   const user = userEvent.setup();
@@ -19,7 +20,7 @@ describe("Cosmica prototype", () => {
     render(<App />);
     expect(screen.getByRole("img", { name: /Cosmica\. Learn the Solar System/i })).toHaveAttribute(
       "src",
-      "/cosmica-logo.png",
+      publicUrl("cosmica-logo.png"),
     );
     expect(document.querySelector(".home-backdrop")).not.toBeNull();
     expect(screen.getByText(/Designed & created by/i)).toBeInTheDocument();

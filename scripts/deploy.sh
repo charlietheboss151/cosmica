@@ -5,13 +5,21 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
 HOST="${COSMICA_SSH_HOST:-charlie@192.64.87.248}"
-SSH_ID="${COSMICA_SSH_IDENTITY:-$HOME/.ssh/id_ed25519}"
+if [ -n "${COSMICA_SSH_IDENTITY:-}" ]; then
+  SSH_ID="$COSMICA_SSH_IDENTITY"
+elif [ -f "$HOME/.ssh/id_ed25519" ]; then
+  SSH_ID="$HOME/.ssh/id_ed25519"
+elif [ -f "$HOME/.ssh/id_ed25519_cosmica" ]; then
+  SSH_ID="$HOME/.ssh/id_ed25519_cosmica"
+else
+  SSH_ID=""
+fi
 BRANCH="${COSMICA_DEPLOY_BRANCH:-main}"
 REMOTE_SRC="${COSMICA_REMOTE_SRC:-~/src/cosmica}"
 REMOTE_WEB="${COSMICA_REMOTE_WEB:-~/public_html/cosmica}"
 
 SSH_OPTS=(-o BatchMode=yes)
-if [ -f "$SSH_ID" ]; then
+if [ -n "$SSH_ID" ] && [ -f "$SSH_ID" ]; then
   SSH_OPTS+=(-i "$SSH_ID")
 fi
 

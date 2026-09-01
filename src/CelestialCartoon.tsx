@@ -1,5 +1,6 @@
 import { BODY_ART } from "./bodyArtAssets";
 import type { CelestialStyle } from "./celestialStyles";
+import { publicUrl } from "./publicUrl";
 
 type Props = {
   id: string;
@@ -164,7 +165,7 @@ export function CelestialCartoon({ id, radius, style }: Props) {
         transform={`rotate(${spin})`}
       >
         <image
-          href="/bodies/asteroid-rock.png"
+          href={publicUrl("bodies/asteroid-rock.png")}
           className="asteroid-rock-sprite"
           x={-radius * 1.35}
           y={-radius * 1.35}

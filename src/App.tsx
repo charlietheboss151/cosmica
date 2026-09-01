@@ -14,6 +14,7 @@ import {
   type QuizState,
 } from "./game";
 import { randomizeOrbitalPositions, layoutProfileForMode } from "./layout";
+import { publicUrl } from "./publicUrl";
 import SolarSystemMap from "./SolarSystemMap";
 import "./App.css";
 
@@ -24,7 +25,7 @@ export const REVEAL_CLEAR_MS = 1500;
 
 const OrbitBackdrop = lazy(() => import("./OrbitBackdrop"));
 
-const LOGO_SRC = "/cosmica-logo.png";
+const LOGO_SRC = publicUrl("cosmica-logo.png");
 const LOGO_ALT = "Cosmica. Learn the Solar System by navigating it.";
 
 type PlayConfig = {

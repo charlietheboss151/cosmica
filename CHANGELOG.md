@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-All open tracker issues (#5–#13) are resolved on `main`; see releases 0.17.5–0.18.1.
+## [0.18.2] - 2026-09-01
+
+### Fixed
+- Prefix public asset paths with the Vite base URL (`/cosmica/`) so logos and body images load on charlietheboss.com instead of the site root HTML fallback.
+
+### Changed
+- Deploy script tries `id_ed25519_cosmica` when the Elementra key is unavailable.
 
 ## [0.18.1] - 2026-09-01
 

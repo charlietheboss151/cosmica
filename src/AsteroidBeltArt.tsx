@@ -1,5 +1,6 @@
 import { useId } from "react";
 import { annulusPath, beltAsteroids, beltDust } from "./layout";
+import { publicUrl } from "./publicUrl";
 
 type Props = {
   inner: number;
@@ -68,7 +69,7 @@ export function AsteroidBeltArt({ inner, outer, label }: Props) {
               transform={`translate(${rock.x} ${rock.y}) rotate(${rock.rotation}) scale(${rock.size / 10})`}
             >
               <image
-                href="/bodies/asteroid-rock.png"
+                href={publicUrl("bodies/asteroid-rock.png")}
                 x={-5}
                 y={-5}
                 width={10}
