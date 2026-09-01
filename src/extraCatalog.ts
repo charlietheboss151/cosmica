@@ -10,7 +10,6 @@ type BodyEntry = {
   displaySize: number;
   color: string;
   hardOnly?: boolean;
-  difficulty?: number;
 };
 
 function body(partial: BodyEntry): BodyEntry {

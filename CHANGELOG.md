@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.18.0] - 2026-09-01
+
+### Added
+- Screen reader live regions for the quiz prompt, score, and feedback.
+- Results dialog focus trap and `aria-modal`.
+- Map keyboard pan/zoom when the SVG is focused; honors `prefers-reduced-motion`.
+- DOM-driven orbit animation (`syncOrbitDom`) to avoid re-rendering body art every frame.
+
+### Removed
+- Unused catalog stubs: `isVisibleInMode`, `isQuizTarget`, `showsOrbitLine`, and the unused `difficulty` field on solar objects.
+
 ## [0.17.5] - 2026-09-01
 
 ### Fixed

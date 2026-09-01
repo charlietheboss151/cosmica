@@ -1,10 +1,15 @@
-import { useEffect, useRef, useState, type PointerEvent, type WheelEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type PointerEvent,
+  type WheelEvent,
+} from "react";
 import {
   cameraTransform,
   createCamera,
   fitCamera,
-  isKeyboardPanKey,
-  keyboardPanDelta,
   panCamera,
   zoomCamera,
   type Camera,
@@ -14,15 +19,13 @@ import { AsteroidBeltArt } from "./AsteroidBeltArt";
 import {
   displayRadius,
   isDecorativeMoon,
-  isQuizTarget,
+  isHeliocentric,
+  isLitInMode,
   isShownLit,
-  isVisibleInMode,
-  showsOrbitLine,
   type GameMode,
   type SolarObject,
 } from "./catalog";
 import {
-  applyOrbitPhase,
   annulusPath,
   beltDust,
   cameraFitRadius,
@@ -38,6 +41,19 @@ import {
   visualLocalOrbit,
   visualOrbit,
 } from "./layout";
+import { syncOrbitDom } from "./orbitSync";
+
+const KEYBOARD_PAN_PX = 48;
+const KEYBOARD_ZOOM_IN = 1.12;
+const KEYBOARD_ZOOM_OUT = 1 / 1.12;
+
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
 
 type Props = {
   objects: SolarObject[];
@@ -70,39 +86,62 @@ export default function SolarSystemMap({
   const hostRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [camera, setCamera] = useState<Camera>(createCamera);
-  const [orbitNow, setOrbitNow] = useState(() => Date.now());
+  const [reduceMotion, setReduceMotion] = useState(prefersReducedMotion);
   const drag = useRef<{ x: number; y: number } | null>(null);
-  const keysHeld = useRef(new Set<string>());
+  const bodyElements = useRef(new Map<string, SVGGElement | null>());
+  const moonOrbitElements = useRef(new Map<string, SVGCircleElement | null>());
 
-  const orbiting = orbitStartMs !== null;
-  const orbitElapsedMs = orbiting
-    ? Math.max(0, (orbitFreezeMs ?? orbitNow) - orbitStartMs)
-    : 0;
-  const heliocentricPhase = orbitPhaseDeg(
-    orbitElapsedMs,
-    ORBIT_ANIMATION_PERIOD_MS,
-  );
-  const moonPhase = orbitPhaseDeg(
-    orbitElapsedMs,
-    ORBIT_ANIMATION_PERIOD_MS / MOON_ORBIT_SPEED_MULTIPLIER,
-  );
-  const sunSpinDeg = orbitPhaseDeg(orbitElapsedMs, SUN_SPIN_PERIOD_MS);
-  const displayObjects = orbiting
-    ? applyOrbitPhase(objects, heliocentricPhase, moonPhase)
-    : objects;
+  const orbiting = orbitStartMs !== null && !reduceMotion;
+  const focusParentId =
+    mode === "moons" && focusId
+      ? objects.find((object) => object.id === focusId)?.parentId ?? undefined
+      : undefined;
+  const modeOptions = { hardMode, parentIds, focusParentId };
+  const layoutProfile = layoutProfileForMode(mode);
+  const displayObjects = objects;
 
   useEffect(() => {
-    if (!orbiting || orbitFreezeMs !== null) {
+    if (typeof window.matchMedia !== "function") {
+      return;
+    }
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => setReduceMotion(media.matches);
+    sync();
+    media.addEventListener("change", sync);
+    return () => media.removeEventListener("change", sync);
+  }, []);
+
+  useEffect(() => {
+    if (!orbiting || orbitStartMs === null) {
+      return;
+    }
+    const applyAt = (nowMs: number) => {
+      const elapsedMs = Math.max(0, (orbitFreezeMs ?? nowMs) - orbitStartMs);
+      syncOrbitDom(
+        objects,
+        orbitPhaseDeg(elapsedMs, ORBIT_ANIMATION_PERIOD_MS),
+        orbitPhaseDeg(
+          elapsedMs,
+          ORBIT_ANIMATION_PERIOD_MS / MOON_ORBIT_SPEED_MULTIPLIER,
+        ),
+        layoutProfile,
+        bodyElements.current,
+        moonOrbitElements.current,
+      );
+    };
+    if (orbitFreezeMs !== null) {
+      applyAt(orbitFreezeMs);
       return;
     }
     let frame = 0;
     const loop = () => {
-      setOrbitNow(Date.now());
+      applyAt(Date.now());
       frame = requestAnimationFrame(loop);
     };
+    applyAt(Date.now());
     frame = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(frame);
-  }, [orbiting, orbitFreezeMs, orbitStartMs]);
+  }, [orbiting, orbitFreezeMs, orbitStartMs, objects, layoutProfile]);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -123,13 +162,6 @@ export default function SolarSystemMap({
     observer.observe(host);
     return () => observer.disconnect();
   }, []);
-
-  const focusParentId =
-    mode === "moons" && focusId
-      ? objects.find((object) => object.id === focusId)?.parentId ?? undefined
-      : undefined;
-  const modeOptions = { hardMode, parentIds, focusParentId };
-  const layoutProfile = layoutProfileForMode(mode);
 
   useEffect(() => {
     if (size.width < 80 || size.height < 80) {
@@ -160,74 +192,22 @@ export default function SolarSystemMap({
     );
   }, [objects, size, layoutProfile, mode, parentIds, hardMode, focusId, focusParentId]);
 
-  useEffect(() => {
-    const isTypingTarget = (target: EventTarget | null) => {
-      if (!(target instanceof HTMLElement)) {
-        return false;
-      }
-      const tag = target.tagName;
-      return (
-        tag === "INPUT" ||
-        tag === "TEXTAREA" ||
-        tag === "SELECT" ||
-        target.isContentEditable
-      );
-    };
-
-    const clearKeys = () => {
-      keysHeld.current.clear();
-    };
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (isTypingTarget(event.target) || !isKeyboardPanKey(event.key)) {
-        return;
-      }
-      event.preventDefault();
-      keysHeld.current.add(event.key.toLowerCase());
-    };
-
-    const onKeyUp = (event: KeyboardEvent) => {
-      keysHeld.current.delete(event.key.toLowerCase());
-    };
-
-    window.addEventListener("keydown", onKeyDown);
-    window.addEventListener("keyup", onKeyUp);
-    window.addEventListener("blur", clearKeys);
-
-    let frame = 0;
-    const loop = () => {
-      const { dx, dy } = keyboardPanDelta(keysHeld.current, 10);
-      if (dx !== 0 || dy !== 0) {
-        setCamera((current) => panCamera(current, dx, dy));
-      }
-      frame = requestAnimationFrame(loop);
-    };
-    frame = requestAnimationFrame(loop);
-
-    return () => {
-      window.removeEventListener("keydown", onKeyDown);
-      window.removeEventListener("keyup", onKeyUp);
-      window.removeEventListener("blur", clearKeys);
-      cancelAnimationFrame(frame);
-      clearKeys();
-    };
-  }, []);
-
-  const visible = displayObjects.filter((object) =>
-    isVisibleInMode(object, mode, modeOptions),
-  );
   const positions = layoutAll(displayObjects, layoutProfile);
-  const heliocentricOrbits = visible.filter(
-    (object) => showsOrbitLine(object, mode, modeOptions) && object.type !== "moon",
+  const heliocentricOrbits = displayObjects.filter(
+    (object) =>
+      isHeliocentric(object) &&
+      object.au > 0 &&
+      isLitInMode(object, mode, modeOptions),
   );
-  const moonOrbits = visible.filter(
-    (object) => object.type === "moon" && showsOrbitLine(object, mode, modeOptions),
+  const moonOrbits = displayObjects.filter(
+    (object) =>
+      object.type === "moon" &&
+      mode !== "planets" &&
+      mode !== "celestial" &&
+      isLitInMode(object, mode, modeOptions),
   );
-  const regions = visible.filter((object) => object.type === "region");
-  const litRegions = regions.filter((object) =>
-    isShownLit(object, mode, modeOptions),
-  );
-  const bodies = [...visible.filter((object) => object.type !== "region")].sort(
+  const regions = displayObjects.filter((object) => object.type === "region");
+  const bodies = [...displayObjects.filter((object) => object.type !== "region")].sort(
     (a, b) =>
       Number(isShownLit(a, mode, modeOptions)) -
       Number(isShownLit(b, mode, modeOptions)),
@@ -290,7 +270,7 @@ export default function SolarSystemMap({
   };
 
   const renderRegionHit = (object: SolarObject) => {
-    if (!isQuizTarget(object, mode, modeOptions)) {
+    if (!isLitInMode(object, mode, modeOptions)) {
       return null;
     }
     const shownLit = isShownLit(object, mode, modeOptions);
@@ -327,18 +307,19 @@ export default function SolarSystemMap({
       positions.get(object.id) ??
       layoutObject(object, displayObjects, layoutProfile);
     const shownLit = isShownLit(object, mode, modeOptions);
-    const quizTarget = isQuizTarget(object, mode, modeOptions);
+    const quizTarget = isLitInMode(object, mode, modeOptions);
     const decorMoon = isDecorativeMoon(object, mode);
     const radius = displayRadius(object, mode);
     const passive = decorMoon;
     const isSun = object.type === "star";
-    const spin =
-      isSun && orbiting ? ` rotate(${sunSpinDeg.toFixed(2)})` : "";
     return (
       <g
         key={object.id}
         className={`body body-${object.type} ${shownLit ? "body-lit" : "body-dim"}${decorMoon ? " body-moon-decor" : ""}${isSun ? " body-sun-anchor" : ""}`}
-        transform={`translate(${laid.x} ${laid.y})${spin}`}
+        transform={`translate(${laid.x} ${laid.y})`}
+        ref={(element) => {
+          bodyElements.current.set(object.id, element);
+        }}
         role={decorMoon ? "presentation" : isSun ? "img" : "button"}
         aria-label={decorMoon ? undefined : object.name}
         aria-hidden={decorMoon ? true : undefined}
@@ -368,6 +349,16 @@ export default function SolarSystemMap({
               }
         }
       >
+        {isSun && orbiting ? (
+          <animateTransform
+            attributeName="transform"
+            type="rotate"
+            from="0"
+            to="360"
+            dur={`${SUN_SPIN_PERIOD_MS / 1000}s`}
+            repeatCount="indefinite"
+          />
+        ) : null}
         {passive || isSun ? null : (
           <circle
             className="hit"
@@ -445,32 +436,78 @@ export default function SolarSystemMap({
     );
   };
 
+  const onKeyDown = (event: KeyboardEvent<SVGSVGElement>) => {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      setCamera((current) => panCamera(current, KEYBOARD_PAN_PX, 0));
+      return;
+    }
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      setCamera((current) => panCamera(current, -KEYBOARD_PAN_PX, 0));
+      return;
+    }
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      setCamera((current) => panCamera(current, 0, KEYBOARD_PAN_PX));
+      return;
+    }
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      setCamera((current) => panCamera(current, 0, -KEYBOARD_PAN_PX));
+      return;
+    }
+    if (event.key === "+" || event.key === "=") {
+      event.preventDefault();
+      setCamera((current) =>
+        zoomCamera(
+          current,
+          KEYBOARD_ZOOM_IN,
+          bounds.width / 2,
+          bounds.height / 2,
+          bounds.width,
+          bounds.height,
+        ),
+      );
+      return;
+    }
+    if (event.key === "-" || event.key === "_") {
+      event.preventDefault();
+      setCamera((current) =>
+        zoomCamera(
+          current,
+          KEYBOARD_ZOOM_OUT,
+          bounds.width / 2,
+          bounds.height / 2,
+          bounds.width,
+          bounds.height,
+        ),
+      );
+    }
+  };
+
   return (
-    <div
-      className="map"
-      ref={hostRef}
-      tabIndex={0}
-      aria-label="Solar system map. Drag, scroll, or use WASD and arrow keys to pan."
-    >
+    <div className="map" ref={hostRef}>
       <svg
         className="map-svg"
         width={size.width}
         height={size.height}
+        tabIndex={0}
+        role="application"
+        aria-label="Solar system map. Arrow keys pan, plus and minus zoom."
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={endDrag}
         onPointerCancel={endDrag}
         onWheel={onWheel}
+        onKeyDown={onKeyDown}
       >
         <g transform={cameraTransform(camera, size.width, size.height)}>
           {heliocentricOrbits.map((object) => (
             <circle
               key={`${object.id}-orbit`}
-              className={
-                mode === "moons" && object.type === "planet"
-                  ? "orbit orbit-dim"
-                  : "orbit"
-              }
+              className="orbit"
               r={visualOrbit(object.au, layoutProfile)}
               cx={0}
               cy={0}
@@ -489,10 +526,13 @@ export default function SolarSystemMap({
                 r={visualLocalOrbit(moon.localOrbit)}
                 cx={at.x}
                 cy={at.y}
+                ref={(element) => {
+                  moonOrbitElements.current.set(moon.id, element);
+                }}
               />
             );
           })}
-          {litRegions.map(renderRegionVisual)}
+          {regions.map(renderRegionVisual)}
           {regions.map(renderRegionHit)}
           {bodies.map(renderBody)}
         </g>

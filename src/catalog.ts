@@ -27,16 +27,14 @@ export type SolarObject = {
   longitudeDeg: number;
   displaySize: number;
   color: string;
-  difficulty: number;
   hardOnly: boolean;
 };
 
 import { EXTRA_CATALOG } from "./extraCatalog";
 
 function body(
-  partial: Omit<SolarObject, "localOrbit" | "difficulty" | "innerAu" | "hardOnly"> & {
+  partial: Omit<SolarObject, "localOrbit" | "innerAu" | "hardOnly"> & {
     localOrbit?: number;
-    difficulty?: number;
     innerAu?: number;
     hardOnly?: boolean;
   },
@@ -44,7 +42,6 @@ function body(
   return {
     localOrbit: 0,
     innerAu: 0,
-    difficulty: 1,
     hardOnly: false,
     ...partial,
   };
@@ -433,41 +430,6 @@ export function isHeliocentric(object: SolarObject): boolean {
   );
 }
 
-export function isVisibleInMode(
-  object: SolarObject,
-  mode: GameMode,
-  options: ModeOptions = { hardMode: false },
-): boolean {
-  if (mode === "moons" && object.hardOnly && !options.hardMode) {
-    return false;
-  }
-  if (mode === "moons" && options.focusParentId) {
-    if (object.type === "star") {
-      return true;
-    }
-    if (object.id === options.focusParentId) {
-      return true;
-    }
-    if (object.type === "moon" && object.parentId === options.focusParentId) {
-      return true;
-    }
-    return false;
-  }
-  if (mode !== "moons" || !options.parentIds?.length) {
-    return true;
-  }
-  if (object.type === "star") {
-    return true;
-  }
-  if (object.type === "moon") {
-    return options.parentIds.includes(object.parentId ?? "");
-  }
-  if (object.type === "planet" || object.type === "dwarf-planet") {
-    return options.parentIds.includes(object.id);
-  }
-  return false;
-}
-
 /** Moons in Planets mode are tiny scenery, not quiz targets. */
 export const PLANETS_MODE_MOON_SCALE = 0.32;
 /** Lit moons in Moons mode stay readable even when catalog size is small. */
@@ -508,35 +470,6 @@ export function isShownLit(
     return true;
   }
   return isLitInMode(object, mode, options);
-}
-
-export function isQuizTarget(
-  object: SolarObject,
-  mode: GameMode,
-  options: ModeOptions = { hardMode: false },
-): boolean {
-  return isLitInMode(object, mode, options);
-}
-
-/** Orbit rings for lit quiz bodies; in Moons mode grayed planets keep solar orbit guides. */
-export function showsOrbitLine(
-  object: SolarObject,
-  mode: GameMode,
-  options: ModeOptions = { hardMode: false },
-): boolean {
-  if (object.type === "moon") {
-    return mode === "moons" && isShownLit(object, mode, options);
-  }
-  if (mode === "moons" && object.type === "planet" && object.au > 0) {
-    if (options.parentIds?.length) {
-      return options.parentIds.includes(object.id);
-    }
-    return true;
-  }
-  if (!isShownLit(object, mode, options)) {
-    return false;
-  }
-  return isHeliocentric(object) && object.au > 0;
 }
 
 export function isLitInMode(

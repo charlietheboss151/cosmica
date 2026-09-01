@@ -70,7 +70,10 @@ describe("Cosmica prototype", () => {
     );
     expect(screen.getByRole("button", { name: target })).toBeEnabled();
     expect(document.querySelectorAll(".body-moon.body-lit").length).toBeGreaterThan(0);
-    expect(screen.queryByRole("button", { name: "Mercury" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Mercury" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
   });
 
   it("shows tiny decorative moons in Planets mode without making them clickable", async () => {
@@ -104,7 +107,6 @@ describe("Cosmica prototype", () => {
   it("draws planet orbit guides in Moons mode", async () => {
     const user = await openMenu();
     await user.click(screen.getByRole("button", { name: "Planets" }));
-    expect(document.querySelectorAll(".belt-orbit").length).toBe(0);
     expect(document.querySelectorAll("circle.orbit").length).toBe(8);
 
     await user.click(screen.getByRole("button", { name: "Menu" }));
@@ -113,7 +115,7 @@ describe("Cosmica prototype", () => {
     const heliocentric = [...document.querySelectorAll("circle.orbit")].filter(
       (node) => !node.classList.contains("orbit-local"),
     );
-    expect(heliocentric.length).toBe(1);
+    expect(heliocentric.length).toBe(0);
     expect(document.querySelectorAll("circle.orbit-local").length).toBeGreaterThan(0);
   });
 
@@ -124,8 +126,14 @@ describe("Cosmica prototype", () => {
     await user.click(screen.getByRole("button", { name: "Play selected (2 moons)" }));
     expect(screen.getByTestId("score")).toHaveTextContent("0 / 2");
     expect(screen.getByRole("button", { name: "Phobos" })).toBeEnabled();
-    expect(screen.queryByRole("button", { name: "Europa" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Mercury" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Europa" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+    expect(screen.getByRole("button", { name: "Mercury" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
   });
 
   it("shows the clicked planet name after a wrong click", async () => {

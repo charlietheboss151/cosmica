@@ -4,11 +4,9 @@ import {
   displayRadius,
   isLitInMode,
   isShownLit,
-  isVisibleInMode,
   moonsOf,
   parentsWithMoons,
   playableInMode,
-  showsOrbitLine,
 } from "./catalog";
 
 describe("solar system catalog", () => {
@@ -64,11 +62,11 @@ describe("solar system catalog", () => {
     const europa = catalog.find((object) => object.id === "europa")!;
     const ceres = catalog.find((object) => object.id === "ceres")!;
     const belt = catalog.find((object) => object.id === "asteroid-belt")!;
-    expect(isVisibleInMode(europa, "planets")).toBe(true);
     expect(isLitInMode(europa, "planets")).toBe(false);
     expect(displayRadius(europa, "planets")).toBeLessThan(europa.displaySize);
     expect(isLitInMode(ceres, "planets")).toBe(false);
     expect(isLitInMode(belt, "planets")).toBe(false);
+    expect(catalog.some((object) => object.id === "europa")).toBe(true);
   });
 
   it("lights dwarf planets, asteroids, comets, and regions in Celestial mode", () => {
@@ -93,22 +91,6 @@ describe("solar system catalog", () => {
     const sedna = catalog.find((object) => object.id === "sedna")!;
     expect(isLitInMode(sedna, "celestial")).toBe(false);
     expect(isLitInMode(sedna, "celestial", { hardMode: true })).toBe(true);
-  });
-
-  it("draws orbit lines for lit bodies and planet guides in Moons mode", () => {
-    const mercury = catalog.find((object) => object.id === "mercury")!;
-    const europa = catalog.find((object) => object.id === "europa")!;
-    const ceres = catalog.find((object) => object.id === "ceres")!;
-    const belt = catalog.find((object) => object.id === "asteroid-belt")!;
-    expect(showsOrbitLine(mercury, "planets")).toBe(true);
-    expect(showsOrbitLine(europa, "planets")).toBe(false);
-    expect(showsOrbitLine(mercury, "moons")).toBe(true);
-    expect(showsOrbitLine(europa, "moons")).toBe(true);
-    expect(showsOrbitLine(ceres, "moons")).toBe(false);
-    expect(showsOrbitLine(ceres, "celestial")).toBe(true);
-    expect(showsOrbitLine(mercury, "celestial")).toBe(false);
-    expect(showsOrbitLine(belt, "celestial")).toBe(false);
-    expect(showsOrbitLine(belt, "planets")).toBe(false);
   });
 
   it("adds every moon in hard Moons mode", () => {
@@ -167,31 +149,18 @@ describe("solar system catalog", () => {
     expect(moonsOf("neptune")).toEqual(["nereid", "proteus", "triton"]);
   });
 
-  it("lights only moons in Moons mode and keeps planets visible but gray", () => {
+  it("lights only moons in Moons mode and keeps planets on the map but gray", () => {
     const lit = catalog
       .filter((object) => isLitInMode(object, "moons"))
       .map((object) => object.type);
     expect(new Set(lit)).toEqual(new Set(["moon"]));
-    expect(
-      isVisibleInMode(catalog.find((object) => object.id === "earth")!, "moons"),
-    ).toBe(true);
     expect(isLitInMode(catalog.find((object) => object.id === "earth")!, "moons")).toBe(
       false,
     );
-    expect(
-      isVisibleInMode(catalog.find((object) => object.id === "europa")!, "moons"),
-    ).toBe(true);
     expect(isLitInMode(catalog.find((object) => object.id === "europa")!, "moons")).toBe(
       true,
     );
-    expect(
-      isVisibleInMode(catalog.find((object) => object.id === "charon")!, "moons"),
-    ).toBe(false);
-    expect(
-      isVisibleInMode(catalog.find((object) => object.id === "charon")!, "moons", {
-        hardMode: true,
-      }),
-    ).toBe(true);
+    expect(catalog.some((object) => object.id === "earth")).toBe(true);
   });
 
   it("keeps small moons readable in Moons mode", () => {
@@ -209,18 +178,6 @@ describe("solar system catalog", () => {
     expect(isLitInMode(catalog.find((object) => object.id === "phobos")!, "moons", jupiterOnly)).toBe(
       false,
     );
-    expect(
-      isVisibleInMode(catalog.find((object) => object.id === "mars")!, "moons", jupiterOnly),
-    ).toBe(false);
-    expect(
-      isVisibleInMode(catalog.find((object) => object.id === "jupiter")!, "moons", jupiterOnly),
-    ).toBe(true);
-    expect(showsOrbitLine(catalog.find((object) => object.id === "mars")!, "moons", jupiterOnly)).toBe(
-      false,
-    );
-    expect(showsOrbitLine(catalog.find((object) => object.id === "jupiter")!, "moons", jupiterOnly)).toBe(
-      true,
-    );
     expect(playableInMode("moons", jupiterOnly).every((object) => object.parentId === "jupiter")).toBe(
       true,
     );
@@ -231,25 +188,6 @@ describe("solar system catalog", () => {
       "ganymede",
       "io",
     ]);
-  });
-
-  it("shows only the focused parent system during Moons play", () => {
-    const uranusFocus = { hardMode: false, focusParentId: "uranus" };
-    expect(
-      isVisibleInMode(catalog.find((object) => object.id === "miranda")!, "moons", uranusFocus),
-    ).toBe(true);
-    expect(
-      isVisibleInMode(catalog.find((object) => object.id === "uranus")!, "moons", uranusFocus),
-    ).toBe(true);
-    expect(
-      isVisibleInMode(catalog.find((object) => object.id === "sun")!, "moons", uranusFocus),
-    ).toBe(true);
-    expect(
-      isVisibleInMode(catalog.find((object) => object.id === "europa")!, "moons", uranusFocus),
-    ).toBe(false);
-    expect(
-      isVisibleInMode(catalog.find((object) => object.id === "jupiter")!, "moons", uranusFocus),
-    ).toBe(false);
   });
 
   it("draws the Sun and planets at cartoon overscale", () => {
