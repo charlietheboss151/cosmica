@@ -40,6 +40,8 @@ npm run lint     # oxlint
 npm run deploy   # publish to charlietheboss.com/cosmica/ (see deploy/README.md)
 ```
 
+GitHub Actions runs `npm ci`, lint, test, and build on pushes to `main` and on pull requests (`.github/workflows/ci.yml`). Deploy to production runs separately on push to `main` (`.github/workflows/deploy.yml`).
+
 ## Deploy
 
 Production URL: **https://charlietheboss.com/cosmica/**

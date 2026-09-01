@@ -41,6 +41,7 @@ import {
   visualLocalOrbit,
   visualOrbit,
 } from "./layout";
+import type { TryMark } from "./game";
 import { syncOrbitDom } from "./orbitSync";
 
 const KEYBOARD_PAN_PX = 48;
@@ -61,7 +62,7 @@ type Props = {
   hardMode?: boolean;
   parentIds?: string[];
   foundIds?: string[];
-  marks?: Record<string, string>;
+  marks?: Record<string, TryMark>;
   flashId?: string | null;
   orbitStartMs?: number | null;
   orbitFreezeMs?: number | null;

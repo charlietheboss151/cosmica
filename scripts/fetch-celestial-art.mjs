@@ -47,7 +47,7 @@ const CROP_ZOOM = {
 
 const OUT_DIR = join(dirname(fileURLToPath(import.meta.url)), "../public/bodies");
 const SIZE = 1024;
-const USER_AGENT = "CosmicaGame/0.16.2 (educational; charlietheboss151/cosmica)";
+const USER_AGENT = "CosmicaGame/0.18.0 (educational; charlietheboss151/cosmica)";
 const API_DELAY_MS = 2200;
 
 function sleep(ms) {

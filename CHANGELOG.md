@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.18.1] - 2026-09-01
+
+### Added
+- GitHub Actions CI workflow (`lint`, `test`, `build`) on pushes to `main` and pull requests.
+- Extended tests for hard-mode moons, full round results/replay, keyboard activation, and map pan/zoom/region hits.
+- Repo hygiene test to keep unused scaffold assets from returning.
+
+### Fixed
+- Type `SolarSystemMap` `marks` as `Record<string, TryMark>`.
+
+### Removed
+- Unused Vite scaffold assets (`src/assets`), `public/icons.svg`, and unused `asteroid-rock.svg`.
+
 ## [0.18.0] - 2026-09-01
 
 ### Added
