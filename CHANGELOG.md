@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.17.4] - 2026-09-01
+
+### Added
+- GitHub Actions workflow to deploy Cosmica to charlietheboss.com/cosmica/ on push to main.
+
 ## [0.17.3] - 2026-08-31
 
 ### Changed

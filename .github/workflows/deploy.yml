@@ -17,8 +17,8 @@ jobs:
       - name: Deploy to charlietheboss.com/cosmica/
         uses: appleboy/ssh-action@v1.2.0
         with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USER }}
+          host: 192.64.87.248
+          username: charlie
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script_stop: true
           script: |
