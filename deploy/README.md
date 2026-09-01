@@ -1,32 +1,12 @@
 # Cosmica deploy SSH
 
-One-time setup to deploy Cosmica to the same server as Elementra (`charlie@192.64.87.248`).
+Deploy Cosmica to the same server as Elementra (`charlie@charlietheboss.com`).
+
+The default deploy path builds locally and rsyncs `dist/` to `~/public_html/cosmica/`. Set `COSMICA_REMOTE_BUILD=1` to build on the server instead (git pull + npm ci + build there).
 
 ## Deploy from Windows
 
-You do **not** need a Mac. Pick one path:
-
-### Easiest: GitHub Actions (browser only)
-
-1. Open **https://github.com/charlietheboss151/cosmica/settings/secrets/actions**
-2. **New repository secret** → name: `DEPLOY_SSH_KEY`
-3. Value: the **full private key** you use for Elementra (the same key that deploys charlietheboss.com). In **PowerShell**:
-
-   ```powershell
-   Get-Content $env:USERPROFILE\.ssh\id_ed25519 -Raw
-   ```
-
-   Copy everything, including the `-----BEGIN … KEY-----` / `-----END … KEY-----` lines, and paste into the secret.
-
-4. **Actions** → **Deploy Cosmica** → **Run workflow** (or push to `main`).
-
-Live site: **https://charlietheboss.com/cosmica/**
-
-See also [`deploy/GITHUB-ACTIONS.md`](GITHUB-ACTIONS.md).
-
-### Local deploy on Windows (optional)
-
-Use **Git Bash** (installed with [Git for Windows](https://git-scm.com/download/win)) or **WSL**:
+You do **not** need a Mac. Use **Git Bash** (installed with [Git for Windows](https://git-scm.com/download/win)) or **WSL**:
 
 ```bash
 cd /c/path/to/cosmica
@@ -74,16 +54,23 @@ Append `deploy/ssh-config.example` to `~/.ssh/config`, then test:
 ssh cosmica 'echo ok'
 ```
 
-## 3. Authorize the key on the server
+## 3. Authorize the key on the server (one-time)
 
-On the server, add the public key to `~/.ssh/authorized_keys` (same account as Elementra):
+The deploy key must be in `~/.ssh/authorized_keys` on the server. From **Windows PowerShell** or **Git Bash**, if you already SSH in with your Elementra key:
 
 ```bash
-# from your machine, if you already have Elementra SSH access:
-ssh charlie@192.64.87.248 "mkdir -p ~/.ssh && chmod 700 ~/.ssh && cat >> ~/.ssh/authorized_keys" < deploy/cosmica-deploy.pub
+ssh charlie@charlietheboss.com "mkdir -p ~/.ssh && chmod 700 ~/.ssh && cat >> ~/.ssh/authorized_keys" < deploy/cosmica-deploy.pub
 ```
 
 Or paste `deploy/cosmica-deploy.pub` into the server’s `authorized_keys` manually.
+
+Test:
+
+```bash
+ssh -i ~/.ssh/id_ed25519_cosmica charlie@charlietheboss.com "echo ok"
+```
+
+Optional GitHub Actions deploy: see [`deploy/GITHUB-ACTIONS.md`](GITHUB-ACTIONS.md).
 
 ## 4. First deploy on the server
 

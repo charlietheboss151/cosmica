@@ -3,7 +3,7 @@
 # (generated as ~/.ssh/id_ed25519_cosmica).
 
 Host cosmica
-  HostName 192.64.87.248
+  HostName charlietheboss.com
   User charlie
   IdentityFile ~/.ssh/id_ed25519_cosmica
   IdentitiesOnly yes
