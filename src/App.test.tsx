@@ -34,6 +34,7 @@ describe("Cosmica prototype", () => {
   it("lets the player pick Planets mode from the menu", async () => {
     const user = await openMenu();
     expect(screen.getByRole("button", { name: "Home" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Back" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "What will you explore?" })).toBeInTheDocument();
     expect(screen.getByText(/Choose your mission/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Quick Play" })).toBeInTheDocument();
@@ -42,6 +43,13 @@ describe("Cosmica prototype", () => {
     expect(screen.getByTestId("progress-planets")).toHaveTextContent("Planets 0/");
     await user.click(screen.getByRole("button", { name: "Planets" }));
     expect(screen.getByTestId("find-prompt")).toBeInTheDocument();
+  });
+
+  it("returns to the title screen from the mission menu", async () => {
+    const user = await openMenu();
+    await user.click(screen.getByRole("button", { name: "Back" }));
+    expect(screen.getByRole("button", { name: "Play" })).toBeInTheDocument();
+    expect(screen.getByText(/Explore the Solar System\. Master the cosmos/i)).toBeInTheDocument();
   });
 
   it("starts a random round from Quick Play", async () => {

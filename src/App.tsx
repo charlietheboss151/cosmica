@@ -159,6 +159,11 @@ function Menu({
     <main className="menu">
       <div className="menu-hud">
         <header className="menu-brand">
+          <div className="menu-sub-nav">
+            <button type="button" className="ghost menu-back" onClick={onHome}>
+              Back
+            </button>
+          </div>
           <button type="button" className="menu-logo-btn" onClick={onHome} aria-label="Home">
             <img className="menu-logo" src={LOGO_SRC} alt="" width={96} height={96} />
           </button>
