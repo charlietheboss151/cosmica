@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
-import { BODY_ART } from "./bodyArtAssets";
 import {
   catalog,
   moonsOf,
@@ -7,8 +6,6 @@ import {
   parentsWithMoons,
   type GameMode,
 } from "./catalog";
-import { CelestialCartoon } from "./CelestialCartoon";
-import { celestialStyleFor } from "./celestialStyles";
 import {
   accuracyPercent,
   applyClick,
@@ -48,30 +45,20 @@ const MODE_ICONS: Record<GameMode, string> = {
   celestial: "☄️",
 };
 
+const MODE_STICKERS: Record<GameMode, string> = {
+  planets: publicUrl("bodies/earth.png"),
+  moons: publicUrl("bodies/moon-sticker.png"),
+  celestial: publicUrl("bodies/comet-sticker.png"),
+};
+
 function ModeBodyArt({ mode }: { mode: GameMode }) {
-  if (mode === "celestial") {
-    const style = celestialStyleFor("halley", "comet");
-    if (!style) {
-      return null;
-    }
-    return (
-      <svg
-        className="mode-body-art mode-body-comet"
-        viewBox="-60 -60 120 120"
-        aria-hidden="true"
-      >
-        <CelestialCartoon id="halley" radius={16} style={style} />
-      </svg>
-    );
-  }
-  const src = mode === "planets" ? BODY_ART.earth : BODY_ART.moon;
   return (
     <img
       className="mode-body-art"
-      src={src}
+      src={MODE_STICKERS[mode]}
       alt=""
-      width={mode === "planets" ? 168 : 96}
-      height={mode === "planets" ? 168 : 96}
+      width={148}
+      height={148}
     />
   );
 }

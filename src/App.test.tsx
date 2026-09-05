@@ -45,9 +45,11 @@ describe("Cosmica prototype", () => {
     );
     expect(screen.getByRole("button", { name: "Moons" }).querySelector("img")).toHaveAttribute(
       "src",
-      publicUrl("bodies/moon.png"),
+      publicUrl("bodies/moon-sticker.png"),
     );
-    expect(screen.getByRole("button", { name: "Celestial bodies" }).querySelector("svg")).not.toBeNull();
+    expect(
+      screen.getByRole("button", { name: "Celestial bodies" }).querySelector("img"),
+    ).toHaveAttribute("src", publicUrl("bodies/comet-sticker.png"));
     expect(screen.getByRole("button", { name: /Spacecraft, coming soon/i })).toBeDisabled();
     expect(screen.getByTestId("progress-planets")).toHaveTextContent("Planets 0/");
     await user.click(screen.getByRole("button", { name: "Planets" }));

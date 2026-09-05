@@ -348,7 +348,7 @@ h1 {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px 18px;
-  align-items: end;
+  align-items: start;
   padding: 8px 0 4px;
 }
 
@@ -374,28 +374,23 @@ h1 {
 .mode-body-art {
   display: block;
   width: min(148px, 28vw);
-  height: auto;
+  height: min(148px, 28vw);
+  border-radius: 50%;
+  object-fit: cover;
   filter: drop-shadow(0 14px 28px #00000099);
   animation: mode-body-float 6s ease-in-out infinite;
 }
 
 .mode-body-planets .mode-body-art {
-  width: min(168px, 32vw);
-  border-radius: 50%;
-  object-fit: cover;
   animation-duration: 5.4s;
 }
 
 .mode-body-moons .mode-body-art {
-  width: min(96px, 22vw);
-  border-radius: 50%;
-  object-fit: cover;
   animation-duration: 6.4s;
   animation-delay: -1.6s;
 }
 
 .mode-body-celestial .mode-body-art {
-  width: min(176px, 34vw);
   animation-duration: 7s;
   animation-delay: -2.8s;
 }
