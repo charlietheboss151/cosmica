@@ -223,4 +223,66 @@ describe("SolarSystemMap interaction", () => {
     const after = world.getAttribute("transform") ?? "";
     expect(after).not.toBe(before);
   });
+
+  it("pans on a touch drag even if the pointer button is -1", () => {
+    const onSelect = vi.fn();
+    const { container } = render(
+      <SolarSystemMap objects={catalog} mode="planets" onSelect={onSelect} />,
+    );
+    const svg = container.querySelector(".map-svg")!;
+    const world = svg.querySelector("g")!;
+    const before = world.getAttribute("transform") ?? "";
+    fireEvent.pointerDown(svg, {
+      pointerId: 1,
+      pointerType: "touch",
+      button: -1,
+      clientX: 400,
+      clientY: 300,
+    });
+    fireEvent.pointerMove(svg, {
+      pointerId: 1,
+      pointerType: "touch",
+      clientX: 330,
+      clientY: 300,
+    });
+    expect(world.getAttribute("transform")).not.toBe(before);
+  });
+
+  it("still selects a planet on tap", async () => {
+    const user = userEvent.setup();
+    const onSelect = vi.fn();
+    render(
+      <SolarSystemMap objects={catalog} mode="planets" onSelect={onSelect} />,
+    );
+    await user.click(screen.getByRole("button", { name: "Mercury" }));
+    expect(onSelect).toHaveBeenCalledWith("mercury");
+  });
+
+  it("pans when the drag starts on a planet and does not count that as a tap", () => {
+    const onSelect = vi.fn();
+    const { container } = render(
+      <SolarSystemMap objects={catalog} mode="planets" onSelect={onSelect} />,
+    );
+    const svg = container.querySelector(".map-svg")!;
+    const world = svg.querySelector("g")!;
+    const mercury = screen.getByRole("button", { name: "Mercury" });
+    const before = world.getAttribute("transform") ?? "";
+    fireEvent.pointerDown(mercury, {
+      pointerId: 1,
+      pointerType: "touch",
+      button: -1,
+      clientX: 400,
+      clientY: 300,
+    });
+    fireEvent.pointerMove(svg, {
+      pointerId: 1,
+      pointerType: "touch",
+      clientX: 320,
+      clientY: 300,
+    });
+    expect(world.getAttribute("transform")).not.toBe(before);
+    fireEvent.pointerUp(svg, { pointerId: 1, pointerType: "touch" });
+    fireEvent.click(mercury);
+    expect(onSelect).not.toHaveBeenCalled();
+  });
 });

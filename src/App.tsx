@@ -628,7 +628,7 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
         </div>
       ) : null}
       <p className="hint">
-        3 guesses per body · click the named body · scroll or pinch to zoom
+        3 guesses per body · tap the named body · pinch or drag to look around
       </p>
     </div>
   );

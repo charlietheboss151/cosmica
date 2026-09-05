@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.23.2] - 2026-09-05
+
+### Fixed
+- Phones can scroll the mission screen, see Play on the title, pan from a planet, pinch to zoom, and tap without the page stealing the gesture.
+
 ## [0.23.1] - 2026-09-05
 
 ### Changed

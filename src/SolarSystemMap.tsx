@@ -53,6 +53,11 @@ import { syncOrbitDom } from "./orbitSync";
 
 const KEYBOARD_ZOOM_IN = 1.12;
 const KEYBOARD_ZOOM_OUT = 1 / 1.12;
+const PAN_START_PX = 8;
+
+function isPrimaryPointer(event: PointerEvent<SVGSVGElement>): boolean {
+  return event.pointerType !== "mouse" || event.button === 0;
+}
 
 function prefersReducedMotion(): boolean {
   return (
@@ -123,9 +128,16 @@ export default function SolarSystemMap({
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [camera, setCamera] = useState<Camera>(createCamera);
   const [reduceMotion, setReduceMotion] = useState(prefersReducedMotion);
-  const drag = useRef<{ x: number; y: number } | null>(null);
+  const drag = useRef<{
+    x: number;
+    y: number;
+    originX: number;
+    originY: number;
+    moved: boolean;
+  } | null>(null);
   const pointers = useRef(new Map<number, { x: number; y: number }>());
   const pinchSpan = useRef<number | null>(null);
+  const ignoreSelect = useRef(false);
   const bodyElements = useRef(new Map<string, SVGGElement | null>());
   const moonOrbitElements = useRef(new Map<string, SVGCircleElement | null>());
   const heldPanKeys = useRef(new Set<string>());
@@ -366,8 +378,11 @@ export default function SolarSystemMap({
         role="button"
         aria-label={object.name}
         tabIndex={0}
-        onPointerDown={(event) => event.stopPropagation()}
-        onClick={choose}
+        onClick={() => {
+          if (!ignoreSelect.current) {
+            choose();
+          }
+        }}
         onKeyDown={(event) => {
           if (event.key === "Enter" || event.key === " ") {
             event.preventDefault();
@@ -400,9 +415,7 @@ export default function SolarSystemMap({
     const hitRadius =
       object.id === "saturn"
         ? laid.radius * 2.1
-        : mode === "moons" && object.type === "moon"
-          ? Math.max(radius, pad(14))
-          : Math.max(laid.radius, 12);
+        : Math.max(radius, laid.radius, pad(24));
     return (
       <g
         key={object.id}
@@ -416,14 +429,14 @@ export default function SolarSystemMap({
         aria-hidden={decorMoon ? true : undefined}
         aria-disabled={decorMoon || isSun ? undefined : quizTarget ? undefined : true}
         tabIndex={decorMoon || isSun ? undefined : quizTarget ? 0 : -1}
-        onPointerDown={passive || isSun ? undefined : (event) => event.stopPropagation()}
         onClick={
           passive || isSun
             ? undefined
             : () => {
-                if (quizTarget) {
-                  onSelect(object.id);
+                if (ignoreSelect.current || !quizTarget) {
+                  return;
                 }
+                onSelect(object.id);
               }
         }
         onKeyDown={
@@ -483,21 +496,31 @@ export default function SolarSystemMap({
   };
 
   const onPointerDown = (event: PointerEvent<SVGSVGElement>) => {
-    if (event.button !== 0) {
+    if (!isPrimaryPointer(event)) {
       return;
+    }
+    if (pointers.current.size === 0) {
+      ignoreSelect.current = false;
     }
     pointers.current.set(event.pointerId, {
       x: event.clientX,
       y: event.clientY,
     });
-    event.currentTarget.setPointerCapture(event.pointerId);
+    event.currentTarget.setPointerCapture?.(event.pointerId);
     if (pointers.current.size >= 2) {
+      ignoreSelect.current = true;
       drag.current = null;
       const [first, second] = [...pointers.current.values()];
       pinchSpan.current = pinchDistance(first!, second!);
       return;
     }
-    drag.current = { x: event.clientX, y: event.clientY };
+    drag.current = {
+      x: event.clientX,
+      y: event.clientY,
+      originX: event.clientX,
+      originY: event.clientY,
+      moved: false,
+    };
   };
 
   const onPointerMove = (event: PointerEvent<SVGSVGElement>) => {
@@ -533,9 +556,24 @@ export default function SolarSystemMap({
     if (!drag.current) {
       return;
     }
+    if (!drag.current.moved) {
+      const fromOrigin = Math.hypot(
+        event.clientX - drag.current.originX,
+        event.clientY - drag.current.originY,
+      );
+      if (fromOrigin < PAN_START_PX) {
+        return;
+      }
+      drag.current.moved = true;
+      ignoreSelect.current = true;
+    }
     const dx = event.clientX - drag.current.x;
     const dy = event.clientY - drag.current.y;
-    drag.current = { x: event.clientX, y: event.clientY };
+    drag.current = {
+      ...drag.current,
+      x: event.clientX,
+      y: event.clientY,
+    };
     setCamera((current) => panCamera(current, dx, dy));
   };
 
@@ -549,7 +587,13 @@ export default function SolarSystemMap({
       return;
     }
     const leftover = [...pointers.current.values()][0]!;
-    drag.current = { x: leftover.x, y: leftover.y };
+    drag.current = {
+      x: leftover.x,
+      y: leftover.y,
+      originX: leftover.x,
+      originY: leftover.y,
+      moved: true,
+    };
   };
 
   const onWheel = (event: WheelEvent<SVGSVGElement>) => {
