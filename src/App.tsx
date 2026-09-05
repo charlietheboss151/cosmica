@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import {
   catalog,
   moonsOf,
@@ -14,10 +14,20 @@ import {
   MAX_GUESSES_PER_BODY,
   startQuiz,
   type QuizState,
+  type TryMark,
 } from "./game";
 import { randomizeOrbitalPositions, layoutProfileForMode } from "./layout";
+import {
+  applyRound,
+  formatBest,
+  loadProgress,
+  modeDenom,
+  rankFromXp,
+  saveProgress,
+} from "./progress";
 import { publicUrl } from "./publicUrl";
 import SolarSystemMap from "./SolarSystemMap";
+import SpaceScene from "./SpaceScene";
 import "./App.css";
 
 /** How long CORRECT / miss feedback stays visible. */
@@ -25,10 +35,19 @@ export const FEEDBACK_CLEAR_MS = 750;
 /** How long a reveal (“It was …”) stays visible. */
 export const REVEAL_CLEAR_MS = 1500;
 
-const OrbitBackdrop = lazy(() => import("./OrbitBackdrop"));
-
 const LOGO_SRC = publicUrl("cosmica-logo.png");
-const LOGO_ALT = "Cosmica. Learn the Solar System by navigating it.";
+const LOGO_ALT = "Cosmica. Explore. Discover. Master the Solar System.";
+const QUICK_MODES: GameMode[] = ["planets", "moons", "celestial"];
+
+const MODE_ICONS: Record<GameMode, string> = {
+  planets: "🪐",
+  moons: "🌙",
+  celestial: "☄️",
+};
+
+function isCorrectMark(mark: TryMark | undefined): boolean {
+  return mark === "green" || mark === "yellow" || mark === "orange";
+}
 
 type PlayConfig = {
   mode: GameMode;
@@ -48,7 +67,7 @@ const PLAYABLE_MODES: {
   description: string;
   hardLabel?: string;
 }[] = [
-  { id: "planets", label: "Planets", description: "Find all 8 planets on the map" },
+  { id: "planets", label: "Planets", description: "Find all 8 planets" },
   {
     id: "moons",
     label: "Moons",
@@ -57,44 +76,41 @@ const PLAYABLE_MODES: {
   {
     id: "celestial",
     label: "Celestial bodies",
-    description: "Dwarf planets, famous asteroids, and comets",
+    description: "Dwarf planets, asteroids & comets",
     hardLabel: "Include hard objects",
   },
 ];
 
 const COMING_SOON = [
-  { id: "spacecraft", label: "Spacecraft" },
-  { id: "whoami", label: "Who am I?" },
-  { id: "everything", label: "Everything" },
+  {
+    id: "spacecraft",
+    label: "Spacecraft",
+    description: "Identify famous spacecraft",
+  },
+  {
+    id: "whoami",
+    label: "Who am I?",
+    description: "Identify the mystery object",
+  },
+  {
+    id: "everything",
+    label: "Everything",
+    description: "The ultimate Cosmica challenge",
+  },
 ] as const;
-
-function MenuBackdrop() {
-  return (
-    <div className="menu-backdrop" aria-hidden="true">
-      <div className="starfield" />
-      <div className="menu-glow" />
-      <Suspense fallback={null}>
-        <OrbitBackdrop className="orbit-backdrop-menu" speed={4} />
-      </Suspense>
-    </div>
-  );
-}
 
 function Home({ onPlay }: { onPlay: () => void }) {
   return (
     <main className="home">
-      <div className="home-backdrop" aria-hidden="true">
-        <div className="starfield" />
-        <Suspense fallback={null}>
-          <OrbitBackdrop className="orbit-backdrop-home" speed={4} />
-        </Suspense>
+      <div className="home-backdrop">
+        <SpaceScene orbitClass="orbit-backdrop-home" speed={5} />
       </div>
       <div className="home-content">
         <div className="home-logo-wrap">
-          <img className="home-logo" src={LOGO_SRC} alt={LOGO_ALT} width={360} height={360} />
+          <img className="home-logo" src={LOGO_SRC} alt={LOGO_ALT} width={480} height={480} />
         </div>
         <div className="home-actions">
-          <p className="home-tagline">Learn the Solar System by navigating it.</p>
+          <p className="home-tagline">Explore. Discover. Master the Solar System.</p>
           <button type="button" className="mode-play home-play" onClick={onPlay}>
             Play
           </button>
@@ -121,6 +137,8 @@ function Menu({
     moons: false,
     celestial: false,
   });
+  const progress = loadProgress();
+  const rank = rankFromXp(progress.xp);
 
   const toggleHard = (mode: GameMode, event: ChangeEvent<HTMLInputElement>) => {
     event.stopPropagation();
@@ -135,52 +153,118 @@ function Menu({
     onPlay({ mode: mode.id, hardMode: hardByMode[mode.id] });
   };
 
+  const quickPlay = () => {
+    const mode = QUICK_MODES[Math.floor(Math.random() * QUICK_MODES.length)]!;
+    onPlay({ mode, hardMode: false });
+  };
+
   return (
     <main className="menu">
-      <MenuBackdrop />
+      <div className="menu-backdrop">
+        <SpaceScene orbitClass="orbit-backdrop-menu" speed={5} glow />
+      </div>
       <div className="menu-panel">
         <header className="menu-brand">
           <button type="button" className="menu-logo-btn" onClick={onHome} aria-label="Home">
             <img className="menu-logo" src={LOGO_SRC} alt="" width={160} height={160} />
           </button>
-          <p className="eyebrow">Choose a mode</p>
-          <p className="lede">
-            An interactive map quiz — click the body named in the prompt.
-          </p>
+          <p className="menu-tagline">Explore. Discover. Master.</p>
         </header>
         <section className="menu-play" aria-label="Play a mode">
-          {PLAYABLE_MODES.map((mode) => (
-            <div key={mode.id} className="mode-card-wrap">
-              <button
-                type="button"
-                className="mode-card"
-                aria-label={mode.label}
-                onClick={() => playMode(mode)}
-              >
-                <span className="mode-card-label">{mode.label}</span>
-                <span className="mode-card-desc">{mode.description}</span>
-              </button>
-              {mode.hardLabel ? (
-                <label className="mode-hard-toggle">
-                  <input
-                    type="checkbox"
-                    checked={hardByMode[mode.id]}
-                    onChange={(event) => toggleHard(mode.id, event)}
-                    onClick={(event) => event.stopPropagation()}
-                  />
-                  <span>{mode.hardLabel}</span>
-                </label>
-              ) : null}
-            </div>
-          ))}
+          <button type="button" className="quick-play" aria-label="Quick Play" onClick={quickPlay}>
+            <span className="quick-play-label">▶ Quick Play</span>
+            <span className="quick-play-desc">Random challenge</span>
+          </button>
+          <p className="eyebrow">Game modes</p>
+          {PLAYABLE_MODES.map((mode) => {
+            const best = formatBest(progress.bestMs[mode.id]);
+            return (
+              <div key={mode.id} className="mode-card-wrap">
+                <button
+                  type="button"
+                  className="mode-card"
+                  aria-label={mode.label}
+                  onClick={() => playMode(mode)}
+                >
+                  <span className="mode-card-icon" aria-hidden="true">
+                    {MODE_ICONS[mode.id]}
+                  </span>
+                  <span className="mode-card-copy">
+                    <span className="mode-card-label">{mode.label}</span>
+                    <span className="mode-card-desc">{mode.description}</span>
+                    <span className="mode-card-best">
+                      {best ? `BEST • ${best}` : "BEST • —"}
+                    </span>
+                  </span>
+                  <span className="mode-card-arrow" aria-hidden="true">
+                    →
+                  </span>
+                </button>
+                {mode.hardLabel ? (
+                  <label className="mode-hard-toggle">
+                    <input
+                      type="checkbox"
+                      checked={hardByMode[mode.id]}
+                      onChange={(event) => toggleHard(mode.id, event)}
+                      onClick={(event) => event.stopPropagation()}
+                    />
+                    <span>{mode.hardLabel}</span>
+                  </label>
+                ) : null}
+              </div>
+            );
+          })}
+        </section>
+        <section className="menu-progress" aria-label="Your progress">
+          <p className="menu-progress-heading">Your progress</p>
+          <p className="menu-rank">
+            Level {rank.level} — {rank.title}
+          </p>
+          <div
+            className="xp-track"
+            role="progressbar"
+            aria-label={`${rank.percent}% to level ${rank.level + 1}`}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={rank.percent}
+          >
+            <span className="xp-fill" style={{ width: `${rank.percent}%` }} />
+          </div>
+          <p className="xp-meta">{rank.percent}% to Level {rank.level + 1}</p>
+          <ul className="progress-modes">
+            {PLAYABLE_MODES.map((mode) => {
+              const found = progress.found[mode.id].length;
+              const total = modeDenom(progress, mode.id);
+              return (
+                <li key={mode.id} data-testid={`progress-${mode.id}`}>
+                  <span aria-hidden="true">{MODE_ICONS[mode.id]}</span>
+                  {mode.label} {found}/{total}
+                </li>
+              );
+            })}
+          </ul>
         </section>
         <section className="menu-soon" aria-label="Coming soon">
           <p className="menu-soon-heading">Coming soon</p>
-          <ul className="menu-soon-list">
+          <div className="menu-soon-cards">
             {COMING_SOON.map((mode) => (
-              <li key={mode.id}>{mode.label}</li>
+              <button
+                key={mode.id}
+                type="button"
+                className="mode-card mode-card-locked"
+                disabled
+                aria-label={`${mode.label}, coming soon`}
+              >
+                <span className="mode-card-icon" aria-hidden="true">
+                  🔒
+                </span>
+                <span className="mode-card-copy">
+                  <span className="mode-card-label">{mode.label}</span>
+                  <span className="mode-card-desc">{mode.description}</span>
+                </span>
+              </button>
             ))}
-          </ul>
+          </div>
         </section>
       </div>
     </main>
@@ -245,7 +329,9 @@ function MoonsSetup({
 
   return (
     <main className="menu">
-      <MenuBackdrop />
+      <div className="menu-backdrop">
+        <SpaceScene orbitClass="orbit-backdrop-menu" speed={5} glow />
+      </div>
       <div className="menu-panel menu-panel-sub">
         <header className="menu-sub-header">
           <div className="menu-sub-nav">
@@ -267,10 +353,18 @@ function MoonsSetup({
             aria-label="All planet moons"
             onClick={playAll}
           >
-            <span className="mode-card-label">All planet moons</span>
-            <span className="mode-card-desc">
-              Every major moon around Earth through Neptune
-              {hardMode ? " plus obscure moons" : ""}
+            <span className="mode-card-icon" aria-hidden="true">
+              🌙
+            </span>
+            <span className="mode-card-copy">
+              <span className="mode-card-label">All planet moons</span>
+              <span className="mode-card-desc">
+                Every major moon around Earth through Neptune
+                {hardMode ? " plus obscure moons" : ""}
+              </span>
+            </span>
+            <span className="mode-card-arrow" aria-hidden="true">
+              →
             </span>
           </button>
           <div className="menu-sub-section">
@@ -328,7 +422,10 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
   const [now, setNow] = useState(() => Date.now());
   const resultsRef = useRef<HTMLDivElement>(null);
 
+  const recorded = useRef(false);
+
   const replay = () => {
+    recorded.current = false;
     setObjects(
       randomizeOrbitalPositions(catalog, Math.random, layoutProfileForMode(mode)),
     );
@@ -372,6 +469,23 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
 
   const elapsedMs = (quiz.finishedAt ?? now) - quiz.startedAt;
   const done = quiz.finishedAt !== null;
+
+  useEffect(() => {
+    if (!done || recorded.current) {
+      return;
+    }
+    recorded.current = true;
+    const foundIds = quiz.foundIds.filter((id) => isCorrectMark(quiz.marks[id]));
+    saveProgress(
+      applyRound(loadProgress(), {
+        mode,
+        foundIds,
+        elapsedMs,
+        score: quiz.score,
+        fullSet: parentIds === undefined,
+      }),
+    );
+  }, [done, elapsedMs, mode, parentIds, quiz.foundIds, quiz.marks, quiz.score]);
 
   useEffect(() => {
     if (!done) {

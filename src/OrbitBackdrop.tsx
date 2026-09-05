@@ -110,7 +110,7 @@ const DRIFTERS = [
   { src: bodySrc("ariel.png"), x: -258, y: 52, size: 5, duration: 42, start: 260 },
 ] as const;
 
-const RING_RADII = [72, 118, 178, 218, 282];
+const RING_RADII = [72, 94, 118, 140, 178, 218, 252, 282];
 
 type Props = {
   /** Higher values spin more slowly. Menu uses 1; gameplay uses ~4. */

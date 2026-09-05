@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import App, { FEEDBACK_CLEAR_MS } from "./App";
@@ -14,14 +14,16 @@ async function openMenu() {
 describe("Cosmica prototype", () => {
   afterEach(() => {
     vi.useRealTimers();
+    localStorage.clear();
   });
 
   it("shows the home page with logo and creator credit", () => {
     render(<App />);
-    expect(screen.getByRole("img", { name: /Cosmica\. Learn the Solar System/i })).toHaveAttribute(
+    expect(screen.getByRole("img", { name: /Cosmica\. Explore/i })).toHaveAttribute(
       "src",
       publicUrl("cosmica-logo.png"),
     );
+    expect(screen.getByText(/Explore\. Discover\. Master the Solar System/i)).toBeInTheDocument();
     expect(document.querySelector(".home-backdrop")).not.toBeNull();
     expect(screen.getByText(/Designed & created by/i)).toBeInTheDocument();
     expect(screen.getByText("Charlie Bishop")).toBeInTheDocument();
@@ -32,10 +34,17 @@ describe("Cosmica prototype", () => {
   it("lets the player pick Planets mode from the menu", async () => {
     const user = await openMenu();
     expect(screen.getByRole("button", { name: "Home" })).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: "Planets" }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Quick Play" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Planets" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Spacecraft, coming soon/i })).toBeDisabled();
+    expect(screen.getByTestId("progress-planets")).toHaveTextContent("Planets 0/");
     await user.click(screen.getByRole("button", { name: "Planets" }));
+    expect(screen.getByTestId("find-prompt")).toBeInTheDocument();
+  });
+
+  it("starts a random round from Quick Play", async () => {
+    const user = await openMenu();
+    await user.click(screen.getByRole("button", { name: "Quick Play" }));
     expect(screen.getByTestId("find-prompt")).toBeInTheDocument();
   });
 
@@ -248,6 +257,21 @@ describe("Cosmica prototype", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(screen.getByTestId("score")).toHaveTextContent("0 / 8");
     expect(screen.getByTestId("find-prompt").textContent).toMatch(/^Click on /);
+  });
+
+  it("records finds, XP, and a best time on the menu after a round", async () => {
+    const user = await openMenu();
+    await user.click(screen.getByRole("button", { name: "Planets" }));
+    for (let placed = 0; placed < 8; placed += 1) {
+      const prompt = screen.getByTestId("find-prompt").textContent ?? "";
+      const name = prompt.replace("Click on ", "");
+      await user.click(screen.getByRole("button", { name }));
+    }
+    const dialog = screen.getByRole("dialog", { name: "Round complete" });
+    await user.click(within(dialog).getByRole("button", { name: "Menu" }));
+    expect(screen.getByTestId("progress-planets")).toHaveTextContent("Planets 8/8");
+    expect(screen.getByText(/Level 1 — Cadet/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Planets" })).toHaveTextContent(/BEST • \d/);
   });
 
   it("activates a quiz body with the keyboard", async () => {

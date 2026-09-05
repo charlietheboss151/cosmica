@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.21.0] - 2026-09-05
+
+### Added
+- Quick Play starts a random Planets, Moons, or Celestial bodies round from the menu.
+- Local XP, rank, unique finds per mode, and best times on the mode menu.
+- Locked coming-soon cards for Spacecraft, Who am I?, and Everything.
+- Slow star drift, shooting stars, orbital rings, and mouse parallax on the home and menu backdrops.
+
+### Changed
+- Home logo is larger with a stronger glow and the tagline “Explore. Discover. Master the Solar System.”
+- Mode tiles show icons, descriptions, and best times, with more glass depth and hover lift.
+
 ## [0.20.4] - 2026-09-05
 
 ### Fixed
