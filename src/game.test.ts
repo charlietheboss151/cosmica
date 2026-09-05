@@ -5,10 +5,14 @@ import {
   playableInMode,
 } from "./catalog";
 import {
+  accuracyPercent,
   applyClick,
   formatElapsed,
+  formatScore,
   markForTries,
   MAX_GUESSES_PER_BODY,
+  pointsForTry,
+  scoreFromPoints,
   startQuiz,
 } from "./game";
 
@@ -24,6 +28,8 @@ describe("Seterra-style quiz", () => {
     expect(quiz.currentId).not.toBe("sun");
     expect(quiz.prompt).toMatch(/^Click on /);
     expect(quiz.placed).toBe(0);
+    expect(quiz.score).toBe(0);
+    expect(quiz.correct).toBe(0);
     expect(quiz.total).toBe(planetCount());
     expect(quiz.mistakes).toBe(0);
   });
@@ -39,6 +45,10 @@ describe("Seterra-style quiz", () => {
     expect(seen).toHaveLength(planetCount());
     expect(new Set(seen).size).toBe(planetCount());
     expect(quiz.placed).toBe(planetCount());
+    expect(quiz.score).toBe(planetCount() * 3);
+    expect(quiz.correct).toBe(planetCount());
+    expect(quiz.incorrect).toBe(0);
+    expect(quiz.bestStreak).toBe(planetCount());
     expect(quiz.finishedAt).toBe(1_000 + planetCount() * 250);
     expect(quiz.mistakes).toBe(0);
   });
@@ -105,6 +115,8 @@ describe("Seterra-style quiz", () => {
     expect(quiz.foundIds).toContain(fourth);
     expect(quiz.currentId).not.toBe(fourth);
     expect(quiz.lastResult).toBe("revealed");
+    expect(quiz.incorrect).toBe(1);
+    expect(quiz.streak).toBe(0);
   });
 
   it("limits each body to three guesses before revealing the answer", () => {
@@ -121,6 +133,43 @@ describe("Seterra-style quiz", () => {
     expect(current.foundIds).toContain(target);
     expect(current.currentId).not.toBe(target);
     expect(current.placed).toBe(1);
+    expect(current.score).toBe(0);
+    expect(current.incorrect).toBe(1);
+    expect(current.streak).toBe(0);
+  });
+
+  it("awards Elementra points: 3 then 2 then 1, and none on a reveal", () => {
+    expect(pointsForTry(1)).toBe(3);
+    expect(pointsForTry(2)).toBe(2);
+    expect(pointsForTry(3)).toBe(1);
+    expect(scoreFromPoints(3)).toBe(1);
+    expect(scoreFromPoints(18)).toBe(6);
+    expect(formatScore(2)).toBe("0.7");
+    expect(accuracyPercent(2, 1, 0)).toBe(66.7);
+    expect(accuracyPercent(3, 1, 1)).toBe(50);
+
+    const other = (id: string) => (id === "venus" ? "mars" : "venus");
+    let quiz = startQuiz("planets", alwaysFirst, 0);
+    const first = quiz.currentId!;
+    quiz = applyClick(quiz, first, 1);
+    expect(quiz.score).toBe(3);
+    expect(quiz.correct).toBe(1);
+    expect(quiz.streak).toBe(1);
+
+    const second = quiz.currentId!;
+    quiz = applyClick(quiz, other(second), 2);
+    quiz = applyClick(quiz, second, 3);
+    expect(quiz.score).toBe(5);
+    expect(quiz.streak).toBe(2);
+
+    const miss = quiz.currentId!;
+    quiz = applyClick(quiz, other(miss), 4);
+    quiz = applyClick(quiz, other(miss), 5);
+    quiz = applyClick(quiz, other(miss), 6);
+    expect(quiz.score).toBe(5);
+    expect(quiz.incorrect).toBe(1);
+    expect(quiz.streak).toBe(0);
+    expect(quiz.bestStreak).toBe(2);
   });
 
   it("colors rings green, yellow, and orange for correct finds on tries 1-3", () => {

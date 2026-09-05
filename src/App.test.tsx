@@ -158,6 +158,7 @@ describe("Cosmica prototype", () => {
     const name = prompt.replace("Click on ", "");
     await user.click(screen.getByRole("button", { name: name }));
     expect(screen.getByTestId("score")).toHaveTextContent("1 / 8");
+    expect(screen.getByTestId("streak")).toHaveTextContent("Streak 1");
     expect(screen.getByTestId("find-prompt").textContent).not.toBe(prompt);
     expect(document.querySelector(".try-ring-green")).not.toBeNull();
     expect(screen.queryByRole("radio")).not.toBeInTheDocument();
@@ -235,6 +236,11 @@ describe("Cosmica prototype", () => {
     }
     expect(screen.getByRole("dialog", { name: "Round complete" })).toBeInTheDocument();
     expect(screen.getByTestId("results-score")).toHaveTextContent("8 / 8");
+    expect(screen.getByTestId("results-found")).toHaveTextContent("8 / 8");
+    expect(screen.getByTestId("results-correct")).toHaveTextContent("8");
+    expect(screen.getByTestId("results-incorrect")).toHaveTextContent("0");
+    expect(screen.getByTestId("results-accuracy")).toHaveTextContent("100%");
+    expect(screen.getByTestId("results-streak")).toHaveTextContent("8");
     await user.click(screen.getByRole("button", { name: "Play again" }));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(screen.getByTestId("score")).toHaveTextContent("0 / 8");

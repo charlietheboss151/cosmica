@@ -26,6 +26,12 @@ export type QuizState = {
   foundIds: string[];
   placed: number;
   total: number;
+  /** Raw points: 3 / 2 / 1 for tries 1–3, same as Elementra. */
+  score: number;
+  correct: number;
+  incorrect: number;
+  streak: number;
+  bestStreak: number;
   mistakes: number;
   triesOnCurrent: number;
   marks: Record<string, TryMark>;
@@ -82,6 +88,37 @@ export function markForTries(tries: number): TryMark {
   }
   return "orange";
 }
+
+/** First try 3, second 2, third 1 — same as Elementra. */
+export function pointsForTry(tryNumber: 1 | 2 | 3): number {
+  return 4 - tryNumber;
+}
+
+export function scoreFromPoints(points: number): number {
+  return Math.round((points / MAX_GUESSES_PER_BODY) * 10) / 10;
+}
+
+export function formatScore(points: number): string {
+  const value = scoreFromPoints(points);
+  return Number.isInteger(value) ? String(value) : value.toFixed(1);
+}
+
+export function accuracyPercent(
+  points: number,
+  correct: number,
+  incorrect: number,
+): number {
+  const answered = correct + incorrect;
+  if (answered === 0) {
+    return 0;
+  }
+  return Math.round((points / (answered * MAX_GUESSES_PER_BODY)) * 1000) / 10;
+}
+
+export function formatScoreLine(points: number, total: number): string {
+  return `${formatScore(points)} / ${total}`;
+}
+
 export function formatElapsed(ms: number): string {
   const totalSeconds = Math.max(0, Math.floor(ms / 1000));
   const minutes = Math.floor(totalSeconds / 60);
@@ -114,6 +151,11 @@ export function startQuiz(
     foundIds: [],
     placed: 0,
     total: ids.length,
+    score: 0,
+    correct: 0,
+    incorrect: 0,
+    streak: 0,
+    bestStreak: 0,
     mistakes: 0,
     triesOnCurrent: 0,
     marks: {},
@@ -173,6 +215,8 @@ export function applyClick(
       return {
         ...advanceFromBody(state, state.currentId, "red", now, "revealed"),
         mistakes: state.mistakes + 1,
+        incorrect: state.incorrect + 1,
+        streak: 0,
         wrongFlashId: objectId,
       };
     }
@@ -184,12 +228,19 @@ export function applyClick(
       lastResult: "incorrect",
     };
   }
-  const tries = state.triesOnCurrent + 1;
-  return advanceFromBody(
-    state,
-    objectId,
-    markForTries(tries),
-    now,
-    "correct",
-  );
+  const tries = (state.triesOnCurrent + 1) as 1 | 2 | 3;
+  const nextStreak = state.streak + 1;
+  return {
+    ...advanceFromBody(
+      state,
+      objectId,
+      markForTries(tries),
+      now,
+      "correct",
+    ),
+    score: state.score + pointsForTry(tries),
+    correct: state.correct + 1,
+    streak: nextStreak,
+    bestStreak: Math.max(state.bestStreak, nextStreak),
+  };
 }

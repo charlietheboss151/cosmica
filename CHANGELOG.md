@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.20.0] - 2026-09-05
+
+### Changed
+- Scoring matches Elementra: 3 / 2 / 1 points by try (0 if you miss all three), shown as a score out of the round, plus accuracy and streak.
+
 ## [0.19.0] - 2026-09-05
 
 ### Changed

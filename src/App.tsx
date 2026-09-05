@@ -7,8 +7,10 @@ import {
   type GameMode,
 } from "./catalog";
 import {
+  accuracyPercent,
   applyClick,
   formatElapsed,
+  formatScoreLine,
   MAX_GUESSES_PER_BODY,
   startQuiz,
   type QuizState,
@@ -426,15 +428,13 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
         </p>
         <div className="stats">
           <p data-testid="score" aria-live="polite">
-            {quiz.placed} / {quiz.total}
+            {formatScoreLine(quiz.score, quiz.total)}
           </p>
           <p data-testid="timer">{formatElapsed(elapsedMs)}</p>
           <p data-testid="guesses-left">
             {MAX_GUESSES_PER_BODY - quiz.triesOnCurrent} left
           </p>
-          <p data-testid="mistakes">
-            {quiz.mistakes === 1 ? "1 miss" : `${quiz.mistakes} misses`}
-          </p>
+          <p data-testid="streak">Streak {quiz.streak}</p>
         </div>
       </header>
       {quiz.lastResult && !done ? (
@@ -459,13 +459,39 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
           ref={resultsRef}
         >
           <h2 id="results-title">Round complete</h2>
-          <p data-testid="results-score">
-            {quiz.placed} / {quiz.total}
+          <p data-testid="results-found">
+            {quiz.correct} / {quiz.total}
           </p>
-          <p data-testid="results-time">{formatElapsed(elapsedMs)}</p>
-          <p data-testid="results-mistakes">
-            {quiz.mistakes} {quiz.mistakes === 1 ? "mistake" : "mistakes"}
-          </p>
+          <ul className="results-stats">
+            <li>
+              <span>Score</span>
+              <strong data-testid="results-score">
+                {formatScoreLine(quiz.score, quiz.total)}
+              </strong>
+            </li>
+            <li>
+              <span>Correct</span>
+              <strong data-testid="results-correct">{quiz.correct}</strong>
+            </li>
+            <li>
+              <span>Incorrect</span>
+              <strong data-testid="results-incorrect">{quiz.incorrect}</strong>
+            </li>
+            <li>
+              <span>Accuracy</span>
+              <strong data-testid="results-accuracy">
+                {accuracyPercent(quiz.score, quiz.correct, quiz.incorrect)}%
+              </strong>
+            </li>
+            <li>
+              <span>Time</span>
+              <strong data-testid="results-time">{formatElapsed(elapsedMs)}</strong>
+            </li>
+            <li>
+              <span>Best streak</span>
+              <strong data-testid="results-streak">{quiz.bestStreak}</strong>
+            </li>
+          </ul>
           <div className="results-actions">
             <button type="button" className="mode-play" onClick={replay}>
               Play again

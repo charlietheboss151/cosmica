@@ -977,7 +977,7 @@ h1 {
   top: 50%;
   transform: translate(-50%, -50%);
   z-index: 2;
-  width: min(360px, calc(100% - 32px));
+  width: min(400px, calc(100% - 32px));
   padding: 28px 24px;
   border-radius: 16px;
   background: #0c1322f2;
@@ -990,8 +990,34 @@ h1 {
   font-size: 1.35rem;
 }
 
-.results p {
-  margin: 6px 0;
+.results [data-testid="results-found"] {
+  margin: 0 0 4px;
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: #e8eef8;
+}
+
+.results-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 18px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.results-stats li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0;
+  font-size: 0.95rem;
+  color: #9eb0cc;
+}
+
+.results-stats strong {
+  color: #e8eef8;
   font-variant-numeric: tabular-nums;
 }
 
