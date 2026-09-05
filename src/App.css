@@ -732,6 +732,11 @@ h1 {
   stroke-width: 1.5;
 }
 
+.body-dim.body-moon:not(.body-moon-decor) .moon-shell {
+  stroke: #6a7384;
+  stroke-opacity: 0.45;
+}
+
 .body-sun-anchor.body-lit .body-art,
 .body-star.body-lit .body-art {
   filter: none;

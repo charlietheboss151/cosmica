@@ -315,6 +315,7 @@ export default function SolarSystemMap({
     const shownLit = isShownLit(object, mode, modeOptions);
     const quizTarget = isLitInMode(object, mode, modeOptions);
     const decorMoon = isDecorativeMoon(object, mode);
+    const planetsSceneryMoon = mode === "planets" && object.type === "moon";
     const radius = displayRadius(object, mode, camera.zoom);
     const pad = (px: number) => screenPxToWorld(px, camera.zoom);
     const passive = decorMoon;
@@ -328,7 +329,7 @@ export default function SolarSystemMap({
     return (
       <g
         key={object.id}
-        className={`body body-${object.type} ${shownLit ? "body-lit" : "body-dim"}${decorMoon ? " body-moon-decor" : ""}${isSun ? " body-sun-anchor" : ""}`}
+        className={`body body-${object.type} ${shownLit ? "body-lit" : "body-dim"}${planetsSceneryMoon ? " body-moon-decor" : ""}${isSun ? " body-sun-anchor" : ""}`}
         transform={`translate(${laid.x} ${laid.y})`}
         ref={(element) => {
           bodyElements.current.set(object.id, element);

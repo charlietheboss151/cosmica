@@ -6,7 +6,7 @@ This version is a **Planets**, **Moons**, and **Celestial bodies** quiz on the *
 
 - **Planets** — find the eight planets; moons appear as tiny scenery.
 - **Moons** — find the major moons; planets stay visible but grayed. Optional **Include all moons** hard mode adds Charon, Amalthea, Hyperion, and more.
-- **Celestial bodies** — dwarf planets, famous asteroids, and comets. Each body has its own cartoon art or NASA photo. The map uses real AU spacing so objects sit in the right place relative to the Sun and planets — zoom and pan to explore. Optional **Include hard objects** adds dwarf-planet candidates and extra asteroids.
+- **Celestial bodies** — dwarf planets, famous asteroids, and comets. Planets and moons stay on the map but grayed. Each body has its own cartoon art or NASA photo. The map uses real AU spacing so objects sit in the right place relative to the Sun and planets — zoom and pan to explore. Optional **Include hard objects** adds dwarf-planet candidates and extra asteroids.
 
 Scattered disc, heliosphere, and trojan regions are clickable in Celestial bodies mode. The Asteroid Belt and Kuiper Belt are not quiz targets there.
 

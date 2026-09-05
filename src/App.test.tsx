@@ -95,6 +95,9 @@ describe("Cosmica prototype", () => {
       "aria-disabled",
       "true",
     );
+    expect(screen.queryByRole("button", { name: "Europa" })).not.toBeInTheDocument();
+    expect(document.querySelector(".body-moon.body-dim")).not.toBeNull();
+    expect(document.querySelector(".body-moon-decor")).toBeNull();
   });
 
   it("lets players click dwarf planets in Celestial mode without belt regions", async () => {
