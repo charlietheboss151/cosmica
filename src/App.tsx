@@ -36,7 +36,7 @@ export const FEEDBACK_CLEAR_MS = 750;
 export const REVEAL_CLEAR_MS = 1500;
 
 const LOGO_SRC = publicUrl("cosmica-logo.png");
-const LOGO_ALT = "Cosmica. Explore. Discover. Master the Solar System.";
+const LOGO_ALT = "Cosmica. Explore the Solar System. Master the cosmos.";
 const QUICK_MODES: GameMode[] = ["planets", "moons", "celestial"];
 
 const MODE_ICONS: Record<GameMode, string> = {
@@ -102,15 +102,12 @@ const COMING_SOON = [
 function Home({ onPlay }: { onPlay: () => void }) {
   return (
     <main className="home">
-      <div className="home-backdrop">
-        <SpaceScene orbitClass="orbit-backdrop-home" speed={5} />
-      </div>
       <div className="home-content">
         <div className="home-logo-wrap">
           <img className="home-logo" src={LOGO_SRC} alt={LOGO_ALT} width={480} height={480} />
         </div>
         <div className="home-actions">
-          <p className="home-tagline">Explore. Discover. Master the Solar System.</p>
+          <p className="home-tagline">Explore the Solar System. Master the cosmos.</p>
           <button type="button" className="mode-play home-play" onClick={onPlay}>
             Play
           </button>
@@ -160,60 +157,78 @@ function Menu({
 
   return (
     <main className="menu">
-      <div className="menu-backdrop">
-        <SpaceScene orbitClass="orbit-backdrop-menu" speed={5} glow />
-      </div>
-      <div className="menu-panel">
+      <div className="menu-hud">
         <header className="menu-brand">
           <button type="button" className="menu-logo-btn" onClick={onHome} aria-label="Home">
-            <img className="menu-logo" src={LOGO_SRC} alt="" width={160} height={160} />
+            <img className="menu-logo" src={LOGO_SRC} alt="" width={96} height={96} />
           </button>
-          <p className="menu-tagline">Explore. Discover. Master.</p>
+          <p className="eyebrow">Choose your mission</p>
+          <h2 className="menu-mission">What will you explore?</h2>
         </header>
         <section className="menu-play" aria-label="Play a mode">
           <button type="button" className="quick-play" aria-label="Quick Play" onClick={quickPlay}>
             <span className="quick-play-label">▶ Quick Play</span>
             <span className="quick-play-desc">Random challenge</span>
           </button>
-          <p className="eyebrow">Game modes</p>
-          {PLAYABLE_MODES.map((mode) => {
-            const best = formatBest(progress.bestMs[mode.id]);
-            return (
-              <div key={mode.id} className="mode-card-wrap">
-                <button
-                  type="button"
-                  className="mode-card"
-                  aria-label={mode.label}
-                  onClick={() => playMode(mode)}
-                >
-                  <span className="mode-card-icon" aria-hidden="true">
-                    {MODE_ICONS[mode.id]}
-                  </span>
-                  <span className="mode-card-copy">
-                    <span className="mode-card-label">{mode.label}</span>
-                    <span className="mode-card-desc">{mode.description}</span>
-                    <span className="mode-card-best">
-                      {best ? `BEST • ${best}` : "BEST • —"}
+          <div className="menu-modes">
+            {PLAYABLE_MODES.map((mode) => {
+              const best = formatBest(progress.bestMs[mode.id]);
+              return (
+                <div key={mode.id} className="mode-card-wrap">
+                  <button
+                    type="button"
+                    className={`mode-card mode-card-mission mode-card-${mode.id}`}
+                    aria-label={mode.label}
+                    onClick={() => playMode(mode)}
+                  >
+                    <span className="mode-card-icon" aria-hidden="true">
+                      {MODE_ICONS[mode.id]}
                     </span>
-                  </span>
-                  <span className="mode-card-arrow" aria-hidden="true">
-                    →
-                  </span>
-                </button>
-                {mode.hardLabel ? (
-                  <label className="mode-hard-toggle">
-                    <input
-                      type="checkbox"
-                      checked={hardByMode[mode.id]}
-                      onChange={(event) => toggleHard(mode.id, event)}
-                      onClick={(event) => event.stopPropagation()}
-                    />
-                    <span>{mode.hardLabel}</span>
-                  </label>
-                ) : null}
-              </div>
-            );
-          })}
+                    <span className="mode-card-copy">
+                      <span className="mode-card-label">{mode.label}</span>
+                      <span className="mode-card-desc">{mode.description}</span>
+                      <span className="mode-card-best">
+                        {best ? `BEST • ${best}` : "BEST • —"}
+                      </span>
+                    </span>
+                  </button>
+                  {mode.hardLabel ? (
+                    <label className="mode-hard-toggle">
+                      <input
+                        type="checkbox"
+                        checked={hardByMode[mode.id]}
+                        onChange={(event) => toggleHard(mode.id, event)}
+                        onClick={(event) => event.stopPropagation()}
+                      />
+                      <span>{mode.hardLabel}</span>
+                    </label>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+        <section className="menu-soon" aria-label="Coming soon">
+          <p className="menu-soon-heading">Coming soon</p>
+          <div className="menu-soon-cards">
+            {COMING_SOON.map((mode) => (
+              <button
+                key={mode.id}
+                type="button"
+                className="mode-card mode-card-locked"
+                disabled
+                aria-label={`${mode.label}, coming soon`}
+              >
+                <span className="mode-card-icon" aria-hidden="true">
+                  🔒
+                </span>
+                <span className="mode-card-copy">
+                  <span className="mode-card-label">{mode.label}</span>
+                  <span className="mode-card-desc">{mode.description}</span>
+                </span>
+              </button>
+            ))}
+          </div>
         </section>
         <section className="menu-progress" aria-label="Your progress">
           <p className="menu-progress-heading">Your progress</p>
@@ -243,28 +258,6 @@ function Menu({
               );
             })}
           </ul>
-        </section>
-        <section className="menu-soon" aria-label="Coming soon">
-          <p className="menu-soon-heading">Coming soon</p>
-          <div className="menu-soon-cards">
-            {COMING_SOON.map((mode) => (
-              <button
-                key={mode.id}
-                type="button"
-                className="mode-card mode-card-locked"
-                disabled
-                aria-label={`${mode.label}, coming soon`}
-              >
-                <span className="mode-card-icon" aria-hidden="true">
-                  🔒
-                </span>
-                <span className="mode-card-copy">
-                  <span className="mode-card-label">{mode.label}</span>
-                  <span className="mode-card-desc">{mode.description}</span>
-                </span>
-              </button>
-            ))}
-          </div>
         </section>
       </div>
     </main>
@@ -329,10 +322,7 @@ function MoonsSetup({
 
   return (
     <main className="menu">
-      <div className="menu-backdrop">
-        <SpaceScene orbitClass="orbit-backdrop-menu" speed={5} glow />
-      </div>
-      <div className="menu-panel menu-panel-sub">
+      <div className="menu-hud menu-hud-sub">
         <header className="menu-sub-header">
           <div className="menu-sub-nav">
             <button type="button" className="ghost menu-back" onClick={onBack}>
@@ -628,23 +618,31 @@ export default function App() {
   if (isPlayConfig(screen)) {
     return <Play config={screen} onMenu={() => setScreen("menu")} />;
   }
-  if (screen === "moons-setup") {
-    return (
-      <MoonsSetup
-        onBack={() => setScreen("menu")}
-        onHome={() => setScreen("home")}
-        onPlay={(config) => setScreen(config)}
-      />
-    );
-  }
-  if (screen === "menu") {
-    return (
-      <Menu
-        onPlay={(config) => setScreen(config)}
-        onMoonsSetup={() => setScreen("moons-setup")}
-        onHome={() => setScreen("home")}
-      />
-    );
-  }
-  return <Home onPlay={() => setScreen("menu")} />;
+  const hubKind = screen === "home" ? "home" : "menu";
+  return (
+    <div className={`hub hub-${hubKind}`}>
+      <div className={`hub-backdrop ${hubKind === "home" ? "home-backdrop" : "menu-backdrop"}`}>
+        <SpaceScene
+          orbitClass="orbit-backdrop-home"
+          speed={5}
+          glow={hubKind === "menu"}
+        />
+      </div>
+      {screen === "moons-setup" ? (
+        <MoonsSetup
+          onBack={() => setScreen("menu")}
+          onHome={() => setScreen("home")}
+          onPlay={(config) => setScreen(config)}
+        />
+      ) : screen === "menu" ? (
+        <Menu
+          onPlay={(config) => setScreen(config)}
+          onMoonsSetup={() => setScreen("moons-setup")}
+          onHome={() => setScreen("home")}
+        />
+      ) : (
+        <Home onPlay={() => setScreen("menu")} />
+      )}
+    </div>
+  );
 }

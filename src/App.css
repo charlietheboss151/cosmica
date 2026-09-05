@@ -1,3 +1,20 @@
+.hub {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background: #05070d;
+}
+
+.hub-backdrop {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hub-menu .orbit-backdrop-home {
+  opacity: 0.82;
+}
+
 .menu,
 .play,
 .home {
@@ -7,9 +24,10 @@
 
 .home {
   position: relative;
+  z-index: 1;
   min-height: 100vh;
   overflow: hidden;
-  background: #05070d;
+  background: transparent;
 }
 
 .home-backdrop {
@@ -56,6 +74,7 @@
     drop-shadow(0 18px 52px #00000099)
     drop-shadow(0 0 42px #7aa2ff88)
     drop-shadow(0 0 90px #4a78ff66);
+  animation: logo-glow 6.5s ease-in-out infinite;
 }
 
 .home-actions {
@@ -82,8 +101,30 @@
 }
 
 .home-play {
-  margin-top: 0;
-  min-width: 9rem;
+  margin-top: 4px;
+  min-width: 12rem;
+  padding: 18px 40px;
+  font-size: 1.32rem;
+  letter-spacing: 0.16em;
+  border-radius: 16px;
+  box-shadow:
+    0 14px 36px #06142888,
+    0 0 22px #4a78ff55;
+  animation: play-idle 3.4s ease-in-out infinite;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    filter 180ms ease,
+    background 180ms ease;
+}
+
+.home-play:hover {
+  transform: translateY(-3px) scale(1.05);
+  background: linear-gradient(180deg, #4a78d4, #2a4a98);
+  box-shadow:
+    0 20px 44px #061428aa,
+    0 0 48px #7aa2ffbb;
+  animation: play-hover 1.3s ease-in-out infinite;
 }
 
 .home-credit {
@@ -100,11 +141,12 @@
 
 .menu {
   position: relative;
+  z-index: 1;
   display: grid;
   place-items: center;
-  overflow: hidden;
-  padding: 32px 20px 48px;
-  background: #05070d;
+  overflow: auto;
+  padding: 36px 20px 56px;
+  background: transparent;
 }
 
 .menu-backdrop {
@@ -117,9 +159,8 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(560px 380px at 50% 46%, #ffcc4d18 0%, transparent 58%),
-    radial-gradient(520px 360px at 50% 42%, #2a4a8833 0%, transparent 70%),
-    radial-gradient(280px 220px at 50% 48%, #7aa2ff18 0%, transparent 100%);
+    radial-gradient(640px 420px at 50% 48%, #ffcc4d12 0%, transparent 62%),
+    radial-gradient(900px 640px at 50% 100%, #05070d55 0%, transparent 70%);
 }
 
 .space-scene {
@@ -177,20 +218,24 @@
   opacity: 0.55;
 }
 
-.menu-panel {
+.menu-hud {
   position: relative;
   z-index: 1;
-  width: min(460px, 100%);
-  padding: 28px 24px 22px;
-  border-radius: 24px;
-  border: 1px solid #4a6ab888;
-  background:
-    linear-gradient(180deg, #121a2ed4 0%, #0a101ecc 100%);
-  backdrop-filter: blur(14px);
+  width: min(960px, 100%);
+  padding: 28px 28px 24px;
+  border-radius: 28px;
+  border: 1px solid #8eb4ff3d;
+  background: linear-gradient(180deg, #0c142888 0%, #070d1880 100%);
+  backdrop-filter: blur(16px);
   box-shadow:
-    0 28px 70px #00000088,
+    0 30px 80px #00000055,
     0 0 0 1px #7aa2ff14,
     inset 0 1px 0 #ffffff18;
+  animation: menu-enter 560ms ease;
+}
+
+.menu-hud-sub {
+  width: min(640px, 100%);
 }
 
 .menu-brand {
@@ -198,11 +243,12 @@
   margin-bottom: 20px;
 }
 
-.menu-tagline {
+.menu-mission {
   margin: 0;
-  font-size: 0.92rem;
-  letter-spacing: 0.06em;
-  color: #b7c6e0;
+  font-size: clamp(1.35rem, 3.4vw, 1.85rem);
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  color: #eef3ff;
 }
 
 .menu-logo-btn {
@@ -224,7 +270,7 @@
 
 .menu-logo {
   display: block;
-  width: min(160px, 42vw);
+  width: min(88px, 28vw);
   height: auto;
   margin: 0 auto;
   border-radius: 50%;
@@ -266,7 +312,7 @@
   letter-spacing: 0.2em;
   font-size: 0.68rem;
   color: #8eb4ff;
-  margin: 0 0 14px;
+  margin: 0 0 8px;
 }
 
 h1 {
@@ -289,8 +335,22 @@ h1 {
 
 .menu-play {
   display: grid;
-  gap: 12px;
+  gap: 16px;
   margin-bottom: 22px;
+}
+
+.menu-modes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+@media (max-width: 760px) {
+  .menu-modes,
+  .menu-soon-cards,
+  .progress-modes {
+    grid-template-columns: 1fr;
+  }
 }
 
 .quick-play {
@@ -354,10 +414,6 @@ h1 {
 
 .mode-hard-toggle input {
   accent-color: #7aa2ff;
-}
-
-.menu-panel-sub {
-  gap: 18px;
 }
 
 .menu-sub-header {
@@ -539,6 +595,36 @@ h1 {
   min-width: 0;
 }
 
+.mode-card-mission {
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 168px;
+  padding: 20px 18px 16px;
+  background: linear-gradient(165deg, #243e74aa 0%, #15284888 100%);
+  backdrop-filter: blur(10px);
+}
+
+.mode-card-mission .mode-card-icon {
+  font-size: 1.85rem;
+  width: auto;
+  flex: none;
+}
+
+.mode-card-planets {
+  border-color: #7aa2ff99;
+  background: linear-gradient(165deg, #2b508fcc 0%, #16305699 100%);
+}
+
+.mode-card-moons {
+  border-color: #b7c6e099;
+  background: linear-gradient(165deg, #3b4c78cc 0%, #1c274099 100%);
+}
+
+.mode-card-celestial {
+  border-color: #9b8cff99;
+  background: linear-gradient(165deg, #3c3a88cc 0%, #241a4899 100%);
+}
+
 .mode-card-label {
   font-size: 1.02rem;
   font-weight: 650;
@@ -571,10 +657,11 @@ h1 {
 .mode-card-locked:hover {
   cursor: not-allowed;
   transform: none;
-  border-color: #2d3c58;
-  background: linear-gradient(135deg, #161e30 0%, #101624 100%);
+  border-color: #3d4c6888;
+  background: linear-gradient(135deg, #161e30aa 0%, #10162488 100%);
   color: #8a95aa;
-  box-shadow: 0 8px 20px #00000044;
+  box-shadow: 0 8px 20px #00000033;
+  backdrop-filter: blur(8px);
 }
 
 .mode-card-locked .mode-card-desc {
@@ -586,8 +673,8 @@ h1 {
 }
 
 .menu-soon {
-  padding-top: 18px;
-  border-top: 1px solid #2c3c5c;
+  padding-top: 6px;
+  margin-bottom: 18px;
 }
 
 .menu-soon-heading {
@@ -600,13 +687,16 @@ h1 {
 
 .menu-soon-cards {
   display: grid;
-  gap: 8px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
 }
 
 .menu-progress {
-  padding-top: 16px;
-  border-top: 1px solid #2c3c5c;
-  margin-bottom: 18px;
+  padding: 16px 18px 14px;
+  border-radius: 16px;
+  border: 1px solid #4a6ab844;
+  background: #0a101e55;
+  backdrop-filter: blur(10px);
 }
 
 .menu-progress-heading {
@@ -654,6 +744,7 @@ h1 {
   padding: 0;
   list-style: none;
   display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 6px;
 }
 
@@ -683,6 +774,10 @@ h1 {
 
 .mode-play:hover {
   background: linear-gradient(180deg, #3558a0, #21407a);
+}
+
+.mode-play.home-play:hover {
+  background: linear-gradient(180deg, #4a78d4, #2a4a98);
 }
 
 .mode-soon {
@@ -740,6 +835,23 @@ h1 {
     radial-gradient(1px 1px at 57% 48%, #fff 50%, transparent 51%);
   transform: translate(calc(var(--px) * 0.55), calc(var(--py) * 0.55)) scale(1.08);
   animation: star-drift 110s linear infinite reverse;
+}
+
+.starfield-twinkle {
+  opacity: 0.4;
+  background:
+    radial-gradient(1.5px 1.5px at 22% 14%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 67% 38%, #eef 50%, transparent 51%),
+    radial-gradient(1px 1px at 14% 62%, #cde 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 84% 78%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 48% 88%, #9cf 50%, transparent 51%),
+    radial-gradient(1px 1px at 91% 28%, #fff 50%, transparent 51%);
+  animation: star-twinkle 4.8s ease-in-out infinite;
+}
+
+.starfield-twinkle-b {
+  animation-delay: -2.4s;
+  animation-duration: 6.2s;
 }
 
 .shooting-stars {
@@ -809,6 +921,67 @@ h1 {
   }
   50% {
     filter: drop-shadow(0 0 38px #ffcc4dcc);
+  }
+}
+
+@keyframes logo-glow {
+  0%,
+  100% {
+    filter:
+      drop-shadow(0 18px 52px #00000099)
+      drop-shadow(0 0 34px #7aa2ff66)
+      drop-shadow(0 0 80px #4a78ff44);
+  }
+  50% {
+    filter:
+      drop-shadow(0 18px 52px #00000099)
+      drop-shadow(0 0 58px #9eb8ffbb)
+      drop-shadow(0 0 110px #4a78ff88);
+  }
+}
+
+@keyframes play-idle {
+  0%,
+  100% {
+    box-shadow:
+      0 14px 36px #06142888,
+      0 0 18px #4a78ff44;
+  }
+  50% {
+    box-shadow:
+      0 14px 36px #06142888,
+      0 0 30px #7aa2ff77;
+  }
+}
+
+@keyframes play-hover {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.12);
+  }
+}
+
+@keyframes menu-enter {
+  from {
+    opacity: 0;
+    transform: scale(1.06) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes star-twinkle {
+  0%,
+  100% {
+    opacity: 0.18;
+  }
+  50% {
+    opacity: 0.8;
   }
 }
 
@@ -1312,8 +1485,12 @@ h1 {
 @media (prefers-reduced-motion: reduce) {
   .starfield-far,
   .starfield-near,
+  .starfield-twinkle,
   .shooting-star,
   .orbit-backdrop-sun,
+  .home-logo,
+  .home-play,
+  .menu-hud,
   .mode-card,
   .quick-play {
     animation: none;

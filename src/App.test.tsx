@@ -19,11 +19,11 @@ describe("Cosmica prototype", () => {
 
   it("shows the home page with logo and creator credit", () => {
     render(<App />);
-    expect(screen.getByRole("img", { name: /Cosmica\. Explore/i })).toHaveAttribute(
+    expect(screen.getByRole("img", { name: /Cosmica\. Explore the Solar System/i })).toHaveAttribute(
       "src",
       publicUrl("cosmica-logo.png"),
     );
-    expect(screen.getByText(/Explore\. Discover\. Master the Solar System/i)).toBeInTheDocument();
+    expect(screen.getByText(/Explore the Solar System\. Master the cosmos/i)).toBeInTheDocument();
     expect(document.querySelector(".home-backdrop")).not.toBeNull();
     expect(screen.getByText(/Designed & created by/i)).toBeInTheDocument();
     expect(screen.getByText("Charlie Bishop")).toBeInTheDocument();
@@ -34,6 +34,8 @@ describe("Cosmica prototype", () => {
   it("lets the player pick Planets mode from the menu", async () => {
     const user = await openMenu();
     expect(screen.getByRole("button", { name: "Home" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "What will you explore?" })).toBeInTheDocument();
+    expect(screen.getByText(/Choose your mission/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Quick Play" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Planets" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Spacecraft, coming soon/i })).toBeDisabled();

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.22.0] - 2026-09-05
+
+### Changed
+- Home Play is larger, with a slow glow and a stronger pulse on hover.
+- Home tagline is “Explore the Solar System. Master the cosmos.”
+- Title-screen stars twinkle and the logo breathes a slow glow (planets already orbit; the Sun already pulses).
+- Play opens a wide glass mission HUD over the same full-screen solar system, with a fade/zoom in, “Choose your mission,” and wider mode tiles.
+
 ## [0.21.1] - 2026-09-05
 
 ### Fixed

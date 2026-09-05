@@ -37,6 +37,8 @@ export default function SpaceScene({ orbitClass, speed, glow = false }: Props) {
     <div className="space-scene" ref={ref} aria-hidden="true">
       <div className="starfield starfield-far" />
       <div className="starfield starfield-near" />
+      <div className="starfield starfield-twinkle" />
+      <div className="starfield starfield-twinkle starfield-twinkle-b" />
       <div className="shooting-stars">
         <span className="shooting-star shooting-star-a" />
         <span className="shooting-star shooting-star-b" />
