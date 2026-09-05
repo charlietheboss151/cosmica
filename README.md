@@ -5,7 +5,7 @@ Cosmica is a browser game: an interactive 2D map of the Solar System that you le
 This version is a **Planets**, **Moons**, and **Celestial bodies** quiz on the **full map**, in the style of Seterra: click the named body, a timer runs, and each body is asked once. Scoring matches Elementra: **3 points** on the first try, **2** on the second, **1** on the third, and **0** if you miss all three. The score is those points divided by 3, so a first-try find is 1.0. You get **3 guesses per body**; find it on the first try for a green ring, second for yellow, third for orange, or miss all three and the answer is revealed with a red ring. The Sun and planets use cartoon sticker art; moons use NASA mission photos. Names stay off the map until you place a body.
 
 - **Planets** — find the eight planets; moons appear as tiny scenery.
-- **Moons** — find the major moons; planets stay visible but grayed. Optional **Include all moons** hard mode adds Charon, Amalthea, Hyperion, and more.
+- **Moons** — find the major moons; planets stay visible but grayed. Optional **Include all moons** hard mode adds Charon, Amalthea, Hyperion, and more. If you miss a moon, the map slowly moves to it so you can see where it was.
 - **Celestial bodies** — dwarf planets, famous asteroids, and comets. Planets and moons stay on the map but grayed. Each body has its own cartoon art or NASA photo. The map uses real AU spacing so objects sit in the right place relative to the Sun and planets — zoom and pan to explore. Optional **Include hard objects** adds dwarf-planet candidates and extra asteroids.
 
 Scattered disc, heliosphere, and trojan regions are clickable in Celestial bodies mode. The Asteroid Belt and Kuiper Belt are not quiz targets there.

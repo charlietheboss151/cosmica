@@ -1,6 +1,7 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { CAMERA_GLIDE_MS } from "./camera";
 import { catalog, MOONS_MODE_MIN_WORLD } from "./catalog";
 import { layoutObject } from "./layout";
 import SolarSystemMap from "./SolarSystemMap";
@@ -207,6 +208,69 @@ describe("SolarSystemMap interaction", () => {
       />,
     );
     expect(world()!.getAttribute("transform")).toBe(before);
+  });
+
+  it("glides to a missed moon instead of jumping to the next planet", () => {
+    const rafQueue: FrameRequestCallback[] = [];
+    vi.spyOn(performance, "now").mockReturnValue(0);
+    vi.stubGlobal("requestAnimationFrame", (cb: FrameRequestCallback) => {
+      rafQueue.push(cb);
+      return rafQueue.length;
+    });
+    vi.stubGlobal("cancelAnimationFrame", () => undefined);
+
+    const onSelect = vi.fn();
+    const { container, rerender } = render(
+      <SolarSystemMap
+        objects={catalog}
+        mode="moons"
+        focusId="europa"
+        onSelect={onSelect}
+      />,
+    );
+    const world = () => container.querySelector(".map-svg > g");
+    const before = world()!.getAttribute("transform") ?? "";
+    const europa = layoutObject(
+      catalog.find((object) => object.id === "europa")!,
+      catalog,
+      "compact",
+    );
+    const titan = layoutObject(
+      catalog.find((object) => object.id === "titan")!,
+      catalog,
+      "compact",
+    );
+
+    rerender(
+      <SolarSystemMap
+        objects={catalog}
+        mode="moons"
+        focusId="titan"
+        revealId="europa"
+        onSelect={onSelect}
+      />,
+    );
+    expect(world()!.getAttribute("transform")).toBe(before);
+
+    const tick = rafQueue.at(-1);
+    expect(tick).toBeTypeOf("function");
+    act(() => {
+      tick?.(CAMERA_GLIDE_MS);
+    });
+    const after = world()!.getAttribute("transform") ?? "";
+    expect(after).not.toBe(before);
+    const xy = (transform: string) => {
+      const parts = [...transform.matchAll(/translate\(([^)]+)\)/g)];
+      const last = parts.at(-1)?.[1]?.split(/\s+/) ?? [];
+      return { x: -Number(last[0]), y: -Number(last[1]) };
+    };
+    const at = xy(after);
+    const distEuropa = Math.hypot(at.x - europa.x, at.y - europa.y);
+    const distTitan = Math.hypot(at.x - titan.x, at.y - titan.y);
+    expect(distEuropa).toBeLessThan(distTitan);
+
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
   });
 
   it("pans the camera on pointer drag", () => {

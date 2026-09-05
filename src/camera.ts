@@ -191,3 +191,28 @@ export function cameraTransform(
 export function screenPxToWorld(px: number, zoom: number): number {
   return px / Math.max(zoom, MIN_ZOOM);
 }
+
+/** Default time to glide the camera to a missed moon. */
+export const CAMERA_GLIDE_MS = 1200;
+
+export function easeInOutCubic(t: number): number {
+  const k = Math.min(1, Math.max(0, t));
+  return k < 0.5 ? 4 * k * k * k : 1 - (-2 * k + 2) ** 3 / 2;
+}
+
+export function lerpCamera(from: Camera, to: Camera, t: number): Camera {
+  const k = Math.min(1, Math.max(0, t));
+  return {
+    x: from.x + (to.x - from.x) * k,
+    y: from.y + (to.y - from.y) * k,
+    zoom: from.zoom + (to.zoom - from.zoom) * k,
+  };
+}
+
+export function camerasNear(a: Camera, b: Camera, epsilon = 0.5): boolean {
+  return (
+    Math.abs(a.x - b.x) < epsilon &&
+    Math.abs(a.y - b.y) < epsilon &&
+    Math.abs(a.zoom - b.zoom) < 0.03
+  );
+}

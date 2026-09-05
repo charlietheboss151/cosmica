@@ -33,7 +33,7 @@ import "./App.css";
 /** How long CORRECT / miss feedback stays visible. */
 export const FEEDBACK_CLEAR_MS = 750;
 /** How long a reveal (“It was …”) stays visible. */
-export const REVEAL_CLEAR_MS = 1500;
+export const REVEAL_CLEAR_MS = 2200;
 
 const LOGO_SRC = publicUrl("cosmica-logo.png");
 const LOGO_ALT = "Cosmica. Explore the Solar System. Master the cosmos.";
@@ -542,6 +542,11 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
         orbitStartMs={quiz.startedAt}
         orbitFreezeMs={quiz.finishedAt}
         focusId={mode === "moons" ? quiz.currentId : null}
+        revealId={
+          mode === "moons" && quiz.lastResult === "revealed"
+            ? quiz.lastResolvedId
+            : null
+        }
         onSelect={choose}
       />
       <header className="hud">

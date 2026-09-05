@@ -1,12 +1,15 @@
 import { describe, expect, it } from "vitest";
 import {
+  camerasNear,
   createCamera,
   createPanVelocity,
+  easeInOutCubic,
   fitCamera,
   isKeyboardPanKey,
   keyboardPanDelta,
   keyboardPanFrame,
   KEYBOARD_PAN_PX_PER_SEC,
+  lerpCamera,
   panCamera,
   pinchDistance,
   screenToWorld,
@@ -90,5 +93,17 @@ describe("map camera", () => {
     expect(coast.active).toBe(true);
     expect(coast.dy).toBeGreaterThan(0);
     expect(coast.dy).toBeLessThan(KEYBOARD_PAN_PX_PER_SEC / 60);
+  });
+
+  it("eases a camera glide toward the target instead of snapping", () => {
+    const from = { x: 0, y: 0, zoom: 1 };
+    const to = { x: 100, y: 40, zoom: 3 };
+    expect(easeInOutCubic(0)).toBe(0);
+    expect(easeInOutCubic(1)).toBe(1);
+    const mid = lerpCamera(from, to, easeInOutCubic(0.5));
+    expect(mid.x).toBeGreaterThan(0);
+    expect(mid.x).toBeLessThan(100);
+    expect(camerasNear(lerpCamera(from, to, 1), to)).toBe(true);
+    expect(camerasNear(from, to)).toBe(false);
   });
 });

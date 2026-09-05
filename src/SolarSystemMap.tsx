@@ -8,11 +8,15 @@ import {
 } from "react";
 import {
   cameraTransform,
+  camerasNear,
+  CAMERA_GLIDE_MS,
   createCamera,
   createPanVelocity,
+  easeInOutCubic,
   fitCamera,
   isKeyboardPanKey,
   keyboardPanFrame,
+  lerpCamera,
   panCamera,
   pinchDistance,
   screenPxToWorld,
@@ -29,6 +33,7 @@ import {
   isLitInMode,
   isShownLit,
   type GameMode,
+  type ModeOptions,
   type SolarObject,
 } from "./catalog";
 import {
@@ -47,6 +52,7 @@ import {
   SUN_SPIN_PERIOD_MS,
   visualLocalOrbit,
   visualOrbit,
+  type LayoutProfile,
 } from "./layout";
 import type { TryMark } from "./game";
 import { syncOrbitDom } from "./orbitSync";
@@ -103,6 +109,37 @@ function objectsAtOrbitTime(
   );
 }
 
+function moonRevealCamera(
+  objects: SolarObject[],
+  moonId: string,
+  profile: LayoutProfile,
+  width: number,
+  height: number,
+  options: ModeOptions,
+): Camera {
+  const moon = objects.find((object) => object.id === moonId);
+  const parentId = moon?.parentId;
+  const parentFit = parentId
+    ? fitCameraOnMoonParent(objects, parentId, profile, width, height, {
+        ...options,
+        focusParentId: parentId,
+      })
+    : fitCamera(
+        cameraFitRadius(objects, profile, "moons", options.parentIds),
+        width,
+        height,
+      );
+  if (!moon) {
+    return parentFit;
+  }
+  const laid = layoutObject(moon, objects, profile);
+  return {
+    x: laid.x,
+    y: laid.y,
+    zoom: Math.min(8, Math.max(parentFit.zoom * 1.35, parentFit.zoom)),
+  };
+}
+
 type Props = {
   objects: SolarObject[];
   mode: GameMode;
@@ -115,6 +152,8 @@ type Props = {
   orbitFreezeMs?: number | null;
   /** In Moons mode, pans and zooms to the parent of this moon. */
   focusId?: string | null;
+  /** Missed moon to glide toward so the player can see where it was. */
+  revealId?: string | null;
   onSelect: (id: string) => void;
 };
 
@@ -129,6 +168,7 @@ export default function SolarSystemMap({
   orbitStartMs = null,
   orbitFreezeMs = null,
   focusId = null,
+  revealId = null,
   onSelect,
 }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -154,11 +194,23 @@ export default function SolarSystemMap({
   const lastPanTs = useRef<number | null>(null);
   const reduceMotionRef = useRef(reduceMotion);
   reduceMotionRef.current = reduceMotion;
+  const cameraRef = useRef(camera);
+  cameraRef.current = camera;
+  const fittedRef = useRef(false);
+  const glideRaf = useRef<number | null>(null);
+
+  const stopGlide = () => {
+    if (glideRaf.current !== null) {
+      cancelAnimationFrame(glideRaf.current);
+      glideRaf.current = null;
+    }
+  };
 
   const orbiting = orbitStartMs !== null && !reduceMotion;
+  const framedMoonId = revealId ?? focusId;
   const focusParentId =
-    mode === "moons" && focusId
-      ? objects.find((object) => object.id === focusId)?.parentId ?? undefined
+    mode === "moons" && framedMoonId
+      ? objects.find((object) => object.id === framedMoonId)?.parentId ?? undefined
       : undefined;
   const modeOptions = { hardMode, parentIds, focusParentId };
   const layoutProfile = layoutProfileForMode(mode);
@@ -255,29 +307,60 @@ export default function SolarSystemMap({
     if (size.width < 80 || size.height < 80) {
       return;
     }
-    if (mode === "moons" && focusParentId) {
-      setCamera(
-        fitCameraOnMoonParent(
-          objectsAtOrbitTime(
-            objects,
-            orbitElapsedMs(orbiting, orbitStartMs, orbitFreezeMs),
-          ),
-          focusParentId,
-          layoutProfile,
-          size.width,
-          size.height,
-          { hardMode, parentIds, focusParentId },
-        ),
+    const atTime = objectsAtOrbitTime(
+      objects,
+      orbitElapsedMs(orbiting, orbitStartMs, orbitFreezeMs),
+    );
+    const options = { hardMode, parentIds, focusParentId };
+    let target: Camera;
+    if (mode === "moons" && revealId) {
+      target = moonRevealCamera(
+        atTime,
+        revealId,
+        layoutProfile,
+        size.width,
+        size.height,
+        options,
       );
-      return;
-    }
-    setCamera(
-      fitCamera(
+    } else if (mode === "moons" && focusParentId) {
+      target = fitCameraOnMoonParent(
+        atTime,
+        focusParentId,
+        layoutProfile,
+        size.width,
+        size.height,
+        options,
+      );
+    } else {
+      target = fitCamera(
         cameraFitRadius(objects, layoutProfile, mode, parentIds),
         size.width,
         size.height,
-      ),
-    );
+      );
+    }
+    if (!fittedRef.current || reduceMotion) {
+      fittedRef.current = true;
+      stopGlide();
+      setCamera(target);
+      return;
+    }
+    if (camerasNear(cameraRef.current, target)) {
+      return;
+    }
+    stopGlide();
+    const from = cameraRef.current;
+    const started = performance.now();
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - started) / CAMERA_GLIDE_MS);
+      setCamera(lerpCamera(from, target, easeInOutCubic(t)));
+      if (t < 1) {
+        glideRaf.current = requestAnimationFrame(tick);
+        return;
+      }
+      glideRaf.current = null;
+    };
+    glideRaf.current = requestAnimationFrame(tick);
+    return stopGlide;
   }, [
     objects,
     size,
@@ -286,9 +369,11 @@ export default function SolarSystemMap({
     parentIds,
     hardMode,
     focusParentId,
+    revealId,
     orbiting,
     orbitStartMs,
     orbitFreezeMs,
+    reduceMotion,
   ]);
 
   const positions = layoutAll(displayObjects, layoutProfile);
@@ -550,6 +635,7 @@ export default function SolarSystemMap({
       if (prevSpan <= 0) {
         return;
       }
+      stopGlide();
       const bounds = event.currentTarget.getBoundingClientRect();
       const midX = (first!.x + second!.x) / 2 - bounds.left;
       const midY = (first!.y + second!.y) / 2 - bounds.top;
@@ -579,6 +665,7 @@ export default function SolarSystemMap({
       drag.current.moved = true;
       ignoreSelect.current = true;
       tapBodyId.current = null;
+      stopGlide();
       event.currentTarget.setPointerCapture?.(event.pointerId);
     }
     const dx = event.clientX - drag.current.x;
@@ -626,6 +713,7 @@ export default function SolarSystemMap({
 
   const onWheel = (event: WheelEvent<SVGSVGElement>) => {
     event.preventDefault();
+    stopGlide();
     const bounds = event.currentTarget.getBoundingClientRect();
     setCamera((current) =>
       zoomCamera(
@@ -674,6 +762,7 @@ export default function SolarSystemMap({
       event.preventDefault();
       if (!event.repeat) {
         heldPanKeys.current.add(event.key.toLowerCase());
+        stopGlide();
         startPanLoop();
       }
       return;
