@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
+import { BODY_ART } from "./bodyArtAssets";
 import {
   catalog,
   moonsOf,
@@ -6,6 +7,8 @@ import {
   parentsWithMoons,
   type GameMode,
 } from "./catalog";
+import { CelestialCartoon } from "./CelestialCartoon";
+import { celestialStyleFor } from "./celestialStyles";
 import {
   accuracyPercent,
   applyClick,
@@ -44,6 +47,34 @@ const MODE_ICONS: Record<GameMode, string> = {
   moons: "🌙",
   celestial: "☄️",
 };
+
+function ModeBodyArt({ mode }: { mode: GameMode }) {
+  if (mode === "celestial") {
+    const style = celestialStyleFor("halley", "comet");
+    if (!style) {
+      return null;
+    }
+    return (
+      <svg
+        className="mode-body-art mode-body-comet"
+        viewBox="-60 -60 120 120"
+        aria-hidden="true"
+      >
+        <CelestialCartoon id="halley" radius={16} style={style} />
+      </svg>
+    );
+  }
+  const src = mode === "planets" ? BODY_ART.earth : BODY_ART.moon;
+  return (
+    <img
+      className="mode-body-art"
+      src={src}
+      alt=""
+      width={mode === "planets" ? 168 : 96}
+      height={mode === "planets" ? 168 : 96}
+    />
+  );
+}
 
 function isCorrectMark(mark: TryMark | undefined): boolean {
   return mark === "green" || mark === "yellow" || mark === "orange";
@@ -175,24 +206,22 @@ function Menu({
             <span className="quick-play-label">▶ Quick Play</span>
             <span className="quick-play-desc">Random challenge</span>
           </button>
-          <div className="menu-modes">
+          <div className="mode-bodies">
             {PLAYABLE_MODES.map((mode) => {
               const best = formatBest(progress.bestMs[mode.id]);
               return (
-                <div key={mode.id} className="mode-card-wrap">
+                <div key={mode.id} className="mode-body-wrap">
                   <button
                     type="button"
-                    className={`mode-card mode-card-mission mode-card-${mode.id}`}
+                    className={`mode-body mode-body-${mode.id}`}
                     aria-label={mode.label}
                     onClick={() => playMode(mode)}
                   >
-                    <span className="mode-card-icon" aria-hidden="true">
-                      {MODE_ICONS[mode.id]}
-                    </span>
-                    <span className="mode-card-copy">
-                      <span className="mode-card-label">{mode.label}</span>
-                      <span className="mode-card-desc">{mode.description}</span>
-                      <span className="mode-card-best">
+                    <ModeBodyArt mode={mode.id} />
+                    <span className="mode-body-copy">
+                      <span className="mode-body-label">{mode.label}</span>
+                      <span className="mode-body-desc">{mode.description}</span>
+                      <span className="mode-body-best">
                         {best ? `BEST • ${best}` : "BEST • —"}
                       </span>
                     </span>

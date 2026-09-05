@@ -344,17 +344,106 @@ h1 {
   margin-bottom: 22px;
 }
 
-.menu-modes {
+.mode-bodies {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
+  gap: 12px 18px;
+  align-items: end;
+  padding: 8px 0 4px;
+}
+
+.mode-body-wrap {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+}
+
+.mode-body {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 6px 4px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 18px;
+}
+
+.mode-body-art {
+  display: block;
+  width: min(148px, 28vw);
+  height: auto;
+  filter: drop-shadow(0 14px 28px #00000099);
+  animation: mode-body-float 6s ease-in-out infinite;
+}
+
+.mode-body-planets .mode-body-art {
+  width: min(168px, 32vw);
+  border-radius: 50%;
+  object-fit: cover;
+  animation-duration: 5.4s;
+}
+
+.mode-body-moons .mode-body-art {
+  width: min(96px, 22vw);
+  border-radius: 50%;
+  object-fit: cover;
+  animation-duration: 6.4s;
+  animation-delay: -1.6s;
+}
+
+.mode-body-celestial .mode-body-art {
+  width: min(176px, 34vw);
+  animation-duration: 7s;
+  animation-delay: -2.8s;
+}
+
+.mode-body:hover .mode-body-art,
+.mode-body:focus-visible .mode-body-art {
+  animation: none;
+  transform: translateY(-8px) scale(1.08);
+  filter:
+    drop-shadow(0 18px 32px #000000aa)
+    drop-shadow(0 0 22px #7aa2ff99);
+}
+
+.mode-body-copy {
+  display: grid;
+  gap: 2px;
+  text-align: center;
+}
+
+.mode-body-label {
+  font-size: 0.98rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mode-body-desc {
+  font-size: 0.8rem;
+  color: #a8b8d4;
+}
+
+.mode-body-best {
+  margin-top: 2px;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #8eb4ff;
 }
 
 @media (max-width: 760px) {
-  .menu-modes,
+  .mode-bodies,
   .menu-soon-cards,
   .progress-modes {
     grid-template-columns: 1fr;
+  }
+
+  .mode-bodies {
+    align-items: center;
   }
 }
 
@@ -549,6 +638,7 @@ h1 {
 .mode-card,
 .mode-play,
 .mode-soon,
+.mode-body,
 .quick-play,
 .ghost {
   font: inherit;
@@ -977,6 +1067,16 @@ h1 {
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+@keyframes mode-body-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
   }
 }
 
@@ -1497,6 +1597,7 @@ h1 {
   .home-play,
   .menu-hud,
   .mode-card,
+  .mode-body-art,
   .quick-play {
     animation: none;
     transition: none;

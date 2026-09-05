@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.23.0] - 2026-09-05
+
+### Changed
+- Mission select uses Earth, the Moon, and a comet instead of mode cards.
+
 ## [0.22.1] - 2026-09-05
 
 ### Added
