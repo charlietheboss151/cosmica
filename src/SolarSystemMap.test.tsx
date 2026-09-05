@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { catalog, MOONS_MODE_MIN_WORLD } from "./catalog";
+import { layoutObject } from "./layout";
 import SolarSystemMap from "./SolarSystemMap";
 
 describe("SolarSystemMap interaction", () => {
@@ -82,6 +83,76 @@ describe("SolarSystemMap interaction", () => {
     });
     const width = Number(image()!.getAttribute("width"));
     expect(width).toBeGreaterThanOrEqual(MOONS_MODE_MIN_WORLD * 2);
+  });
+
+  it("does not snap orbiting moons back to rest after a miss re-render", () => {
+    const start = 2_000_000;
+    vi.spyOn(Date, "now").mockReturnValue(start + 90_000);
+    const onSelect = vi.fn();
+    const { container, rerender } = render(
+      <SolarSystemMap
+        objects={catalog}
+        mode="moons"
+        focusId="europa"
+        orbitStartMs={start}
+        onSelect={onSelect}
+      />,
+    );
+    const europa = () => container.querySelector('[aria-label="Europa"]');
+    const rest = layoutObject(
+      catalog.find((object) => object.id === "europa")!,
+      catalog,
+      "compact",
+    );
+    const transform = europa()!.getAttribute("transform");
+    expect(transform).not.toBe(`translate(${rest.x} ${rest.y})`);
+
+    rerender(
+      <SolarSystemMap
+        objects={catalog}
+        mode="moons"
+        focusId="europa"
+        flashId="io"
+        orbitStartMs={start}
+        onSelect={onSelect}
+      />,
+    );
+    expect(europa()!.getAttribute("transform")).toBe(transform);
+    vi.restoreAllMocks();
+  });
+
+  it("keeps the Moons-mode camera on the same parent after a miss", () => {
+    const onSelect = vi.fn();
+    const { container, rerender } = render(
+      <SolarSystemMap
+        objects={catalog}
+        mode="moons"
+        focusId="europa"
+        onSelect={onSelect}
+      />,
+    );
+    const world = () => container.querySelector(".map-svg > g");
+    const before = world()!.getAttribute("transform");
+    rerender(
+      <SolarSystemMap
+        objects={catalog}
+        mode="moons"
+        focusId="europa"
+        flashId="io"
+        onSelect={onSelect}
+      />,
+    );
+    expect(world()!.getAttribute("transform")).toBe(before);
+
+    rerender(
+      <SolarSystemMap
+        objects={catalog}
+        mode="moons"
+        focusId="io"
+        onSelect={onSelect}
+      />,
+    );
+    expect(world()!.getAttribute("transform")).toBe(before);
   });
 
   it("pans the camera on pointer drag", () => {

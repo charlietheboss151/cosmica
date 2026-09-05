@@ -27,6 +27,7 @@ import {
   type SolarObject,
 } from "./catalog";
 import {
+  applyOrbitPhase,
   annulusPath,
   beltDust,
   cameraFitRadius,
@@ -54,6 +55,35 @@ function prefersReducedMotion(): boolean {
     typeof window !== "undefined" &&
     typeof window.matchMedia === "function" &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
+function orbitElapsedMs(
+  orbiting: boolean,
+  orbitStartMs: number | null,
+  orbitFreezeMs: number | null,
+  nowMs: number = Date.now(),
+): number {
+  if (!orbiting || orbitStartMs === null) {
+    return 0;
+  }
+  return Math.max(0, (orbitFreezeMs ?? nowMs) - orbitStartMs);
+}
+
+function objectsAtOrbitTime(
+  objects: SolarObject[],
+  elapsedMs: number,
+): SolarObject[] {
+  if (elapsedMs === 0) {
+    return objects;
+  }
+  return applyOrbitPhase(
+    objects,
+    orbitPhaseDeg(elapsedMs, ORBIT_ANIMATION_PERIOD_MS),
+    orbitPhaseDeg(
+      elapsedMs,
+      ORBIT_ANIMATION_PERIOD_MS / MOON_ORBIT_SPEED_MULTIPLIER,
+    ),
   );
 }
 
@@ -100,7 +130,8 @@ export default function SolarSystemMap({
       : undefined;
   const modeOptions = { hardMode, parentIds, focusParentId };
   const layoutProfile = layoutProfileForMode(mode);
-  const displayObjects = objects;
+  const orbitElapsed = orbitElapsedMs(orbiting, orbitStartMs, orbitFreezeMs);
+  const displayObjects = objectsAtOrbitTime(objects, orbitElapsed);
 
   useEffect(() => {
     if (typeof window.matchMedia !== "function") {
@@ -118,7 +149,7 @@ export default function SolarSystemMap({
       return;
     }
     const applyAt = (nowMs: number) => {
-      const elapsedMs = Math.max(0, (orbitFreezeMs ?? nowMs) - orbitStartMs);
+      const elapsedMs = orbitElapsedMs(true, orbitStartMs, orbitFreezeMs, nowMs);
       syncOrbitDom(
         objects,
         orbitPhaseDeg(elapsedMs, ORBIT_ANIMATION_PERIOD_MS),
@@ -169,21 +200,21 @@ export default function SolarSystemMap({
     if (size.width < 80 || size.height < 80) {
       return;
     }
-    if (mode === "moons" && focusId) {
-      const moon = objects.find((object) => object.id === focusId);
-      if (moon?.parentId) {
-        setCamera(
-          fitCameraOnMoonParent(
+    if (mode === "moons" && focusParentId) {
+      setCamera(
+        fitCameraOnMoonParent(
+          objectsAtOrbitTime(
             objects,
-            moon.parentId,
-            layoutProfile,
-            size.width,
-            size.height,
-            { hardMode, parentIds, focusParentId: moon.parentId },
+            orbitElapsedMs(orbiting, orbitStartMs, orbitFreezeMs),
           ),
-        );
-        return;
-      }
+          focusParentId,
+          layoutProfile,
+          size.width,
+          size.height,
+          { hardMode, parentIds, focusParentId },
+        ),
+      );
+      return;
     }
     setCamera(
       fitCamera(
@@ -192,7 +223,18 @@ export default function SolarSystemMap({
         size.height,
       ),
     );
-  }, [objects, size, layoutProfile, mode, parentIds, hardMode, focusId, focusParentId]);
+  }, [
+    objects,
+    size,
+    layoutProfile,
+    mode,
+    parentIds,
+    hardMode,
+    focusParentId,
+    orbiting,
+    orbitStartMs,
+    orbitFreezeMs,
+  ]);
 
   const positions = layoutAll(displayObjects, layoutProfile);
   const heliocentricOrbits = displayObjects.filter(
