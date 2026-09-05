@@ -34,8 +34,8 @@ describe("SolarSystemMap interaction", () => {
         onSelect={onSelect}
       />,
     );
-    await user.click(screen.getByRole("button", { name: "Kuiper Belt" }));
-    expect(onSelect).toHaveBeenCalledWith("kuiper-belt");
+    await user.click(screen.getByRole("button", { name: "Scattered Disc" }));
+    expect(onSelect).toHaveBeenCalledWith("scattered-disc");
   });
 
   it("zooms the camera when the wheel scrolls", () => {

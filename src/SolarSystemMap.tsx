@@ -208,7 +208,11 @@ export default function SolarSystemMap({
       mode !== "celestial" &&
       isLitInMode(object, mode, modeOptions),
   );
-  const regions = displayObjects.filter((object) => object.type === "region");
+  const regions = displayObjects.filter(
+    (object) =>
+      object.type === "region" &&
+      (mode !== "celestial" || isLitInMode(object, mode, modeOptions)),
+  );
   const bodies = [...displayObjects.filter((object) => object.type !== "region")].sort(
     (a, b) =>
       Number(isShownLit(a, mode, modeOptions)) -

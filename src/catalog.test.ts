@@ -86,6 +86,12 @@ describe("solar system catalog", () => {
     expect(isLitInMode(catalog.find((object) => object.id === "earth")!, "celestial")).toBe(
       false,
     );
+    expect(
+      isLitInMode(catalog.find((object) => object.id === "asteroid-belt")!, "celestial"),
+    ).toBe(false);
+    expect(
+      isLitInMode(catalog.find((object) => object.id === "kuiper-belt")!, "celestial"),
+    ).toBe(false);
   });
 
   it("keeps hard-only objects out of Celestial mode until hard mode is on", () => {

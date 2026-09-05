@@ -145,7 +145,7 @@ export function cameraFitRadius(
     }
   }
   if (profile === "proportional") {
-    return visualOrbit(10, profile) * 1.06;
+    return visualOrbit(7, profile) * 1.08;
   }
   const jupiter = objects.find((object) => object.id === "jupiter");
   return visualOrbit(jupiter?.au ?? 5.2, profile) * 1.08;

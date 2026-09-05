@@ -55,7 +55,7 @@ const PLAYABLE_MODES: {
   {
     id: "celestial",
     label: "Celestial bodies",
-    description: "Dwarf planets, famous asteroids, comets, and regions",
+    description: "Dwarf planets, famous asteroids, and comets",
     hardLabel: "Include hard objects",
   },
 ];

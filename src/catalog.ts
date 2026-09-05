@@ -439,6 +439,11 @@ export function isDecorativeMoon(object: SolarObject, mode: GameMode): boolean {
   return (mode === "planets" || mode === "celestial") && object.type === "moon";
 }
 
+/** Asteroid Belt and Kuiper Belt stay off the Celestial bodies quiz. */
+export function isBeltRegion(object: SolarObject): boolean {
+  return object.type === "region" && object.id.endsWith("-belt");
+}
+
 export function displayRadius(
   object: SolarObject,
   mode: GameMode,
@@ -494,6 +499,9 @@ export function isLitInMode(
     return true;
   }
   if (mode === "celestial") {
+    if (isBeltRegion(object)) {
+      return false;
+    }
     return (
       object.type === "dwarf-planet" ||
       object.type === "asteroid" ||

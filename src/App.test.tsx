@@ -97,12 +97,14 @@ describe("Cosmica prototype", () => {
     );
   });
 
-  it("lets players click dwarf planets inside a belt region in Celestial mode", async () => {
+  it("lets players click dwarf planets in Celestial mode without belt regions", async () => {
     const user = await openMenu();
     await user.click(screen.getByRole("button", { name: "Celestial bodies" }));
     const pluto = screen.getByRole("button", { name: "Pluto" });
     expect(pluto).not.toHaveAttribute("aria-disabled", "true");
-    expect(screen.getByRole("button", { name: "Kuiper Belt" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Asteroid Belt" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Kuiper Belt" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Scattered Disc" })).toBeInTheDocument();
   });
 
   it("draws planet orbit guides in Moons mode", async () => {

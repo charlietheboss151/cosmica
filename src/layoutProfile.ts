@@ -9,10 +9,10 @@ export function layoutProfileForMode(mode: GameMode): LayoutProfile {
 /** Scales moon/local orbit radii to match tighter heliocentric spacing. */
 export const LOCAL_ORBIT_SCALE = 0.62;
 
-const PROPORTIONAL_BASE = 48;
-const PROPORTIONAL_AU_SCALE = 30;
-const PROPORTIONAL_OUTER_AU = 22;
-const PROPORTIONAL_LOG_SCALE = 160;
+const PROPORTIONAL_BASE = 56;
+const PROPORTIONAL_AU_SCALE = 48;
+const PROPORTIONAL_OUTER_AU = 50;
+const PROPORTIONAL_LOG_SCALE = 240;
 
 const COMPACT_BASE = 52;
 const COMPACT_AU_SCALE = 100;
@@ -43,5 +43,5 @@ export function visualLocalOrbit(localOrbit: number): number {
 }
 
 export function minBodyGap(profile: LayoutProfile): number {
-  return profile === "proportional" ? 16 : 10;
+  return profile === "proportional" ? 24 : 10;
 }

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.19.0] - 2026-09-05
+
+### Changed
+- Celestial bodies mode spreads orbits farther apart so named bodies are easier to pick out.
+- The Asteroid Belt and Kuiper Belt are no longer quiz targets (or drawn bands) in Celestial bodies mode.
+
 ## [0.18.3] - 2026-09-05
 
 ### Fixed

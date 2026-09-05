@@ -138,6 +138,25 @@ describe("compressed visual layout", () => {
     expect(fit).toBeGreaterThan(visualOrbit(jupiter.au));
     expect(fit).toBeLessThan(visualOrbit(saturn.au));
   });
+
+  it("spaces nearby asteroids farther apart in proportional layout than compact", () => {
+    const vesta = catalog.find((object) => object.id === "vesta")!;
+    const pallas = catalog.find((object) => object.id === "pallas")!;
+    const compactGap = Math.abs(
+      visualOrbit(pallas.au, "compact") - visualOrbit(vesta.au, "compact"),
+    );
+    const proportionalGap = Math.abs(
+      visualOrbit(pallas.au, "proportional") - visualOrbit(vesta.au, "proportional"),
+    );
+    expect(proportionalGap).toBeGreaterThan(compactGap);
+  });
+
+  it("frames the celestial first view inside Saturn's orbit so inner bodies are not tiny", () => {
+    const saturn = catalog.find((object) => object.id === "saturn")!;
+    const fit = cameraFitRadius(catalog, "proportional", "celestial");
+    expect(fit).toBeLessThan(visualOrbit(saturn.au, "proportional"));
+    expect(fit).toBeGreaterThan(visualOrbit(4, "proportional"));
+  });
 });
 
 describe("randomizeOrbitalPositions", () => {
