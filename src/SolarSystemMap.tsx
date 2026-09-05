@@ -11,6 +11,7 @@ import {
   createCamera,
   fitCamera,
   panCamera,
+  screenPxToWorld,
   zoomCamera,
   type Camera,
 } from "./camera";
@@ -310,9 +311,16 @@ export default function SolarSystemMap({
     const shownLit = isShownLit(object, mode, modeOptions);
     const quizTarget = isLitInMode(object, mode, modeOptions);
     const decorMoon = isDecorativeMoon(object, mode);
-    const radius = displayRadius(object, mode);
+    const radius = displayRadius(object, mode, camera.zoom);
+    const pad = (px: number) => screenPxToWorld(px, camera.zoom);
     const passive = decorMoon;
     const isSun = object.type === "star";
+    const hitRadius =
+      object.id === "saturn"
+        ? laid.radius * 2.1
+        : mode === "moons" && object.type === "moon"
+          ? Math.max(radius, pad(14))
+          : Math.max(laid.radius, 12);
     return (
       <g
         key={object.id}
@@ -361,26 +369,19 @@ export default function SolarSystemMap({
           />
         ) : null}
         {passive || isSun ? null : (
-          <circle
-            className="hit"
-            r={
-              object.id === "saturn"
-                ? laid.radius * 2.1
-                : Math.max(laid.radius, 12)
-            }
-          />
+          <circle className="hit" r={hitRadius} />
         )}
         {marks[object.id] ? (
           <circle
             className={`try-ring try-ring-${marks[object.id]}`}
-            r={radius + 6}
+            r={radius + pad(6)}
             fill="none"
           />
         ) : null}
         {flashId === object.id ? (
           <circle
             className="try-ring try-ring-flash"
-            r={radius + 6}
+            r={radius + pad(6)}
             fill="none"
           />
         ) : null}
@@ -391,7 +392,7 @@ export default function SolarSystemMap({
           type={object.type}
         />
         {foundIds.includes(object.id) ? (
-          <text className="label" y={radius + 18}>
+          <text className="label" y={radius + pad(16)}>
             {object.name}
           </text>
         ) : null}

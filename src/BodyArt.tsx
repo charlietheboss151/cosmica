@@ -133,7 +133,7 @@ export function BodyArt({ id, radius, color, type = "planet" }: Props) {
           r={radius * 1.08}
           fill="none"
           stroke="#eef3ff"
-          strokeWidth={Math.max(2.5, radius * 0.1)}
+          strokeWidth={Math.max(radius * 0.12, 0.25)}
         />
       </>
     ) : null;

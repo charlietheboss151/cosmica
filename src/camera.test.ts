@@ -6,6 +6,7 @@ import {
   keyboardPanDelta,
   panCamera,
   screenToWorld,
+  screenPxToWorld,
   zoomCamera,
 } from "./camera";
 
@@ -41,6 +42,11 @@ describe("map camera", () => {
     expect(isKeyboardPanKey("w")).toBe(true);
     expect(isKeyboardPanKey("ArrowLeft")).toBe(true);
     expect(isKeyboardPanKey("Enter")).toBe(false);
+  });
+
+  it("converts a screen-pixel size into world units at the current zoom", () => {
+    expect(screenPxToWorld(16, 1)).toBe(16);
+    expect(screenPxToWorld(16, 4)).toBe(4);
   });
 
   it("maps held keys to the same pan axes as drag", () => {

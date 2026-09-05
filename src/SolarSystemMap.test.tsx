@@ -57,6 +57,29 @@ describe("SolarSystemMap interaction", () => {
     expect(after).toMatch(/scale\(/);
   });
 
+  it("shrinks Moons-mode moon art in world units as the camera zooms in", () => {
+    const onSelect = vi.fn();
+    const { container } = render(
+      <SolarSystemMap
+        objects={catalog}
+        mode="moons"
+        focusId="europa"
+        onSelect={onSelect}
+      />,
+    );
+    const svg = container.querySelector(".map-svg")!;
+    const image = () =>
+      container.querySelector('[data-testid="art-europa"] image');
+    const before = Number(image()!.getAttribute("width"));
+    fireEvent.wheel(svg, {
+      deltaY: -120,
+      clientX: 400,
+      clientY: 300,
+    });
+    const after = Number(image()!.getAttribute("width"));
+    expect(after).toBeLessThan(before);
+  });
+
   it("pans the camera on pointer drag", () => {
     const onSelect = vi.fn();
     const { container } = render(

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.18.3] - 2026-09-05
+
+### Fixed
+- Moons in Moons mode stay a readable on-screen size as you zoom, instead of filling the view when the camera closes in on a planet.
+
 ### Changed
 - Document Windows deploy paths (GitHub Actions and Git Bash/WSL) in deploy README.
 

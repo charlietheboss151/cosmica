@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   catalog,
   displayRadius,
+  MOONS_MODE_SCREEN_MIN,
   isLitInMode,
   isShownLit,
   moonsOf,
@@ -163,11 +164,20 @@ describe("solar system catalog", () => {
     expect(catalog.some((object) => object.id === "earth")).toBe(true);
   });
 
-  it("keeps small moons readable in Moons mode", () => {
+  it("keeps small moons readable in Moons mode without a huge world radius", () => {
     const kerberos = catalog.find((object) => object.id === "kerberos")!;
     expect(kerberos.displaySize).toBeLessThan(11);
-    expect(displayRadius(kerberos, "moons")).toBe(28);
+    expect(displayRadius(kerberos, "moons")).toBe(MOONS_MODE_SCREEN_MIN);
     expect(displayRadius(kerberos, "planets")).toBeLessThan(11);
+  });
+
+  it("shrinks Moons-mode moon world radius as zoom grows so on-screen size stays put", () => {
+    const europa = catalog.find((object) => object.id === "europa")!;
+    const atOne = displayRadius(europa, "moons", 1);
+    const atFour = displayRadius(europa, "moons", 4);
+    expect(atOne).toBe(europa.displaySize);
+    expect(atFour * 4).toBeCloseTo(atOne);
+    expect(atFour).toBeLessThan(atOne);
   });
 
   it("limits Moons mode to selected parent planets", () => {

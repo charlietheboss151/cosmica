@@ -123,3 +123,8 @@ export function cameraTransform(
 ): string {
   return `translate(${width / 2} ${height / 2}) scale(${camera.zoom}) translate(${-camera.x} ${-camera.y})`;
 }
+
+/** Convert a target on-screen size in CSS pixels to world units at this zoom. */
+export function screenPxToWorld(px: number, zoom: number): number {
+  return px / Math.max(zoom, MIN_ZOOM);
+}
