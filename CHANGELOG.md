@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.20.4] - 2026-09-05
+
+### Fixed
+- Pinch-to-zoom on phones can zoom out as well as in (two-finger pinch and ctrl-wheel).
+
 ## [0.20.3] - 2026-09-05
 
 ### Fixed

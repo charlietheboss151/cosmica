@@ -58,6 +58,60 @@ describe("SolarSystemMap interaction", () => {
     expect(after).toMatch(/scale\(/);
   });
 
+  it("zooms out when two pointers pinch together", () => {
+    const onSelect = vi.fn();
+    const { container } = render(
+      <SolarSystemMap objects={catalog} mode="planets" onSelect={onSelect} />,
+    );
+    const svg = container.querySelector(".map-svg")!;
+    const world = svg.querySelector("g")!;
+    const scaleOf = (transform: string) =>
+      Number(/scale\(([^)]+)\)/.exec(transform)?.[1]);
+    fireEvent.pointerDown(svg, {
+      pointerId: 1,
+      button: 0,
+      clientX: 300,
+      clientY: 300,
+    });
+    fireEvent.pointerDown(svg, {
+      pointerId: 2,
+      button: 0,
+      clientX: 500,
+      clientY: 300,
+    });
+    const before = scaleOf(world.getAttribute("transform") ?? "");
+    fireEvent.pointerMove(svg, { pointerId: 1, clientX: 360, clientY: 300 });
+    fireEvent.pointerMove(svg, { pointerId: 2, clientX: 440, clientY: 300 });
+    const after = scaleOf(world.getAttribute("transform") ?? "");
+    expect(after).toBeLessThan(before);
+  });
+
+  it("zooms out on ctrl-wheel, the browser pinch gesture", () => {
+    const onSelect = vi.fn();
+    const { container } = render(
+      <SolarSystemMap objects={catalog} mode="planets" onSelect={onSelect} />,
+    );
+    const svg = container.querySelector(".map-svg")!;
+    const world = svg.querySelector("g")!;
+    const scaleOf = (transform: string) =>
+      Number(/scale\(([^)]+)\)/.exec(transform)?.[1]);
+    fireEvent.wheel(svg, {
+      deltaY: -120,
+      ctrlKey: false,
+      clientX: 400,
+      clientY: 300,
+    });
+    const zoomedIn = scaleOf(world.getAttribute("transform") ?? "");
+    fireEvent.wheel(svg, {
+      deltaY: 80,
+      ctrlKey: true,
+      clientX: 400,
+      clientY: 300,
+    });
+    const zoomedOut = scaleOf(world.getAttribute("transform") ?? "");
+    expect(zoomedOut).toBeLessThan(zoomedIn);
+  });
+
   it("keeps Moons-mode moons at a world-size floor when zoomed in close", () => {
     const onSelect = vi.fn();
     const { container } = render(

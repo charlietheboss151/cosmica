@@ -5,8 +5,10 @@ import {
   isKeyboardPanKey,
   keyboardPanDelta,
   panCamera,
+  pinchDistance,
   screenToWorld,
   screenPxToWorld,
+  wheelZoomFactor,
   zoomCamera,
 } from "./camera";
 
@@ -42,6 +44,14 @@ describe("map camera", () => {
     expect(isKeyboardPanKey("w")).toBe(true);
     expect(isKeyboardPanKey("ArrowLeft")).toBe(true);
     expect(isKeyboardPanKey("Enter")).toBe(false);
+  });
+
+  it("zooms out when pinch or ctrl-wheel shrinks, and in when they grow", () => {
+    expect(wheelZoomFactor(120)).toBeLessThan(1);
+    expect(wheelZoomFactor(-120)).toBeGreaterThan(1);
+    expect(wheelZoomFactor(80, true)).toBeLessThan(1);
+    expect(wheelZoomFactor(-80, true)).toBeGreaterThan(1);
+    expect(pinchDistance({ x: 0, y: 0 }, { x: 3, y: 4 })).toBe(5);
   });
 
   it("converts a screen-pixel size into world units at the current zoom", () => {

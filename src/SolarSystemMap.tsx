@@ -11,7 +11,9 @@ import {
   createCamera,
   fitCamera,
   panCamera,
+  pinchDistance,
   screenPxToWorld,
+  wheelZoomFactor,
   zoomCamera,
   type Camera,
 } from "./camera";
@@ -120,6 +122,8 @@ export default function SolarSystemMap({
   const [camera, setCamera] = useState<Camera>(createCamera);
   const [reduceMotion, setReduceMotion] = useState(prefersReducedMotion);
   const drag = useRef<{ x: number; y: number } | null>(null);
+  const pointers = useRef(new Map<number, { x: number; y: number }>());
+  const pinchSpan = useRef<number | null>(null);
   const bodyElements = useRef(new Map<string, SVGGElement | null>());
   const moonOrbitElements = useRef(new Map<string, SVGCircleElement | null>());
 
@@ -451,11 +455,50 @@ export default function SolarSystemMap({
     if (event.button !== 0) {
       return;
     }
-    drag.current = { x: event.clientX, y: event.clientY };
+    pointers.current.set(event.pointerId, {
+      x: event.clientX,
+      y: event.clientY,
+    });
     event.currentTarget.setPointerCapture(event.pointerId);
+    if (pointers.current.size >= 2) {
+      drag.current = null;
+      const [first, second] = [...pointers.current.values()];
+      pinchSpan.current = pinchDistance(first!, second!);
+      return;
+    }
+    drag.current = { x: event.clientX, y: event.clientY };
   };
 
   const onPointerMove = (event: PointerEvent<SVGSVGElement>) => {
+    if (pointers.current.has(event.pointerId)) {
+      pointers.current.set(event.pointerId, {
+        x: event.clientX,
+        y: event.clientY,
+      });
+    }
+    if (pointers.current.size >= 2) {
+      const [first, second] = [...pointers.current.values()];
+      const nextSpan = pinchDistance(first!, second!);
+      const prevSpan = pinchSpan.current ?? nextSpan;
+      pinchSpan.current = nextSpan;
+      if (prevSpan <= 0) {
+        return;
+      }
+      const bounds = event.currentTarget.getBoundingClientRect();
+      const midX = (first!.x + second!.x) / 2 - bounds.left;
+      const midY = (first!.y + second!.y) / 2 - bounds.top;
+      setCamera((current) =>
+        zoomCamera(
+          current,
+          nextSpan / prevSpan,
+          midX,
+          midY,
+          bounds.width,
+          bounds.height,
+        ),
+      );
+      return;
+    }
     if (!drag.current) {
       return;
     }
@@ -465,18 +508,26 @@ export default function SolarSystemMap({
     setCamera((current) => panCamera(current, dx, dy));
   };
 
-  const endDrag = () => {
-    drag.current = null;
+  const onPointerUp = (event: PointerEvent<SVGSVGElement>) => {
+    pointers.current.delete(event.pointerId);
+    if (pointers.current.size < 2) {
+      pinchSpan.current = null;
+    }
+    if (pointers.current.size === 0) {
+      drag.current = null;
+      return;
+    }
+    const leftover = [...pointers.current.values()][0]!;
+    drag.current = { x: leftover.x, y: leftover.y };
   };
 
   const onWheel = (event: WheelEvent<SVGSVGElement>) => {
     event.preventDefault();
     const bounds = event.currentTarget.getBoundingClientRect();
-    const factor = event.deltaY < 0 ? 1.12 : 1 / 1.12;
     setCamera((current) =>
       zoomCamera(
         current,
-        factor,
+        wheelZoomFactor(event.deltaY, event.ctrlKey),
         event.clientX - bounds.left,
         event.clientY - bounds.top,
         bounds.width,
@@ -544,11 +595,11 @@ export default function SolarSystemMap({
         height={size.height}
         tabIndex={0}
         role="application"
-        aria-label="Solar system map. Arrow keys pan, plus and minus zoom."
+        aria-label="Solar system map. Arrow keys pan, plus and minus zoom. Pinch or scroll to zoom."
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
-        onPointerUp={endDrag}
-        onPointerCancel={endDrag}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
         onWheel={onWheel}
         onKeyDown={onKeyDown}
       >

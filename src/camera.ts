@@ -116,6 +116,21 @@ export function zoomCamera(
   };
 }
 
+/** Wheel / trackpad zoom; ctrl+wheel is how browsers expose pinch. */
+export function wheelZoomFactor(deltaY: number, ctrlKey = false): number {
+  if (ctrlKey) {
+    return Math.exp(-deltaY * 0.01);
+  }
+  return deltaY < 0 ? 1.12 : 1 / 1.12;
+}
+
+export function pinchDistance(
+  a: { x: number; y: number },
+  b: { x: number; y: number },
+): number {
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
 export function cameraTransform(
   camera: Camera,
   width: number,

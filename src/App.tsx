@@ -503,7 +503,7 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
         </div>
       ) : null}
       <p className="hint">
-        3 guesses per body · click the named body · scroll to zoom
+        3 guesses per body · click the named body · scroll or pinch to zoom
       </p>
     </div>
   );
