@@ -1,9 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
   createCamera,
+  createPanVelocity,
   fitCamera,
   isKeyboardPanKey,
   keyboardPanDelta,
+  keyboardPanFrame,
+  KEYBOARD_PAN_PX_PER_SEC,
   panCamera,
   pinchDistance,
   screenToWorld,
@@ -62,9 +65,30 @@ describe("map camera", () => {
   it("maps held keys to the same pan axes as drag", () => {
     expect(keyboardPanDelta(new Set(["w"]), 10)).toEqual({ dx: 0, dy: 10 });
     expect(keyboardPanDelta(new Set(["d"]), 10)).toEqual({ dx: -10, dy: 0 });
-    expect(keyboardPanDelta(new Set(["arrowleft", "s"]), 10)).toEqual({
-      dx: 10,
-      dy: -10,
-    });
+    const diagonal = keyboardPanDelta(new Set(["arrowleft", "s"]), 10);
+    expect(diagonal.dx).toBeCloseTo(10 / Math.SQRT2);
+    expect(diagonal.dy).toBeCloseTo(-10 / Math.SQRT2);
+  });
+
+  it("eases keyboard pan instead of jumping a full step on the first frame", () => {
+    const dt = 1 / 60;
+    const first = keyboardPanFrame(new Set(["d"]), createPanVelocity(), dt);
+    const full = KEYBOARD_PAN_PX_PER_SEC * dt;
+    expect(first.active).toBe(true);
+    expect(first.dx).toBeLessThan(0);
+    expect(Math.abs(first.dx)).toBeLessThan(Math.abs(full));
+    const later = keyboardPanFrame(new Set(["d"]), first.velocity, dt);
+    expect(Math.abs(later.dx)).toBeGreaterThan(Math.abs(first.dx));
+  });
+
+  it("coasts to a stop after keys are released", () => {
+    let velocity = createPanVelocity();
+    for (let i = 0; i < 12; i += 1) {
+      velocity = keyboardPanFrame(new Set(["w"]), velocity, 1 / 60).velocity;
+    }
+    const coast = keyboardPanFrame(new Set(), velocity, 1 / 60);
+    expect(coast.active).toBe(true);
+    expect(coast.dy).toBeGreaterThan(0);
+    expect(coast.dy).toBeLessThan(KEYBOARD_PAN_PX_PER_SEC / 60);
   });
 });

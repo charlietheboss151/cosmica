@@ -9,7 +9,10 @@ import {
 import {
   cameraTransform,
   createCamera,
+  createPanVelocity,
   fitCamera,
+  isKeyboardPanKey,
+  keyboardPanFrame,
   panCamera,
   pinchDistance,
   screenPxToWorld,
@@ -48,7 +51,6 @@ import {
 import type { TryMark } from "./game";
 import { syncOrbitDom } from "./orbitSync";
 
-const KEYBOARD_PAN_PX = 48;
 const KEYBOARD_ZOOM_IN = 1.12;
 const KEYBOARD_ZOOM_OUT = 1 / 1.12;
 
@@ -126,6 +128,12 @@ export default function SolarSystemMap({
   const pinchSpan = useRef<number | null>(null);
   const bodyElements = useRef(new Map<string, SVGGElement | null>());
   const moonOrbitElements = useRef(new Map<string, SVGCircleElement | null>());
+  const heldPanKeys = useRef(new Set<string>());
+  const panVelocity = useRef(createPanVelocity());
+  const panRaf = useRef<number | null>(null);
+  const lastPanTs = useRef<number | null>(null);
+  const reduceMotionRef = useRef(reduceMotion);
+  reduceMotionRef.current = reduceMotion;
 
   const orbiting = orbitStartMs !== null && !reduceMotion;
   const focusParentId =
@@ -146,6 +154,29 @@ export default function SolarSystemMap({
     sync();
     media.addEventListener("change", sync);
     return () => media.removeEventListener("change", sync);
+  }, []);
+
+  useEffect(() => {
+    const onKeyUp = (event: globalThis.KeyboardEvent) => {
+      if (!isKeyboardPanKey(event.key)) {
+        return;
+      }
+      heldPanKeys.current.delete(event.key.toLowerCase());
+    };
+    const onWindowBlur = () => {
+      heldPanKeys.current.clear();
+    };
+    window.addEventListener("keyup", onKeyUp);
+    window.addEventListener("blur", onWindowBlur);
+    return () => {
+      window.removeEventListener("keyup", onKeyUp);
+      window.removeEventListener("blur", onWindowBlur);
+      if (panRaf.current !== null) {
+        cancelAnimationFrame(panRaf.current);
+        panRaf.current = null;
+      }
+      lastPanTs.current = null;
+    };
   }, []);
 
   useEffect(() => {
@@ -536,28 +567,46 @@ export default function SolarSystemMap({
     );
   };
 
+  const startPanLoop = () => {
+    if (panRaf.current !== null) {
+      return;
+    }
+    const tickPan = (now: number) => {
+      const dt =
+        lastPanTs.current === null
+          ? 1 / 60
+          : Math.min(0.05, (now - lastPanTs.current) / 1000);
+      lastPanTs.current = now;
+      const step = keyboardPanFrame(
+        heldPanKeys.current,
+        panVelocity.current,
+        dt,
+        { reducedMotion: reduceMotionRef.current },
+      );
+      panVelocity.current = step.velocity;
+      if (step.dx !== 0 || step.dy !== 0) {
+        setCamera((current) => panCamera(current, step.dx, step.dy));
+      }
+      if (step.active) {
+        panRaf.current = requestAnimationFrame(tickPan);
+        return;
+      }
+      panRaf.current = null;
+      lastPanTs.current = null;
+    };
+    panRaf.current = requestAnimationFrame(tickPan);
+  };
+
   const onKeyDown = (event: KeyboardEvent<SVGSVGElement>) => {
+    if (isKeyboardPanKey(event.key)) {
+      event.preventDefault();
+      if (!event.repeat) {
+        heldPanKeys.current.add(event.key.toLowerCase());
+        startPanLoop();
+      }
+      return;
+    }
     const bounds = event.currentTarget.getBoundingClientRect();
-    if (event.key === "ArrowLeft") {
-      event.preventDefault();
-      setCamera((current) => panCamera(current, KEYBOARD_PAN_PX, 0));
-      return;
-    }
-    if (event.key === "ArrowRight") {
-      event.preventDefault();
-      setCamera((current) => panCamera(current, -KEYBOARD_PAN_PX, 0));
-      return;
-    }
-    if (event.key === "ArrowUp") {
-      event.preventDefault();
-      setCamera((current) => panCamera(current, 0, KEYBOARD_PAN_PX));
-      return;
-    }
-    if (event.key === "ArrowDown") {
-      event.preventDefault();
-      setCamera((current) => panCamera(current, 0, -KEYBOARD_PAN_PX));
-      return;
-    }
     if (event.key === "+" || event.key === "=") {
       event.preventDefault();
       setCamera((current) =>
@@ -595,7 +644,7 @@ export default function SolarSystemMap({
         height={size.height}
         tabIndex={0}
         role="application"
-        aria-label="Solar system map. Arrow keys pan, plus and minus zoom. Pinch or scroll to zoom."
+        aria-label="Solar system map. Hold WASD or arrow keys to pan, plus and minus zoom. Pinch or scroll to zoom."
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}

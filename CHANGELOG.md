@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.21.1] - 2026-09-05
+
+### Fixed
+- WASD and arrow-key panning glides continuously while a key is held instead of jumping on key-repeat.
+
 ## [0.21.0] - 2026-09-05
 
 ### Added

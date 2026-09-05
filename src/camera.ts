@@ -60,7 +60,18 @@ export function isKeyboardPanKey(key: string): boolean {
   return KEYBOARD_PAN_KEYS.has(key.toLowerCase());
 }
 
-/** Screen-pixel pan delta for held WASD / arrow keys (same axes as drag-to-pan). */
+/** Screen-pixel pan speed while WASD / arrows are held. */
+export const KEYBOARD_PAN_PX_PER_SEC = 520;
+/** How quickly pan speed eases toward the held-key target (higher = snappier). */
+export const KEYBOARD_PAN_SMOOTHING = 16;
+
+export type PanVelocity = { vx: number; vy: number };
+
+export function createPanVelocity(): PanVelocity {
+  return { vx: 0, vy: 0 };
+}
+
+/** Screen-pixel pan rate for held WASD / arrow keys (same axes as drag-to-pan). */
 export function keyboardPanDelta(
   keys: ReadonlySet<string>,
   speed: number,
@@ -80,7 +91,44 @@ export function keyboardPanDelta(
   if (held.has("arrowdown") || held.has("s")) {
     dy -= speed;
   }
+  if (dx !== 0 && dy !== 0) {
+    const inv = 1 / Math.SQRT2;
+    dx *= inv;
+    dy *= inv;
+  }
   return { dx, dy };
+}
+
+/**
+ * One animation-frame of keyboard panning: ease velocity toward held keys,
+ * then return the screen-pixel delta to apply this frame.
+ */
+export function keyboardPanFrame(
+  keys: ReadonlySet<string>,
+  velocity: PanVelocity,
+  dtSec: number,
+  options: { reducedMotion?: boolean } = {},
+): { velocity: PanVelocity; dx: number; dy: number; active: boolean } {
+  const dt = Number.isFinite(dtSec) ? Math.min(0.05, Math.max(0, dtSec)) : 0;
+  const target = keyboardPanDelta(keys, KEYBOARD_PAN_PX_PER_SEC);
+  const blend = options.reducedMotion
+    ? 1
+    : 1 - Math.exp(-KEYBOARD_PAN_SMOOTHING * dt);
+  const vx = velocity.vx + (target.dx - velocity.vx) * blend;
+  const vy = velocity.vy + (target.dy - velocity.vy) * blend;
+  const still =
+    target.dx === 0 &&
+    target.dy === 0 &&
+    Math.hypot(vx, vy) < 8;
+  if (still) {
+    return { velocity: createPanVelocity(), dx: 0, dy: 0, active: false };
+  }
+  return {
+    velocity: { vx, vy },
+    dx: vx * dt,
+    dy: vy * dt,
+    active: true,
+  };
 }
 
 export function focusCameraOnBody(
