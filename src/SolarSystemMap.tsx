@@ -59,6 +59,13 @@ function isPrimaryPointer(event: PointerEvent<SVGSVGElement>): boolean {
   return event.pointerType !== "mouse" || event.button === 0;
 }
 
+function bodyIdFromTarget(target: EventTarget | null): string | null {
+  if (!(target instanceof Element)) {
+    return null;
+  }
+  return target.closest("[data-body-id]")?.getAttribute("data-body-id") ?? null;
+}
+
 function prefersReducedMotion(): boolean {
   return (
     typeof window !== "undefined" &&
@@ -138,6 +145,7 @@ export default function SolarSystemMap({
   const pointers = useRef(new Map<number, { x: number; y: number }>());
   const pinchSpan = useRef<number | null>(null);
   const ignoreSelect = useRef(false);
+  const tapBodyId = useRef<string | null>(null);
   const bodyElements = useRef(new Map<string, SVGGElement | null>());
   const moonOrbitElements = useRef(new Map<string, SVGCircleElement | null>());
   const heldPanKeys = useRef(new Set<string>());
@@ -378,6 +386,7 @@ export default function SolarSystemMap({
         role="button"
         aria-label={object.name}
         tabIndex={0}
+        data-body-id={object.id}
         onClick={() => {
           if (!ignoreSelect.current) {
             choose();
@@ -429,6 +438,7 @@ export default function SolarSystemMap({
         aria-hidden={decorMoon ? true : undefined}
         aria-disabled={decorMoon || isSun ? undefined : quizTarget ? undefined : true}
         tabIndex={decorMoon || isSun ? undefined : quizTarget ? 0 : -1}
+        data-body-id={passive || isSun || !quizTarget ? undefined : object.id}
         onClick={
           passive || isSun
             ? undefined
@@ -501,15 +511,17 @@ export default function SolarSystemMap({
     }
     if (pointers.current.size === 0) {
       ignoreSelect.current = false;
+      tapBodyId.current = bodyIdFromTarget(event.target);
     }
     pointers.current.set(event.pointerId, {
       x: event.clientX,
       y: event.clientY,
     });
-    event.currentTarget.setPointerCapture?.(event.pointerId);
     if (pointers.current.size >= 2) {
       ignoreSelect.current = true;
+      tapBodyId.current = null;
       drag.current = null;
+      event.currentTarget.setPointerCapture?.(event.pointerId);
       const [first, second] = [...pointers.current.values()];
       pinchSpan.current = pinchDistance(first!, second!);
       return;
@@ -566,6 +578,8 @@ export default function SolarSystemMap({
       }
       drag.current.moved = true;
       ignoreSelect.current = true;
+      tapBodyId.current = null;
+      event.currentTarget.setPointerCapture?.(event.pointerId);
     }
     const dx = event.clientX - drag.current.x;
     const dy = event.clientY - drag.current.y;
@@ -577,13 +591,27 @@ export default function SolarSystemMap({
     setCamera((current) => panCamera(current, dx, dy));
   };
 
-  const onPointerUp = (event: PointerEvent<SVGSVGElement>) => {
+  const endPointer = (
+    event: PointerEvent<SVGSVGElement>,
+    cancelled: boolean,
+  ) => {
+    const wasTap =
+      !cancelled &&
+      pointers.current.size === 1 &&
+      drag.current !== null &&
+      !drag.current.moved;
+    const tappedId = tapBodyId.current;
     pointers.current.delete(event.pointerId);
     if (pointers.current.size < 2) {
       pinchSpan.current = null;
     }
     if (pointers.current.size === 0) {
       drag.current = null;
+      tapBodyId.current = null;
+      if (wasTap && tappedId) {
+        ignoreSelect.current = true;
+        onSelect(tappedId);
+      }
       return;
     }
     const leftover = [...pointers.current.values()][0]!;
@@ -691,8 +719,8 @@ export default function SolarSystemMap({
         aria-label="Solar system map. Hold WASD or arrow keys to pan, plus and minus zoom. Pinch or scroll to zoom."
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
+        onPointerUp={(event) => endPointer(event, false)}
+        onPointerCancel={(event) => endPointer(event, true)}
         onWheel={onWheel}
         onKeyDown={onKeyDown}
       >

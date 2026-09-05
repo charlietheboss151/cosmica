@@ -255,6 +255,31 @@ describe("SolarSystemMap interaction", () => {
       <SolarSystemMap objects={catalog} mode="planets" onSelect={onSelect} />,
     );
     await user.click(screen.getByRole("button", { name: "Mercury" }));
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    expect(onSelect).toHaveBeenCalledWith("mercury");
+  });
+
+  it("selects a planet on pointer up even if click never fires", () => {
+    const onSelect = vi.fn();
+    render(
+      <SolarSystemMap objects={catalog} mode="planets" onSelect={onSelect} />,
+    );
+    const mercury = screen.getByRole("button", { name: "Mercury" });
+    fireEvent.pointerDown(mercury, {
+      pointerId: 1,
+      pointerType: "mouse",
+      button: 0,
+      clientX: 400,
+      clientY: 300,
+    });
+    fireEvent.pointerUp(mercury, {
+      pointerId: 1,
+      pointerType: "mouse",
+      button: 0,
+      clientX: 400,
+      clientY: 300,
+    });
+    expect(onSelect).toHaveBeenCalledTimes(1);
     expect(onSelect).toHaveBeenCalledWith("mercury");
   });
 
