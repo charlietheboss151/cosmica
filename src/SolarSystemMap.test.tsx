@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { catalog } from "./catalog";
+import { catalog, MOONS_MODE_MIN_WORLD } from "./catalog";
 import SolarSystemMap from "./SolarSystemMap";
 
 describe("SolarSystemMap interaction", () => {
@@ -57,7 +57,7 @@ describe("SolarSystemMap interaction", () => {
     expect(after).toMatch(/scale\(/);
   });
 
-  it("shrinks Moons-mode moon art in world units as the camera zooms in", () => {
+  it("keeps Moons-mode moons at a world-size floor when zoomed in close", () => {
     const onSelect = vi.fn();
     const { container } = render(
       <SolarSystemMap
@@ -70,14 +70,18 @@ describe("SolarSystemMap interaction", () => {
     const svg = container.querySelector(".map-svg")!;
     const image = () =>
       container.querySelector('[data-testid="art-europa"] image');
-    const before = Number(image()!.getAttribute("width"));
     fireEvent.wheel(svg, {
       deltaY: -120,
       clientX: 400,
       clientY: 300,
     });
-    const after = Number(image()!.getAttribute("width"));
-    expect(after).toBeLessThan(before);
+    fireEvent.wheel(svg, {
+      deltaY: -120,
+      clientX: 400,
+      clientY: 300,
+    });
+    const width = Number(image()!.getAttribute("width"));
+    expect(width).toBeGreaterThanOrEqual(MOONS_MODE_MIN_WORLD * 2);
   });
 
   it("pans the camera on pointer drag", () => {

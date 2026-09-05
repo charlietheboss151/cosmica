@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.20.1] - 2026-09-05
+
+### Fixed
+- Moons in Moons mode stay a bit larger and stop shrinking past a size floor when you zoom all the way in.
+
 ## [0.20.0] - 2026-09-05
 
 ### Changed

@@ -3,6 +3,7 @@ import {
   catalog,
   displayRadius,
   MOONS_MODE_SCREEN_MIN,
+  MOONS_MODE_MIN_WORLD,
   isLitInMode,
   isShownLit,
   moonsOf,
@@ -177,13 +178,17 @@ describe("solar system catalog", () => {
     expect(displayRadius(kerberos, "planets")).toBeLessThan(11);
   });
 
-  it("shrinks Moons-mode moon world radius as zoom grows so on-screen size stays put", () => {
+  it("shrinks Moons-mode moon world radius with zoom until a floor", () => {
     const europa = catalog.find((object) => object.id === "europa")!;
     const atOne = displayRadius(europa, "moons", 1);
-    const atFour = displayRadius(europa, "moons", 4);
-    expect(atOne).toBe(europa.displaySize);
-    expect(atFour * 4).toBeCloseTo(atOne);
-    expect(atFour).toBeLessThan(atOne);
+    const atMild = displayRadius(europa, "moons", 1.4);
+    expect(atOne).toBe(Math.max(europa.displaySize, MOONS_MODE_SCREEN_MIN));
+    expect(atMild).toBeLessThan(atOne);
+    expect(atMild * 1.4).toBeCloseTo(atOne);
+
+    const atMax = displayRadius(europa, "moons", 8);
+    expect(atMax).toBe(MOONS_MODE_MIN_WORLD);
+    expect(atMax * 8).toBeGreaterThan(atOne);
   });
 
   it("limits Moons mode to selected parent planets", () => {
