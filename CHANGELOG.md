@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.26.6] - 2026-09-06
+
+### Changed
+- Background stars are brighter and scattered instead of lining up in a grid.
+
 ## [0.26.5] - 2026-09-06
 
 ### Changed
