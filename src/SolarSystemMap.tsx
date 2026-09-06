@@ -32,6 +32,7 @@ import {
   isHeliocentric,
   isLitInMode,
   isShownLit,
+  type CelestialKind,
   type GameMode,
   type ModeOptions,
   type SolarObject,
@@ -145,6 +146,7 @@ type Props = {
   mode: GameMode;
   hardMode?: boolean;
   parentIds?: string[];
+  types?: CelestialKind[];
   foundIds?: string[];
   marks?: Record<string, TryMark>;
   flashId?: string | null;
@@ -162,6 +164,7 @@ export default function SolarSystemMap({
   mode,
   hardMode = false,
   parentIds,
+  types,
   foundIds = [],
   marks = {},
   flashId = null,
@@ -212,7 +215,7 @@ export default function SolarSystemMap({
     mode === "moons" && framedMoonId
       ? objects.find((object) => object.id === framedMoonId)?.parentId ?? undefined
       : undefined;
-  const modeOptions = { hardMode, parentIds, focusParentId };
+  const modeOptions = { hardMode, parentIds, focusParentId, types };
   const layoutProfile = layoutProfileForMode(mode);
   const orbitElapsed = orbitElapsedMs(orbiting, orbitStartMs, orbitFreezeMs);
   const displayObjects = objectsAtOrbitTime(objects, orbitElapsed);
@@ -311,7 +314,7 @@ export default function SolarSystemMap({
       objects,
       orbitElapsedMs(orbiting, orbitStartMs, orbitFreezeMs),
     );
-    const options = { hardMode, parentIds, focusParentId };
+    const options = { hardMode, parentIds, focusParentId, types };
 
     if (mode === "moons" && revealId) {
       const target = moonRevealCamera(
@@ -377,6 +380,7 @@ export default function SolarSystemMap({
     layoutProfile,
     mode,
     parentIds,
+    types,
     hardMode,
     focusParentId,
     revealId,

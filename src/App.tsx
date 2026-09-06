@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   catalog,
+  celestialOf,
   moonsOf,
   objectById,
   parentsWithMoons,
+  type CelestialKind,
   type GameMode,
 } from "./catalog";
 import {
@@ -71,19 +73,24 @@ type PlayConfig = {
   mode: GameMode;
   hardMode: boolean;
   parentIds?: string[];
+  types?: CelestialKind[];
 };
 
-type Screen = "home" | "menu" | "moons-setup" | PlayConfig;
+type Screen = "home" | "menu" | "moons-setup" | "celestial-setup" | PlayConfig;
 
 function isPlayConfig(screen: Screen): screen is PlayConfig {
-  return screen !== "home" && screen !== "menu" && screen !== "moons-setup";
+  return (
+    screen !== "home" &&
+    screen !== "menu" &&
+    screen !== "moons-setup" &&
+    screen !== "celestial-setup"
+  );
 }
 
 const PLAYABLE_MODES: {
   id: GameMode;
   label: string;
   description: string;
-  hardLabel?: string;
 }[] = [
   { id: "planets", label: "Planets", description: "Find all 8 planets" },
   {
@@ -95,8 +102,14 @@ const PLAYABLE_MODES: {
     id: "celestial",
     label: "Celestial bodies",
     description: "Dwarf planets, asteroids & comets",
-    hardLabel: "Include hard objects",
   },
+];
+
+const CELESTIAL_KINDS: { id: CelestialKind; label: string }[] = [
+  { id: "dwarf-planet", label: "Dwarf planets" },
+  { id: "asteroid", label: "Asteroids" },
+  { id: "comet", label: "Comets" },
+  { id: "region", label: "Regions" },
 ];
 
 const COMING_SOON = [
@@ -141,31 +154,27 @@ function Home({ onPlay }: { onPlay: () => void }) {
 function Menu({
   onPlay,
   onMoonsSetup,
+  onCelestialSetup,
   onHome,
 }: {
   onPlay: (config: PlayConfig) => void;
   onMoonsSetup: () => void;
+  onCelestialSetup: () => void;
   onHome: () => void;
 }) {
-  const [hardByMode, setHardByMode] = useState<Record<GameMode, boolean>>({
-    planets: false,
-    moons: false,
-    celestial: false,
-  });
   const progress = loadProgress();
   const rank = rankFromXp(progress.xp);
-
-  const toggleHard = (mode: GameMode, event: ChangeEvent<HTMLInputElement>) => {
-    event.stopPropagation();
-    setHardByMode((current) => ({ ...current, [mode]: event.target.checked }));
-  };
 
   const playMode = (mode: (typeof PLAYABLE_MODES)[number]) => {
     if (mode.id === "moons") {
       onMoonsSetup();
       return;
     }
-    onPlay({ mode: mode.id, hardMode: hardByMode[mode.id] });
+    if (mode.id === "celestial") {
+      onCelestialSetup();
+      return;
+    }
+    onPlay({ mode: mode.id, hardMode: false });
   };
 
   const quickPlay = () => {
@@ -213,17 +222,6 @@ function Menu({
                       </span>
                     </span>
                   </button>
-                  {mode.hardLabel ? (
-                    <label className="mode-hard-toggle">
-                      <input
-                        type="checkbox"
-                        checked={hardByMode[mode.id]}
-                        onChange={(event) => toggleHard(mode.id, event)}
-                        onClick={(event) => event.stopPropagation()}
-                      />
-                      <span>{mode.hardLabel}</span>
-                    </label>
-                  ) : null}
                 </div>
               );
             })}
@@ -422,13 +420,137 @@ function MoonsSetup({
   );
 }
 
+function CelestialSetup({
+  onBack,
+  onPlay,
+  onHome,
+}: {
+  onBack: () => void;
+  onPlay: (config: PlayConfig) => void;
+  onHome: () => void;
+}) {
+  const [hardMode, setHardMode] = useState(false);
+  const [selected, setSelected] = useState<Set<CelestialKind>>(() => new Set());
+
+  const selectedIds = [...selected];
+  const bodyCount = selectedIds.reduce(
+    (total, kind) => total + celestialOf(kind, { hardMode }).length,
+    0,
+  );
+
+  const toggleKind = (kind: CelestialKind) => {
+    setSelected((current) => {
+      const next = new Set(current);
+      if (next.has(kind)) {
+        next.delete(kind);
+      } else {
+        next.add(kind);
+      }
+      return next;
+    });
+  };
+
+  const playAll = () => {
+    onPlay({ mode: "celestial", hardMode, types: undefined });
+  };
+
+  const playSelected = () => {
+    if (selectedIds.length === 0) {
+      return;
+    }
+    const types =
+      selectedIds.length < CELESTIAL_KINDS.length ? selectedIds : undefined;
+    onPlay({ mode: "celestial", hardMode, types });
+  };
+
+  return (
+    <main className="menu">
+      <div className="menu-hud menu-hud-sub">
+        <header className="menu-sub-header">
+          <div className="menu-sub-nav">
+            <button type="button" className="ghost menu-back" onClick={onBack}>
+              Back
+            </button>
+            <button type="button" className="ghost menu-home" onClick={onHome}>
+              Home
+            </button>
+          </div>
+          <img className="menu-logo menu-logo-small" src={LOGO_SRC} alt="" width={96} height={96} />
+          <h2 className="menu-sub-title">Celestial bodies</h2>
+          <p className="menu-sub-lede">Play everything, pick a type, or mix a few.</p>
+        </header>
+        <section className="menu-sub-play" aria-label="Celestial bodies options">
+          <button
+            type="button"
+            className="mode-card"
+            aria-label="All celestial bodies"
+            onClick={playAll}
+          >
+            <span className="mode-card-icon" aria-hidden="true">
+              ☄️
+            </span>
+            <span className="mode-card-copy">
+              <span className="mode-card-label">All celestial bodies</span>
+              <span className="mode-card-desc">
+                Dwarf planets, asteroids, comets, and regions
+                {hardMode ? " plus hard objects" : ""}
+              </span>
+            </span>
+            <span className="mode-card-arrow" aria-hidden="true">
+              →
+            </span>
+          </button>
+          <div className="menu-sub-section">
+            <p className="menu-sub-heading">Pick types</p>
+            <div className="mode-planet-chips" role="group" aria-label="Types">
+              {CELESTIAL_KINDS.map((kind) => {
+                const on = selected.has(kind.id);
+                return (
+                  <button
+                    key={kind.id}
+                    type="button"
+                    className={`mode-planet-chip${on ? " mode-planet-chip-on" : ""}`}
+                    aria-pressed={on}
+                    aria-label={kind.label}
+                    onClick={() => toggleKind(kind.id)}
+                  >
+                    {kind.label}
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              type="button"
+              className="mode-play menu-sub-play-btn"
+              disabled={selected.size === 0}
+              onClick={playSelected}
+            >
+              {selected.size === 0
+                ? "Play selected"
+                : `Play selected (${bodyCount} ${bodyCount === 1 ? "body" : "bodies"})`}
+            </button>
+          </div>
+          <button
+            type="button"
+            className={`mode-option-toggle${hardMode ? " mode-option-toggle-on" : ""}`}
+            aria-pressed={hardMode}
+            onClick={() => setHardMode((current) => !current)}
+          >
+            Include hard objects
+          </button>
+        </section>
+      </div>
+    </main>
+  );
+}
+
 function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
-  const { mode, hardMode, parentIds } = config;
+  const { mode, hardMode, parentIds, types } = config;
   const [objects, setObjects] = useState(() =>
     randomizeOrbitalPositions(catalog, Math.random, layoutProfileForMode(mode)),
   );
   const [quiz, setQuiz] = useState<QuizState>(() =>
-    startQuiz(mode, Math.random, Date.now(), { hardMode, parentIds }),
+    startQuiz(mode, Math.random, Date.now(), { hardMode, parentIds, types }),
   );
   const [now, setNow] = useState(() => Date.now());
   const resultsRef = useRef<HTMLDivElement>(null);
@@ -440,7 +562,7 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
     setObjects(
       randomizeOrbitalPositions(catalog, Math.random, layoutProfileForMode(mode)),
     );
-    setQuiz(startQuiz(mode, Math.random, Date.now(), { hardMode, parentIds }));
+    setQuiz(startQuiz(mode, Math.random, Date.now(), { hardMode, parentIds, types }));
   };
 
   useEffect(() => {
@@ -496,7 +618,7 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
         fullSet: parentIds === undefined,
       }),
     );
-  }, [done, elapsedMs, mode, parentIds, quiz.foundIds, quiz.marks, quiz.score]);
+  }, [done, elapsedMs, mode, parentIds, types, quiz.foundIds, quiz.marks, quiz.score]);
 
   useEffect(() => {
     if (!done) {
@@ -536,6 +658,7 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
         mode={mode}
         hardMode={hardMode}
         parentIds={parentIds}
+        types={types}
         foundIds={quiz.foundIds}
         marks={quiz.marks}
         flashId={quiz.wrongFlashId}
@@ -660,10 +783,17 @@ export default function App() {
           onHome={() => setScreen("home")}
           onPlay={(config) => setScreen(config)}
         />
+      ) : screen === "celestial-setup" ? (
+        <CelestialSetup
+          onBack={() => setScreen("menu")}
+          onHome={() => setScreen("home")}
+          onPlay={(config) => setScreen(config)}
+        />
       ) : screen === "menu" ? (
         <Menu
           onPlay={(config) => setScreen(config)}
           onMoonsSetup={() => setScreen("moons-setup")}
+          onCelestialSetup={() => setScreen("celestial-setup")}
           onHome={() => setScreen("home")}
         />
       ) : (

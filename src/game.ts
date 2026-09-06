@@ -2,6 +2,7 @@ import {
   isLitInMode,
   objectById,
   playableInMode,
+  type CelestialKind,
   type GameMode,
   type SolarObject,
 } from "./catalog";
@@ -15,12 +16,14 @@ export const MAX_GUESSES_PER_BODY = 3;
 export type QuizOptions = {
   hardMode?: boolean;
   parentIds?: string[];
+  types?: CelestialKind[];
 };
 
 export type QuizState = {
   mode: GameMode;
   hardMode: boolean;
   parentIds?: string[];
+  types?: CelestialKind[];
   currentId: string | null;
   remainingIds: string[];
   foundIds: string[];
@@ -43,11 +46,18 @@ export type QuizState = {
   prompt: string;
 };
 
-function modeOptions(state: Pick<QuizState, "hardMode" | "parentIds">): {
+function modeOptions(
+  state: Pick<QuizState, "hardMode" | "parentIds" | "types">,
+): {
   hardMode: boolean;
   parentIds?: string[];
+  types?: CelestialKind[];
 } {
-  return { hardMode: state.hardMode, parentIds: state.parentIds };
+  return {
+    hardMode: state.hardMode,
+    parentIds: state.parentIds,
+    types: state.types,
+  };
 }
 
 function playable(
@@ -57,6 +67,7 @@ function playable(
   return playableInMode(mode, {
     hardMode: options.hardMode ?? false,
     parentIds: options.parentIds,
+    types: options.types,
   });
 }
 
@@ -136,8 +147,9 @@ export function startQuiz(
     typeof options === "boolean" ? { hardMode: options } : options;
   const hardMode = resolved.hardMode ?? false;
   const parentIds = resolved.parentIds;
+  const types = resolved.types;
   const ids = shuffle(
-    playable(mode, { hardMode, parentIds }).map((object) => object.id),
+    playable(mode, { hardMode, parentIds, types }).map((object) => object.id),
     rng,
   );
   const currentId = ids[0] ?? null;
@@ -146,6 +158,7 @@ export function startQuiz(
     mode,
     hardMode,
     parentIds,
+    types,
     currentId,
     remainingIds,
     foundIds: [],

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.25.0] - 2026-09-06
+
+### Changed
+- Celestial bodies opens a setup screen like Moons: play all, pick types, and include hard objects there instead of a menu checkbox.
+
 ## [0.24.2] - 2026-09-06
 
 ### Changed

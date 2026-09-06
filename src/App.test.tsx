@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import App, { FEEDBACK_CLEAR_MS } from "./App";
+import { playableInMode } from "./catalog";
 import { publicUrl } from "./publicUrl";
 
 async function openMenu() {
@@ -79,6 +80,45 @@ describe("Cosmica prototype", () => {
     expect(screen.queryByRole("button", { name: "Asteroid Belt" })).not.toBeInTheDocument();
   });
 
+  it("opens a Celestial bodies setup screen from the menu", async () => {
+    const user = await openMenu();
+    await user.click(screen.getByRole("button", { name: "Celestial bodies" }));
+    expect(screen.getByRole("heading", { name: "Celestial bodies" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "All celestial bodies" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Comets" })).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
+    expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
+  });
+
+  it("lets players quiz only comets from Celestial setup", async () => {
+    const user = await openMenu();
+    await user.click(screen.getByRole("button", { name: "Celestial bodies" }));
+    await user.click(screen.getByRole("button", { name: "Comets" }));
+    await user.click(screen.getByRole("button", { name: /Play selected/ }));
+    expect(screen.getByTestId("find-prompt").textContent).toMatch(/^Click on /);
+    expect(screen.getByRole("button", { name: "Halley's Comet" })).not.toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+    expect(screen.getByRole("button", { name: "Pluto" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+  });
+
+  it("wires hard objects into a Celestial bodies round", async () => {
+    const user = await openMenu();
+    await user.click(screen.getByRole("button", { name: "Celestial bodies" }));
+    await user.click(screen.getByRole("button", { name: "Include hard objects" }));
+    await user.click(screen.getByRole("button", { name: "All celestial bodies" }));
+    const score = screen.getByTestId("score").textContent ?? "";
+    const total = Number(score.split("/")[1]?.trim());
+    const base = playableInMode("celestial").length;
+    expect(total).toBeGreaterThan(base);
+  });
+
   it("opens a Moons setup screen from the menu", async () => {
     const user = await openMenu();
     await user.click(screen.getByRole("button", { name: "Moons" }));
@@ -120,6 +160,8 @@ describe("Cosmica prototype", () => {
   it("starts Celestial bodies mode from the menu", async () => {
     const user = await openMenu();
     await user.click(screen.getByRole("button", { name: "Celestial bodies" }));
+    expect(screen.getByRole("heading", { name: "Celestial bodies" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "All celestial bodies" }));
     expect(screen.getByTestId("find-prompt").textContent).toMatch(/^Click on /);
     expect(screen.getByRole("button", { name: "Mercury" })).toHaveAttribute(
       "aria-disabled",
@@ -133,6 +175,7 @@ describe("Cosmica prototype", () => {
   it("lets players click dwarf planets in Celestial mode without belt regions", async () => {
     const user = await openMenu();
     await user.click(screen.getByRole("button", { name: "Celestial bodies" }));
+    await user.click(screen.getByRole("button", { name: "All celestial bodies" }));
     const pluto = screen.getByRole("button", { name: "Pluto" });
     expect(pluto).not.toHaveAttribute("aria-disabled", "true");
     expect(screen.queryByRole("button", { name: "Asteroid Belt" })).not.toBeInTheDocument();

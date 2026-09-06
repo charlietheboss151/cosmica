@@ -7,6 +7,7 @@ export type ObjectType =
   | "comet"
   | "region";
 export type GameMode = "planets" | "moons" | "celestial";
+export type CelestialKind = "dwarf-planet" | "asteroid" | "comet" | "region";
 
 export type ModeOptions = {
   hardMode: boolean;
@@ -14,6 +15,8 @@ export type ModeOptions = {
   parentIds?: string[];
   /** When set in Moons mode, only this parent and its moons are shown. */
   focusParentId?: string;
+  /** When set in Celestial bodies mode, only these kinds are lit. */
+  types?: CelestialKind[];
 };
 
 export type SolarObject = {
@@ -481,6 +484,15 @@ export function isShownLit(
   return isLitInMode(object, mode, options);
 }
 
+export function isCelestialKind(type: ObjectType): type is CelestialKind {
+  return (
+    type === "dwarf-planet" ||
+    type === "asteroid" ||
+    type === "comet" ||
+    type === "region"
+  );
+}
+
 export function isLitInMode(
   object: SolarObject,
   mode: GameMode,
@@ -505,12 +517,13 @@ export function isLitInMode(
     if (isBeltRegion(object)) {
       return false;
     }
-    return (
-      object.type === "dwarf-planet" ||
-      object.type === "asteroid" ||
-      object.type === "comet" ||
-      object.type === "region"
-    );
+    if (!isCelestialKind(object.type)) {
+      return false;
+    }
+    if (options.types?.length) {
+      return options.types.includes(object.type);
+    }
+    return true;
   }
   return false;
 }
@@ -543,6 +556,13 @@ export function moonsOf(
   return playableInMode("moons", options).filter(
     (object) => object.parentId === parentId,
   );
+}
+
+export function celestialOf(
+  kind: CelestialKind,
+  options: ModeOptions = { hardMode: false },
+): SolarObject[] {
+  return playableInMode("celestial", { ...options, types: [kind] });
 }
 
 export function objectById(id: string): SolarObject | undefined {

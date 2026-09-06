@@ -6,7 +6,7 @@ This version is a **Planets**, **Moons**, and **Celestial bodies** quiz on the *
 
 - **Planets** — find the eight planets; moons appear as tiny scenery.
 - **Moons** — find the major moons; planets stay visible but grayed. Optional **Include all moons** hard mode adds Charon, Amalthea, Hyperion, and more. The map only zooms in when you miss a moon, to show where it was; the next moon does not jump you to another planet.
-- **Celestial bodies** — dwarf planets, famous asteroids, and comets. Planets and moons stay on the map but grayed. Each body has its own cartoon art or NASA photo. The map uses real AU spacing so objects sit in the right place relative to the Sun and planets — zoom and pan to explore. Optional **Include hard objects** adds dwarf-planet candidates and extra asteroids.
+- **Celestial bodies** — dwarf planets, famous asteroids, and comets. Planets and moons stay on the map but grayed. Each body has its own cartoon art or NASA photo. The map uses real AU spacing so objects sit in the right place relative to the Sun and planets — zoom and pan to explore. After you pick Celestial bodies, choose all of them, pick types, and optionally **Include hard objects** for dwarf-planet candidates and extra asteroids.
 
 Scattered disc, heliosphere, and trojan regions are clickable in Celestial bodies mode. The Asteroid Belt and Kuiper Belt are not quiz targets there.
 
@@ -25,7 +25,7 @@ npm run dev
 
 Open **http://127.0.0.1:5173/cosmica/** (production builds use the `/cosmica/` base path). There are no env files or secrets.
 
-The **home page** shows the Cosmica logo, the tagline **Explore the Solar System. Master the cosmos.**, and a **Play** button. Play opens mission select over the same solar-system sky: **Quick Play**, or tap **Earth** for Planets, the **Moon** for Moons, or a **comet** for Celestial bodies. **Back** (or the logo) returns to the title screen. Toggle hard mode on Moons or Celestial bodies if you want the extra objects. Best times, unique finds, and XP stay in this browser. On a phone, drag to pan, pinch to zoom, and tap the named body. On a computer, click the body, scroll or pinch to zoom, drag to pan, or hold **WASD** / **arrow keys** to look around. Gray bodies are still there so you can learn the whole Solar System; they are just not in play. The round ends when every lit body has been found.
+The **home page** shows the Cosmica logo, the tagline **Explore the Solar System. Master the cosmos.**, and a **Play** button. Play opens mission select over the same solar-system sky: **Quick Play**, or tap **Earth** for Planets, the **Moon** for Moons, or a **comet** for Celestial bodies. **Back** (or the logo) returns to the title screen. Moons and Celestial bodies each open a setup screen; toggle the extra objects there if you want them. Best times, unique finds, and XP stay in this browser. On a phone, drag to pan, pinch to zoom, and tap the named body. On a computer, click the body, scroll or pinch to zoom, drag to pan, or hold **WASD** / **arrow keys** to look around. Gray bodies are still there so you can learn the whole Solar System; they are just not in play. The round ends when every lit body has been found.
 
 ## How it is built
 

@@ -101,6 +101,16 @@ describe("solar system catalog", () => {
     expect(isLitInMode(sedna, "celestial", { hardMode: true })).toBe(true);
   });
 
+  it("can light only one celestial kind", () => {
+    const options = { hardMode: false, types: ["comet" as const] };
+    expect(isLitInMode(catalog.find((object) => object.id === "halley")!, "celestial", options)).toBe(
+      true,
+    );
+    expect(isLitInMode(catalog.find((object) => object.id === "pluto")!, "celestial", options)).toBe(
+      false,
+    );
+  });
+
   it("adds every moon in hard Moons mode", () => {
     const base = catalog.filter((object) => isLitInMode(object, "moons")).length;
     const all = catalog.filter((object) =>
