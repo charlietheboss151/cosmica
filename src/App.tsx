@@ -810,6 +810,7 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
         types={types}
         spacecraftGroups={spacecraftGroups}
         foundIds={quiz.foundIds}
+        missedIds={quiz.missedIds}
         marks={quiz.marks}
         flashId={quiz.wrongFlashId}
         orbitStartMs={quiz.startedAt}

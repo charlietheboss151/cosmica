@@ -40,6 +40,8 @@ export type QuizState = {
   bestStreak: number;
   mistakes: number;
   triesOnCurrent: number;
+  /** Wrong bodies already guessed for the current prompt; they cannot be clicked again. */
+  missedIds: string[];
   marks: Record<string, TryMark>;
   wrongFlashId: string | null;
   lastResolvedId: string | null;
@@ -179,6 +181,7 @@ export function startQuiz(
     bestStreak: 0,
     mistakes: 0,
     triesOnCurrent: 0,
+    missedIds: [],
     marks: {},
     wrongFlashId: null,
     lastResolvedId: null,
@@ -206,6 +209,7 @@ function advanceFromBody(
     foundIds,
     placed: foundIds.length,
     triesOnCurrent: 0,
+    missedIds: [],
     wrongFlashId: null,
     lastResolvedId: resolvedId,
     marks: { ...state.marks, [resolvedId]: mark },
@@ -230,6 +234,9 @@ export function applyClick(
   ) {
     return state;
   }
+  if (state.missedIds.includes(objectId)) {
+    return state;
+  }
   if (objectId !== state.currentId) {
     const tries = state.triesOnCurrent + 1;
     if (tries >= MAX_GUESSES_PER_BODY) {
@@ -245,6 +252,7 @@ export function applyClick(
       ...state,
       mistakes: state.mistakes + 1,
       triesOnCurrent: tries,
+      missedIds: [...state.missedIds, objectId],
       wrongFlashId: objectId,
       lastResult: "incorrect",
     };

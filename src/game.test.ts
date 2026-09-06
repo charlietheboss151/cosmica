@@ -22,6 +22,21 @@ function planetCount() {
   return catalog.filter((object) => object.type === "planet").length;
 }
 
+const PLANET_IDS = [
+  "mercury",
+  "venus",
+  "earth",
+  "mars",
+  "jupiter",
+  "saturn",
+  "uranus",
+  "neptune",
+] as const;
+
+function decoys(target: string, count: number): string[] {
+  return PLANET_IDS.filter((id) => id !== target).slice(0, count);
+}
+
 describe("Seterra-style quiz", () => {
   it("asks the player to click a planet, never the Sun", () => {
     const quiz = startQuiz("planets", alwaysFirst, 0);
@@ -90,7 +105,7 @@ describe("Seterra-style quiz", () => {
   });
 
   it("marks a first-try find with green, then yellow, orange, and red", () => {
-    const other = (id: string) => (id === "venus" ? "mars" : "venus");
+    const other = (id: string) => decoys(id, 1)[0]!;
     let quiz = startQuiz("planets", alwaysFirst, 0);
     const first = quiz.currentId!;
     quiz = applyClick(quiz, first, 1);
@@ -102,15 +117,17 @@ describe("Seterra-style quiz", () => {
     expect(quiz.marks[second]).toBe("yellow");
 
     const third = quiz.currentId!;
-    quiz = applyClick(quiz, other(third), 4);
-    quiz = applyClick(quiz, other(third), 5);
+    const thirdMisses = decoys(third, 2);
+    quiz = applyClick(quiz, thirdMisses[0]!, 4);
+    quiz = applyClick(quiz, thirdMisses[1]!, 5);
     quiz = applyClick(quiz, third, 6);
     expect(quiz.marks[third]).toBe("orange");
 
     const fourth = quiz.currentId!;
-    quiz = applyClick(quiz, other(fourth), 7);
-    quiz = applyClick(quiz, other(fourth), 8);
-    quiz = applyClick(quiz, other(fourth), 9);
+    const fourthMisses = decoys(fourth, 3);
+    quiz = applyClick(quiz, fourthMisses[0]!, 7);
+    quiz = applyClick(quiz, fourthMisses[1]!, 8);
+    quiz = applyClick(quiz, fourthMisses[2]!, 9);
     expect(quiz.marks[fourth]).toBe("red");
     expect(quiz.foundIds).toContain(fourth);
     expect(quiz.currentId).not.toBe(fourth);
@@ -122,13 +139,14 @@ describe("Seterra-style quiz", () => {
   it("limits each body to three guesses before revealing the answer", () => {
     const quiz = startQuiz("planets", alwaysFirst, 0);
     const target = quiz.currentId!;
-    const wrong = target === "venus" ? "mars" : "venus";
-    let current = applyClick(quiz, wrong, 1);
+    const misses = decoys(target, 3);
+    let current = applyClick(quiz, misses[0]!, 1);
     expect(current.triesOnCurrent).toBe(1);
     expect(current.currentId).toBe(target);
-    current = applyClick(current, wrong, 2);
+    expect(applyClick(current, misses[0]!, 2)).toEqual(current);
+    current = applyClick(current, misses[1]!, 2);
     expect(current.triesOnCurrent).toBe(2);
-    current = applyClick(current, wrong, 3);
+    current = applyClick(current, misses[2]!, 3);
     expect(current.marks[target]).toBe("red");
     expect(current.foundIds).toContain(target);
     expect(current.currentId).not.toBe(target);
@@ -148,7 +166,7 @@ describe("Seterra-style quiz", () => {
     expect(accuracyPercent(2, 1, 0)).toBe(66.7);
     expect(accuracyPercent(3, 1, 1)).toBe(50);
 
-    const other = (id: string) => (id === "venus" ? "mars" : "venus");
+    const other = (id: string) => decoys(id, 1)[0]!;
     let quiz = startQuiz("planets", alwaysFirst, 0);
     const first = quiz.currentId!;
     quiz = applyClick(quiz, first, 1);
@@ -163,9 +181,10 @@ describe("Seterra-style quiz", () => {
     expect(quiz.streak).toBe(2);
 
     const miss = quiz.currentId!;
-    quiz = applyClick(quiz, other(miss), 4);
-    quiz = applyClick(quiz, other(miss), 5);
-    quiz = applyClick(quiz, other(miss), 6);
+    const missDecoys = decoys(miss, 3);
+    quiz = applyClick(quiz, missDecoys[0]!, 4);
+    quiz = applyClick(quiz, missDecoys[1]!, 5);
+    quiz = applyClick(quiz, missDecoys[2]!, 6);
     expect(quiz.score).toBe(5);
     expect(quiz.incorrect).toBe(1);
     expect(quiz.streak).toBe(0);
@@ -187,6 +206,16 @@ describe("Seterra-style quiz", () => {
     expect(after.wrongFlashId).toBe(wrong);
     expect(after.marks[wrong]).toBeUndefined();
     expect(after.marks[target]).toBeUndefined();
+    expect(after.missedIds).toEqual([wrong]);
+  });
+
+  it("ignores a second click on the same wrong body", () => {
+    const quiz = startQuiz("planets", alwaysFirst, 0);
+    const target = quiz.currentId!;
+    const wrong = decoys(target, 1)[0]!;
+    const after = applyClick(quiz, wrong, 1);
+    expect(applyClick(after, wrong, 2)).toEqual(after);
+    expect(after.triesOnCurrent).toBe(1);
   });
 
   it("asks for celestial bodies and regions in Celestial mode", () => {

@@ -167,6 +167,7 @@ type Props = {
   types?: CelestialKind[];
   spacecraftGroups?: SpacecraftGroup[];
   foundIds?: string[];
+  missedIds?: string[];
   marks?: Record<string, TryMark>;
   flashId?: string | null;
   orbitStartMs?: number | null;
@@ -186,6 +187,7 @@ export default function SolarSystemMap({
   types,
   spacecraftGroups,
   foundIds = [],
+  missedIds = [],
   marks = {},
   flashId = null,
   orbitStartMs = null,
@@ -498,7 +500,7 @@ export default function SolarSystemMap({
   };
 
   const renderRegionHit = (object: SolarObject) => {
-    if (!isLitInMode(object, mode, modeOptions)) {
+    if (!isLitInMode(object, mode, modeOptions) || missedIds.includes(object.id)) {
       return null;
     }
     const shownLit = isShownLit(object, mode, modeOptions);
@@ -539,7 +541,8 @@ export default function SolarSystemMap({
       positions.get(object.id) ??
       layoutObject(object, displayObjects, layoutProfile);
     const shownLit = isShownLit(object, mode, modeOptions);
-    const quizTarget = isLitInMode(object, mode, modeOptions);
+    const quizTarget =
+      isLitInMode(object, mode, modeOptions) && !missedIds.includes(object.id);
     const decorMoon = isDecorativeMoon(object, mode);
     const planetsSceneryMoon = mode === "planets" && object.type === "moon";
     const radius = displayRadius(object, mode, camera.zoom);

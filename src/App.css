@@ -1168,6 +1168,10 @@ h1 {
   outline: none;
 }
 
+.body[aria-disabled="true"] {
+  cursor: default;
+}
+
 .body-dim {
   cursor: default;
   pointer-events: none;

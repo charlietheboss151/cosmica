@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.26.4] - 2026-09-06
+
+### Changed
+- After an incorrect guess, that body cannot be clicked again until the next question.
+
 ## [0.26.3] - 2026-09-06
 
 ### Fixed

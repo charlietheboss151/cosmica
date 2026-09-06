@@ -230,6 +230,13 @@ describe("Cosmica prototype", () => {
     expect(screen.getByTestId("feedback")).toHaveTextContent(decoy);
     expect(document.querySelector(".try-ring-flash")).not.toBeNull();
     expect(document.querySelector(".try-ring-red")).toBeNull();
+    expect(screen.getByRole("button", { name: decoy })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+    expect(screen.getByTestId("guesses-left")).toHaveTextContent("2 left");
+    fireEvent.click(screen.getByRole("button", { name: decoy }));
+    expect(screen.getByTestId("guesses-left")).toHaveTextContent("2 left");
   });
 
   it("scores a correct planet click and keeps the map as the answer", async () => {
