@@ -1,5 +1,4 @@
 import { playableInMode, type GameMode } from "./catalog";
-import { formatElapsed } from "./game";
 
 export const PROGRESS_KEY = "cosmica-progress-v1";
 export const XP_PER_LEVEL = 40;
@@ -20,7 +19,7 @@ export const LEVEL_TITLES = [
 export type ProgressState = {
   xp: number;
   found: Record<GameMode, string[]>;
-  bestMs: Record<GameMode, number | null>;
+  bestPercent: Record<GameMode, number | null>;
 };
 
 export type ProgressStore = {
@@ -32,7 +31,7 @@ export function emptyProgress(): ProgressState {
   return {
     xp: 0,
     found: { planets: [], moons: [], celestial: [], spacecraft: [] },
-    bestMs: { planets: null, moons: null, celestial: null, spacecraft: null },
+    bestPercent: { planets: null, moons: null, celestial: null, spacecraft: null },
   };
 }
 
@@ -60,7 +59,7 @@ export function parseProgress(raw: unknown): ProgressState {
   const row = raw as Partial<ProgressState>;
   const xp = typeof row.xp === "number" && row.xp >= 0 ? Math.floor(row.xp) : 0;
   const found = { ...empty.found };
-  const bestMs = { ...empty.bestMs };
+  const bestPercent = { ...empty.bestPercent };
   if (row.found && typeof row.found === "object") {
     for (const key of Object.keys(row.found)) {
       if (!isMode(key)) {
@@ -72,16 +71,23 @@ export function parseProgress(raw: unknown): ProgressState {
       }
     }
   }
-  if (row.bestMs && typeof row.bestMs === "object") {
-    for (const key of Object.keys(row.bestMs)) {
+  const savedBest =
+    row.bestPercent && typeof row.bestPercent === "object"
+      ? row.bestPercent
+      : undefined;
+  if (savedBest) {
+    for (const key of Object.keys(savedBest)) {
       if (!isMode(key)) {
         continue;
       }
-      const ms = row.bestMs[key];
-      bestMs[key] = typeof ms === "number" && ms >= 0 ? ms : null;
+      const percent = savedBest[key];
+      bestPercent[key] =
+        typeof percent === "number" && percent >= 0 && percent <= 100
+          ? percent
+          : null;
     }
   }
-  return { xp, found, bestMs };
+  return { xp, found, bestPercent };
 }
 
 export function loadProgress(store: ProgressStore = defaultStore()): ProgressState {
@@ -108,7 +114,7 @@ export function applyRound(
   round: {
     mode: GameMode;
     foundIds: string[];
-    elapsedMs: number;
+    percent: number;
     score: number;
     fullSet: boolean;
   },
@@ -119,18 +125,19 @@ export function applyRound(
       ...new Set([...progress.found[round.mode], ...round.foundIds]),
     ],
   };
-  const bestMs = { ...progress.bestMs };
+  const bestPercent = { ...progress.bestPercent };
   if (
     round.fullSet &&
-    round.elapsedMs >= 0 &&
-    (bestMs[round.mode] === null || round.elapsedMs < bestMs[round.mode]!)
+    Number.isFinite(round.percent) &&
+    round.percent >= 0 &&
+    (bestPercent[round.mode] === null || round.percent > bestPercent[round.mode]!)
   ) {
-    bestMs[round.mode] = round.elapsedMs;
+    bestPercent[round.mode] = Math.min(100, round.percent);
   }
   return {
     xp: progress.xp + Math.max(0, round.score),
     found,
-    bestMs,
+    bestPercent,
   };
 }
 
@@ -160,13 +167,11 @@ export function modeDenom(progress: ProgressState, mode: GameMode): number {
   return progress.found[mode].length > easy ? hard : easy;
 }
 
-export function formatBest(ms: number | null): string | null {
-  if (ms === null) {
+export function formatBest(percent: number | null): string | null {
+  if (percent === null || !Number.isFinite(percent)) {
     return null;
   }
-  if (ms < 60_000) {
-    const tenths = Math.round(ms / 100) / 10;
-    return `${tenths.toFixed(1)}s`;
-  }
-  return formatElapsed(ms);
+  const clamped = Math.min(100, Math.max(0, percent));
+  const rounded = Math.round(clamped * 10) / 10;
+  return Number.isInteger(rounded) ? `${rounded}%` : `${rounded.toFixed(1)}%`;
 }

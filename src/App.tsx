@@ -217,7 +217,7 @@ function Menu({
           </button>
           <div className="mode-bodies">
             {PLAYABLE_MODES.map((mode) => {
-              const best = formatBest(progress.bestMs[mode.id]);
+              const best = formatBest(progress.bestPercent[mode.id]);
               return (
                 <div key={mode.id} className="mode-body-wrap">
                   <button
@@ -762,12 +762,12 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
       applyRound(loadProgress(), {
         mode,
         foundIds,
-        elapsedMs,
+        percent: accuracyPercent(quiz.score, quiz.correct, quiz.incorrect),
         score: quiz.score,
         fullSet: parentIds === undefined && spacecraftGroups === undefined,
       }),
     );
-  }, [done, elapsedMs, mode, parentIds, types, spacecraftGroups, quiz.foundIds, quiz.marks, quiz.score]);
+  }, [done, elapsedMs, mode, parentIds, types, spacecraftGroups, quiz.foundIds, quiz.marks, quiz.score, quiz.correct, quiz.incorrect]);
 
   useEffect(() => {
     if (!done) {

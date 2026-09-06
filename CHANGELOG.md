@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.26.2] - 2026-09-06
+
+### Changed
+- Mission BEST is the highest accuracy percent for a full round, not the fastest time.
+
 ## [0.26.1] - 2026-09-06
 
 ### Fixed

@@ -34,39 +34,47 @@ describe("player progress", () => {
     expect(rankFromXp(XP_PER_LEVEL * 6).title).toBe("Space Explorer");
   });
 
-  it("records unique finds, XP, and a faster full-set best time", () => {
+  it("records unique finds, XP, and a higher full-set best percent", () => {
     const first = applyRound(emptyProgress(), {
       mode: "planets",
       foundIds: ["mercury", "venus"],
-      elapsedMs: 80_000,
+      percent: 80,
       score: 6,
       fullSet: true,
     });
     expect(first.xp).toBe(6);
-    expect(first.bestMs.planets).toBe(80_000);
+    expect(first.bestPercent.planets).toBe(80);
     const second = applyRound(first, {
       mode: "planets",
       foundIds: ["venus", "earth"],
-      elapsedMs: 50_000,
+      percent: 100,
       score: 3,
       fullSet: true,
     });
     expect(second.found.planets.sort()).toEqual(["earth", "mercury", "venus"]);
     expect(second.xp).toBe(9);
-    expect(second.bestMs.planets).toBe(50_000);
-    expect(formatBest(second.bestMs.planets)).toBe("50.0s");
-    expect(formatBest(94_000)).toBe("1:34");
+    expect(second.bestPercent.planets).toBe(100);
+    expect(formatBest(second.bestPercent.planets)).toBe("100%");
+    expect(formatBest(87.5)).toBe("87.5%");
+    const slower = applyRound(second, {
+      mode: "planets",
+      foundIds: ["mars"],
+      percent: 50,
+      score: 1,
+      fullSet: true,
+    });
+    expect(slower.bestPercent.planets).toBe(100);
   });
 
   it("does not use a subset round as the mode best", () => {
     const after = applyRound(emptyProgress(), {
       mode: "moons",
       foundIds: ["phobos"],
-      elapsedMs: 4_000,
+      percent: 100,
       score: 3,
       fullSet: false,
     });
-    expect(after.bestMs.moons).toBeNull();
+    expect(after.bestPercent.moons).toBeNull();
     expect(after.found.moons).toEqual(["phobos"]);
   });
 
@@ -75,7 +83,7 @@ describe("player progress", () => {
     const saved = applyRound(emptyProgress(), {
       mode: "celestial",
       foundIds: ["pluto"],
-      elapsedMs: 12_000,
+      percent: 100,
       score: 3,
       fullSet: true,
     });
@@ -98,6 +106,7 @@ describe("player progress", () => {
       bestMs: { planets: 12_000, moons: null, celestial: null },
     });
     expect(parsed.found.spacecraft).toEqual([]);
-    expect(parsed.bestMs.spacecraft).toBeNull();
+    expect(parsed.bestPercent.spacecraft).toBeNull();
+    expect(parsed.bestPercent.planets).toBeNull();
   });
 });

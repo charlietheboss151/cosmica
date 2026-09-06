@@ -328,7 +328,7 @@ describe("Cosmica prototype", () => {
     expect(screen.getByTestId("find-prompt").textContent).toMatch(/^Click on /);
   });
 
-  it("records finds, XP, and a best time on the menu after a round", async () => {
+  it("records finds, XP, and a best score on the menu after a round", async () => {
     const user = await openMenu();
     await user.click(screen.getByRole("button", { name: "Planets" }));
     for (let placed = 0; placed < 8; placed += 1) {
@@ -340,7 +340,7 @@ describe("Cosmica prototype", () => {
     await user.click(within(dialog).getByRole("button", { name: "Menu" }));
     expect(screen.getByTestId("progress-planets")).toHaveTextContent("Planets 8/8");
     expect(screen.getByText(/Level 1 — Cadet/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Planets" })).toHaveTextContent(/BEST • \d/);
+    expect(screen.getByRole("button", { name: "Planets" })).toHaveTextContent(/BEST • 100%/);
   });
 
   it("opens a Spacecraft setup screen from the menu", async () => {
