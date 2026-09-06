@@ -89,7 +89,7 @@ Cartoon asteroid sprite: `asteroid-rock.png` from [OpenClipart #323535](https://
 | Hope | Emirates Mars Mission mockup at IAC 2021 01 (cropped).jpg |
 | Mars Odyssey | NASA PIA04244 |
 | Mars Express | Mars Express over Tharsis volcanoes.jpg |
-| Tianwen-1 | Tianwen-1 in Mars orbit.jpg |
+| Tianwen-1 | Tianwen-1 schematic.png |
 | Juno | NASA PIA16869 |
 | JUICE | Juice launch kit cover close-up.png |
 | Europa Clipper | Europa Clipper spacecraft model.png |
@@ -112,3 +112,5 @@ python scripts/process-amalthea.py
 node scripts/fetch-celestial-art.mjs
 node scripts/fetch-spacecraft-art.mjs
 ```
+
+Spacecraft cutouts need Python packages: `pip install "rembg[cpu]" pillow numpy`.

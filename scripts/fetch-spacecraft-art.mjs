@@ -15,6 +15,7 @@ const SPACECRAFT_FILES = {
     "Parker Solar Probe spacecraft model.png",
   ],
   "solar-orbiter": [
+    "Solar Orbiter spacecraft.png",
     "Solar Orbiter ESA20813950.jpg",
     "Solar Orbiter- journey around the Sun ESA21809047.jpg",
   ],
@@ -53,7 +54,7 @@ const SPACECRAFT_FILES = {
     "Mars Express over Tharsis volcanoes.jpg",
     "Mars Express.jpg",
   ],
-  "tianwen-1": ["Tianwen-1 in Mars orbit.jpg", "Tianwen-1 schematic.png"],
+  "tianwen-1": ["Tianwen-1 schematic.png", "Tianwen-1 in Mars orbit.jpg"],
   juno: ["Juno spacecraft model 1.png", "Juno & Jupiter (30273927457).jpg"],
   juice: ["Juice launch kit cover close-up.png", "JUICE spacecraft model 2.png"],
   "europa-clipper": [
@@ -74,8 +75,8 @@ const SPACECRAFT_FILES = {
     "New Horizons Spacecraft (ann24023a).jpg",
     "New Horizons spacecraft model 1.png",
   ],
-  "voyager-1": ["Voyager spacecraft.jpg", "Voyager spacecraft model.png"],
-  "voyager-2": ["Voyager spacecraft.jpg", "Voyager spacecraft model.png"],
+  "voyager-1": ["Voyager spacecraft model.png", "Voyager spacecraft.jpg"],
+  "voyager-2": ["Voyager spacecraft model.png", "Voyager spacecraft.jpg"],
   "pioneer-10": [
     "Pioneer 10-11 spacecraft.jpg",
     "An artist's impression of a Pioneer spacecraft on its way to interstellar space.jpg",

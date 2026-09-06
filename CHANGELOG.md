@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.29.0] - 2026-09-06
+
+### Changed
+
+- Spacecraft photos are cut out of their square backgrounds, so only the probe sits on the map.
+
 ## [0.28.1] - 2026-09-06
 
 ### Fixed

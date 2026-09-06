@@ -80,7 +80,12 @@ export const BODY_ART: Record<string, string> = {
   "tempel-1": body("tempel-1"),
   "wild-2": body("wild-2"),
   "shoemaker-levy-9": body("shoemaker-levy-9"),
-  ...Object.fromEntries(SPACECRAFT_CATALOG.map((craft) => [craft.id, body(craft.id)])),
+  ...Object.fromEntries(
+    SPACECRAFT_CATALOG.filter((craft) => craft.id !== "solar-orbiter").map((craft) => [
+      craft.id,
+      body(craft.id),
+    ]),
+  ),
 };
 
 export const MOON_ART_IDS = catalog
