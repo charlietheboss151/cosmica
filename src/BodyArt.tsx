@@ -45,7 +45,23 @@ function saturnRingFrontPath(
 export function BodyArt({ id, radius, color, type = "planet" }: Props) {
   const clipId = `clip-${id}-${useId().replace(/:/g, "")}`;
   if (type === "spacecraft") {
-    return <SpacecraftArt id={id} radius={radius} color={color} />;
+    const src = BODY_ART[id];
+    if (!src) {
+      return <SpacecraftArt id={id} radius={radius} color={color} />;
+    }
+    const size = radius * 2.7;
+    return (
+      <g className="body-art spacecraft-art" data-testid={`art-${id}`}>
+        <image
+          href={src}
+          x={-size / 2}
+          y={-size / 2}
+          width={size}
+          height={size}
+          preserveAspectRatio="xMidYMid meet"
+        />
+      </g>
+    );
   }
   const celestial = celestialStyleFor(id, type);
   if (celestial) {

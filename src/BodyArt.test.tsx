@@ -1,9 +1,10 @@
 import { execFileSync } from "node:child_process";
+import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { BODY_ART, MOON_ART_IDS } from "./bodyArtAssets";
+import { BODY_ART, MOON_ART_IDS, SPACECRAFT_ART_IDS } from "./bodyArtAssets";
 import { BodyArt } from "./BodyArt";
 import { publicUrl } from "./publicUrl";
 
@@ -149,7 +150,15 @@ describe("cartoon body art", () => {
     expect(asteroid.container.querySelector("image")).toHaveAttribute("href", publicUrl("bodies/vesta.png"));
   });
 
-  it("draws spacecraft as cartoon probes, not planet stickers", () => {
+  it("has photos for every spacecraft in the catalog", () => {
+    expect(SPACECRAFT_ART_IDS.length).toBeGreaterThan(20);
+    for (const id of SPACECRAFT_ART_IDS) {
+      expect(BODY_ART[id]).toBe(publicUrl(`bodies/${id}.png`));
+      expect(fs.existsSync(path.join(repoRoot, "public", "bodies", `${id}.png`))).toBe(true);
+    }
+  });
+
+  it("draws spacecraft from photos, not planet stickers or cartoon probes", () => {
     const { container } = render(
       <svg>
         <BodyArt id="voyager-1" radius={16} color="#ffd36a" type="spacecraft" />
@@ -157,7 +166,8 @@ describe("cartoon body art", () => {
     );
     expect(container.querySelector(".spacecraft-art")).not.toBeNull();
     expect(container.querySelector('[data-testid="art-voyager-1"]')).not.toBeNull();
-    expect(container.querySelector("image")).toBeNull();
+    expect(container.querySelector("image")).toHaveAttribute("href", publicUrl("bodies/voyager-1.png"));
+    expect(container.querySelector("circle.disc")).toBeNull();
   });
 
   it("keeps useId unconditional so oxlint rules-of-hooks passes", () => {

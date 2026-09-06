@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.28.0] - 2026-09-06
+
+### Added
+- Spacecraft on the map use photos and drawings of the real probes (in space when a public-domain image exists).
+
 ## [0.27.2] - 2026-09-06
 
 ### Changed

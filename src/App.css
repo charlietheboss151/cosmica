@@ -1516,6 +1516,10 @@ h1 {
   opacity: 1;
 }
 
+.body-spacecraft .spacecraft-art image {
+  pointer-events: none;
+}
+
 .body-moon-decor .body-art {
   filter: none;
   opacity: 0.72;
