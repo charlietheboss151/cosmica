@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.24.2] - 2026-09-06
+
+### Changed
+- Amalthea uses a single Galileo portrait instead of a four-view mosaic.
+
 ## [0.24.1] - 2026-09-06
 
 ### Fixed

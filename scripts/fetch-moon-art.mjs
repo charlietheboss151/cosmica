@@ -31,7 +31,7 @@ const MOON_FILES = {
   hydra: "Hydra true color map.png",
   kerberos: "Kerberos (moon).jpg",
   styx: "Styx (moon).jpg",
-  amalthea: "Jupiter's moon Amalthea photographed by Galileo.jpg",
+  amalthea: "Amalthea, Galileo, 2000 01. 04., eingefärbt.png",
   hyperion: "Hyperion false color.jpg",
   phoebe: "Phoebe closeup cassini NASA.jpg",
   puck: "Puck, moon of Uranus (1986).png",
