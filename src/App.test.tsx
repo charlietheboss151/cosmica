@@ -129,6 +129,7 @@ describe("Cosmica prototype", () => {
     await user.click(screen.getByRole("button", { name: "Moons" }));
     expect(screen.getByRole("heading", { name: "Moons" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "All planet moons" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Well-known moons" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Mars" })).toHaveAttribute(
       "aria-pressed",
       "false",
@@ -220,6 +221,17 @@ describe("Cosmica prototype", () => {
     );
   });
 
+  it("includes lesser-known moons when a planet is picked", async () => {
+    const user = await openMenu();
+    await user.click(screen.getByRole("button", { name: "Moons" }));
+    await user.click(screen.getByRole("button", { name: "Jupiter" }));
+    await user.click(screen.getByRole("button", { name: "Play selected (5 moons)" }));
+    expect(screen.getByRole("button", { name: "Amalthea" })).not.toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+  });
+
   it("shows the clicked planet name after a wrong click", async () => {
     const user = await openMenu();
     await user.click(screen.getByRole("button", { name: "Planets" }));
@@ -290,10 +302,9 @@ describe("Cosmica prototype", () => {
     expect(screen.queryByTestId("feedback")).not.toBeInTheDocument();
   });
 
-  it("wires obscure moons hard mode into a Moons round", async () => {
+  it("starts All planet moons with obscure moons in play", async () => {
     const user = await openMenu();
     await user.click(screen.getByRole("button", { name: "Moons" }));
-    await user.click(screen.getByRole("button", { name: "Include obscure moons" }));
     await user.click(screen.getByRole("button", { name: "All planet moons" }));
     const score = screen.getByTestId("score").textContent ?? "";
     const total = Number(score.split("/")[1]?.trim());
@@ -304,11 +315,15 @@ describe("Cosmica prototype", () => {
     );
   });
 
-  it("keeps hard-only moons disabled until hard mode is on", async () => {
+  it("starts Well-known moons without obscure moons", async () => {
     const user = await openMenu();
     await user.click(screen.getByRole("button", { name: "Moons" }));
-    await user.click(screen.getByRole("button", { name: "All planet moons" }));
+    await user.click(screen.getByRole("button", { name: "Well-known moons" }));
     expect(screen.getByRole("button", { name: "Charon" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+    expect(screen.getByRole("button", { name: "Europa" })).not.toHaveAttribute(
       "aria-disabled",
       "true",
     );

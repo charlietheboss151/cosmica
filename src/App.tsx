@@ -192,7 +192,7 @@ function Menu({
 
   const quickPlay = () => {
     const mode = QUICK_MODES[Math.floor(Math.random() * QUICK_MODES.length)]!;
-    onPlay({ mode, hardMode: false });
+    onPlay({ mode, hardMode: mode === "moons" });
   };
 
   return (
@@ -305,24 +305,13 @@ function MoonsSetup({
   onPlay: (config: PlayConfig) => void;
   onHome: () => void;
 }) {
-  const [hardMode, setHardMode] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(() => new Set());
-
-  const parentOptions = useMemo(
-    () => parentsWithMoons({ hardMode }),
-    [hardMode],
-  );
-
-  useEffect(() => {
-    setSelected((current) => {
-      const valid = new Set(parentOptions.map((parent) => parent.id));
-      return new Set([...current].filter((id) => valid.has(id)));
-    });
-  }, [parentOptions]);
+  const allMoons = { hardMode: true };
+  const parentOptions = useMemo(() => parentsWithMoons(allMoons), []);
 
   const selectedIds = [...selected];
   const moonCount = selectedIds.reduce(
-    (total, parentId) => total + moonsOf(parentId, { hardMode }).length,
+    (total, parentId) => total + moonsOf(parentId, allMoons).length,
     0,
   );
 
@@ -339,7 +328,11 @@ function MoonsSetup({
   };
 
   const playAll = () => {
-    onPlay({ mode: "moons", hardMode, parentIds: undefined });
+    onPlay({ mode: "moons", hardMode: true, parentIds: undefined });
+  };
+
+  const playWellKnown = () => {
+    onPlay({ mode: "moons", hardMode: false, parentIds: undefined });
   };
 
   const playSelected = () => {
@@ -349,7 +342,7 @@ function MoonsSetup({
     const allParentIds = parentOptions.map((parent) => parent.id);
     const parentIds =
       selectedIds.length < allParentIds.length ? selectedIds : undefined;
-    onPlay({ mode: "moons", hardMode, parentIds });
+    onPlay({ mode: "moons", hardMode: true, parentIds });
   };
 
   return (
@@ -381,8 +374,26 @@ function MoonsSetup({
             <span className="mode-card-copy">
               <span className="mode-card-label">All planet moons</span>
               <span className="mode-card-desc">
-                Every major moon around Earth through Neptune
-                {hardMode ? " plus obscure moons" : ""}
+                Every moon in the catalog, including Charon, Amalthea, and other lesser-known moons
+              </span>
+            </span>
+            <span className="mode-card-arrow" aria-hidden="true">
+              →
+            </span>
+          </button>
+          <button
+            type="button"
+            className="mode-card"
+            aria-label="Well-known moons"
+            onClick={playWellKnown}
+          >
+            <span className="mode-card-icon" aria-hidden="true">
+              🌕
+            </span>
+            <span className="mode-card-copy">
+              <span className="mode-card-label">Well-known moons</span>
+              <span className="mode-card-desc">
+                The Moon, the Galileans, Titan, and other familiar moons
               </span>
             </span>
             <span className="mode-card-arrow" aria-hidden="true">
@@ -419,14 +430,6 @@ function MoonsSetup({
                 : `Play selected (${moonCount} ${moonCount === 1 ? "moon" : "moons"})`}
             </button>
           </div>
-          <button
-            type="button"
-            className={`mode-option-toggle${hardMode ? " mode-option-toggle-on" : ""}`}
-            aria-pressed={hardMode}
-            onClick={() => setHardMode((current) => !current)}
-          >
-            Include obscure moons
-          </button>
         </section>
       </div>
     </main>

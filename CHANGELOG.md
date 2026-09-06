@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.27.0] - 2026-09-06
+
+### Added
+- Moons setup has a **Well-known moons** card for the familiar set only.
+
+### Changed
+- **All planet moons** now includes Charon, Amalthea, and the other lesser-known moons. The obscure-moons toggle is gone.
+
 ## [0.26.8] - 2026-09-06
 
 ### Fixed
