@@ -4,6 +4,7 @@ import {
   displayRadius,
   isHeliocentric,
   isLitInMode,
+  isLocalOrbiter,
   type GameMode,
   type ModeOptions,
   type SolarObject,
@@ -104,6 +105,7 @@ export function cameraFitRadius(
   profile: LayoutProfile = "compact",
   mode?: GameMode,
   parentIds?: string[],
+  options: ModeOptions = { hardMode: false },
 ): number {
   if (mode === "moons") {
     const laid = layoutAll(objects, profile);
@@ -142,6 +144,37 @@ export function cameraFitRadius(
     }
     if (maxReach > 0) {
       return maxReach * 1.1;
+    }
+  }
+  if (mode === "spacecraft") {
+    const laid = layoutAll(objects, profile);
+    const modeOptions: ModeOptions = {
+      hardMode: options.hardMode,
+      spacecraftGroups: options.spacecraftGroups,
+    };
+    let maxReach = 0;
+    for (const object of objects) {
+      if (object.type !== "spacecraft" || !isLitInMode(object, "spacecraft", modeOptions)) {
+        continue;
+      }
+      const position = laid.get(object.id);
+      if (!position) {
+        continue;
+      }
+      maxReach = Math.max(
+        maxReach,
+        Math.hypot(position.x, position.y) + displayRadius(object, "spacecraft"),
+      );
+      const parent = object.parentId ? laid.get(object.parentId) : undefined;
+      if (parent) {
+        maxReach = Math.max(
+          maxReach,
+          Math.hypot(parent.x, parent.y) + parent.radius,
+        );
+      }
+    }
+    if (maxReach > 0) {
+      return maxReach * 1.12;
     }
   }
   if (profile === "proportional") {
@@ -424,7 +457,7 @@ export function applyOrbitPhase(
     if (object.type === "star" || object.type === "region") {
       return object;
     }
-    if (object.type === "moon") {
+    if (isLocalOrbiter(object)) {
       if (moonPhaseDeg === 0) {
         return object;
       }

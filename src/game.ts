@@ -5,6 +5,7 @@ import {
   type CelestialKind,
   type GameMode,
   type SolarObject,
+  type SpacecraftGroup,
 } from "./catalog";
 
 export type Rng = () => number;
@@ -17,6 +18,7 @@ export type QuizOptions = {
   hardMode?: boolean;
   parentIds?: string[];
   types?: CelestialKind[];
+  spacecraftGroups?: SpacecraftGroup[];
 };
 
 export type QuizState = {
@@ -24,6 +26,7 @@ export type QuizState = {
   hardMode: boolean;
   parentIds?: string[];
   types?: CelestialKind[];
+  spacecraftGroups?: SpacecraftGroup[];
   currentId: string | null;
   remainingIds: string[];
   foundIds: string[];
@@ -47,16 +50,18 @@ export type QuizState = {
 };
 
 function modeOptions(
-  state: Pick<QuizState, "hardMode" | "parentIds" | "types">,
+  state: Pick<QuizState, "hardMode" | "parentIds" | "types" | "spacecraftGroups">,
 ): {
   hardMode: boolean;
   parentIds?: string[];
   types?: CelestialKind[];
+  spacecraftGroups?: SpacecraftGroup[];
 } {
   return {
     hardMode: state.hardMode,
     parentIds: state.parentIds,
     types: state.types,
+    spacecraftGroups: state.spacecraftGroups,
   };
 }
 
@@ -68,6 +73,7 @@ function playable(
     hardMode: options.hardMode ?? false,
     parentIds: options.parentIds,
     types: options.types,
+    spacecraftGroups: options.spacecraftGroups,
   });
 }
 
@@ -148,8 +154,9 @@ export function startQuiz(
   const hardMode = resolved.hardMode ?? false;
   const parentIds = resolved.parentIds;
   const types = resolved.types;
+  const spacecraftGroups = resolved.spacecraftGroups;
   const ids = shuffle(
-    playable(mode, { hardMode, parentIds, types }).map((object) => object.id),
+    playable(mode, { hardMode, parentIds, types, spacecraftGroups }).map((object) => object.id),
     rng,
   );
   const currentId = ids[0] ?? null;
@@ -159,6 +166,7 @@ export function startQuiz(
     hardMode,
     parentIds,
     types,
+    spacecraftGroups,
     currentId,
     remainingIds,
     foundIds: [],

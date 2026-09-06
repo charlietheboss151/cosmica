@@ -51,7 +51,12 @@ describe("Cosmica prototype", () => {
     expect(
       screen.getByRole("button", { name: "Celestial bodies" }).querySelector("img"),
     ).toHaveAttribute("src", publicUrl("bodies/comet-sticker.png"));
-    expect(screen.getByRole("button", { name: /Spacecraft, coming soon/i })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Spacecraft" }).querySelector("img")).toHaveAttribute(
+      "src",
+      publicUrl("bodies/spacecraft-sticker.svg"),
+    );
+    expect(screen.queryByRole("button", { name: /Spacecraft, coming soon/i })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Who am I\?, coming soon/i })).toBeDisabled();
     expect(screen.getByTestId("progress-planets")).toHaveTextContent("Planets 0/");
     await user.click(screen.getByRole("button", { name: "Planets" }));
     expect(screen.getByTestId("find-prompt")).toBeInTheDocument();
@@ -336,6 +341,46 @@ describe("Cosmica prototype", () => {
     expect(screen.getByTestId("progress-planets")).toHaveTextContent("Planets 8/8");
     expect(screen.getByText(/Level 1 — Cadet/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Planets" })).toHaveTextContent(/BEST • \d/);
+  });
+
+  it("opens a Spacecraft setup screen from the menu", async () => {
+    const user = await openMenu();
+    await user.click(screen.getByRole("button", { name: "Spacecraft" }));
+    expect(screen.getByRole("heading", { name: "Spacecraft" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "All spacecraft" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Outer & interstellar" })).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
+  });
+
+  it("starts Spacecraft mode with Voyager 1 lit and planets grayed", async () => {
+    const user = await openMenu();
+    await user.click(screen.getByRole("button", { name: "Spacecraft" }));
+    await user.click(screen.getByRole("button", { name: "All spacecraft" }));
+    expect(screen.getByTestId("find-prompt").textContent).toMatch(/^Click on /);
+    expect(screen.getByRole("button", { name: "Voyager 1" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "ISS" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Mercury" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+    expect(screen.getByRole("button", { name: "Pioneer 10" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+  });
+
+  it("lets players quiz only outer spacecraft", async () => {
+    const user = await openMenu();
+    await user.click(screen.getByRole("button", { name: "Spacecraft" }));
+    await user.click(screen.getByRole("button", { name: "Outer & interstellar" }));
+    await user.click(screen.getByRole("button", { name: /Play selected/ }));
+    expect(screen.getByRole("button", { name: "Voyager 1" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "ISS" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
   });
 
   it("activates a quiz body with the keyboard", async () => {

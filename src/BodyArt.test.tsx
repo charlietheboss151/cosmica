@@ -149,6 +149,17 @@ describe("cartoon body art", () => {
     expect(asteroid.container.querySelector("image")).toHaveAttribute("href", publicUrl("bodies/vesta.png"));
   });
 
+  it("draws spacecraft as cartoon probes, not planet stickers", () => {
+    const { container } = render(
+      <svg>
+        <BodyArt id="voyager-1" radius={16} color="#ffd36a" type="spacecraft" />
+      </svg>,
+    );
+    expect(container.querySelector(".spacecraft-art")).not.toBeNull();
+    expect(container.querySelector('[data-testid="art-voyager-1"]')).not.toBeNull();
+    expect(container.querySelector("image")).toBeNull();
+  });
+
   it("keeps useId unconditional so oxlint rules-of-hooks passes", () => {
     expect(() =>
       execFileSync(oxlintBin, ["src/BodyArt.tsx"], {

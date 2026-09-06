@@ -215,4 +215,23 @@ describe("Seterra-style quiz", () => {
     const after = applyClick(jupiterOnly, "phobos", 10);
     expect(after).toEqual(jupiterOnly);
   });
+
+  it("asks the player to click a spacecraft in Spacecraft mode", () => {
+    const quiz = startQuiz("spacecraft", alwaysFirst, 0);
+    const target = objectById(quiz.currentId!);
+    expect(target?.type).toBe("spacecraft");
+    expect(quiz.total).toBe(playableInMode("spacecraft").length);
+    expect(quiz.total).toBeGreaterThan(10);
+    const voyagerRound = startQuiz("spacecraft", alwaysFirst, 0, {
+      spacecraftGroups: ["outer"],
+    });
+    expect(
+      playableInMode("spacecraft", {
+        hardMode: false,
+        spacecraftGroups: ["outer"],
+      }).some((object) => object.id === "voyager-1"),
+    ).toBe(true);
+    const after = applyClick(voyagerRound, "iss", 10);
+    expect(after).toEqual(voyagerRound);
+  });
 });

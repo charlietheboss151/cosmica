@@ -5,8 +5,11 @@ import {
   moonsOf,
   objectById,
   parentsWithMoons,
+  spacecraftOf,
+  SPACECRAFT_GROUPS,
   type CelestialKind,
   type GameMode,
+  type SpacecraftGroup,
 } from "./catalog";
 import {
   accuracyPercent,
@@ -39,18 +42,20 @@ export const REVEAL_CLEAR_MS = 2200;
 
 const LOGO_SRC = publicUrl("cosmica-logo.png");
 const LOGO_ALT = "Cosmica. Explore the Solar System. Master the cosmos.";
-const QUICK_MODES: GameMode[] = ["planets", "moons", "celestial"];
+const QUICK_MODES: GameMode[] = ["planets", "moons", "celestial", "spacecraft"];
 
 const MODE_ICONS: Record<GameMode, string> = {
   planets: "🪐",
   moons: "🌙",
   celestial: "☄️",
+  spacecraft: "🛰️",
 };
 
 const MODE_STICKERS: Record<GameMode, string> = {
   planets: publicUrl("bodies/earth.png"),
   moons: publicUrl("bodies/moon-sticker.png"),
   celestial: publicUrl("bodies/comet-sticker.png"),
+  spacecraft: publicUrl("bodies/spacecraft-sticker.svg"),
 };
 
 function ModeBodyArt({ mode }: { mode: GameMode }) {
@@ -74,16 +79,18 @@ type PlayConfig = {
   hardMode: boolean;
   parentIds?: string[];
   types?: CelestialKind[];
+  spacecraftGroups?: SpacecraftGroup[];
 };
 
-type Screen = "home" | "menu" | "moons-setup" | "celestial-setup" | PlayConfig;
+type Screen = "home" | "menu" | "moons-setup" | "celestial-setup" | "spacecraft-setup" | PlayConfig;
 
 function isPlayConfig(screen: Screen): screen is PlayConfig {
   return (
     screen !== "home" &&
     screen !== "menu" &&
     screen !== "moons-setup" &&
-    screen !== "celestial-setup"
+    screen !== "celestial-setup" &&
+    screen !== "spacecraft-setup"
   );
 }
 
@@ -103,6 +110,11 @@ const PLAYABLE_MODES: {
     label: "Celestial bodies",
     description: "Dwarf planets, asteroids & comets",
   },
+  {
+    id: "spacecraft",
+    label: "Spacecraft",
+    description: "Probes from Earth to Voyager 1",
+  },
 ];
 
 const CELESTIAL_KINDS: { id: CelestialKind; label: string }[] = [
@@ -113,11 +125,6 @@ const CELESTIAL_KINDS: { id: CelestialKind; label: string }[] = [
 ];
 
 const COMING_SOON = [
-  {
-    id: "spacecraft",
-    label: "Spacecraft",
-    description: "Identify famous spacecraft",
-  },
   {
     id: "whoami",
     label: "Who am I?",
@@ -155,11 +162,13 @@ function Menu({
   onPlay,
   onMoonsSetup,
   onCelestialSetup,
+  onSpacecraftSetup,
   onHome,
 }: {
   onPlay: (config: PlayConfig) => void;
   onMoonsSetup: () => void;
   onCelestialSetup: () => void;
+  onSpacecraftSetup: () => void;
   onHome: () => void;
 }) {
   const progress = loadProgress();
@@ -172,6 +181,10 @@ function Menu({
     }
     if (mode.id === "celestial") {
       onCelestialSetup();
+      return;
+    }
+    if (mode.id === "spacecraft") {
+      onSpacecraftSetup();
       return;
     }
     onPlay({ mode: mode.id, hardMode: false });
@@ -544,13 +557,142 @@ function CelestialSetup({
   );
 }
 
+function SpacecraftSetup({
+  onBack,
+  onPlay,
+  onHome,
+}: {
+  onBack: () => void;
+  onPlay: (config: PlayConfig) => void;
+  onHome: () => void;
+}) {
+  const [hardMode, setHardMode] = useState(false);
+  const [selected, setSelected] = useState<Set<SpacecraftGroup>>(() => new Set());
+
+  const selectedIds = [...selected];
+  const craftCount = selectedIds.reduce(
+    (total, group) => total + spacecraftOf(group, { hardMode }).length,
+    0,
+  );
+
+  const toggleGroup = (group: SpacecraftGroup) => {
+    setSelected((current) => {
+      const next = new Set(current);
+      if (next.has(group)) {
+        next.delete(group);
+      } else {
+        next.add(group);
+      }
+      return next;
+    });
+  };
+
+  const playAll = () => {
+    onPlay({ mode: "spacecraft", hardMode, spacecraftGroups: undefined });
+  };
+
+  const playSelected = () => {
+    if (selectedIds.length === 0) {
+      return;
+    }
+    const spacecraftGroups =
+      selectedIds.length < SPACECRAFT_GROUPS.length ? selectedIds : undefined;
+    onPlay({ mode: "spacecraft", hardMode, spacecraftGroups });
+  };
+
+  return (
+    <main className="menu">
+      <div className="menu-hud menu-hud-sub">
+        <header className="menu-sub-header">
+          <div className="menu-sub-nav">
+            <button type="button" className="ghost menu-back" onClick={onBack}>
+              Back
+            </button>
+            <button type="button" className="ghost menu-home" onClick={onHome}>
+              Home
+            </button>
+          </div>
+          <img className="menu-logo menu-logo-small" src={LOGO_SRC} alt="" width={96} height={96} />
+          <h2 className="menu-sub-title">Spacecraft</h2>
+          <p className="menu-sub-lede">Play everything, pick a destination, or mix a few.</p>
+        </header>
+        <section className="menu-sub-play" aria-label="Spacecraft options">
+          <button
+            type="button"
+            className="mode-card"
+            aria-label="All spacecraft"
+            onClick={playAll}
+          >
+            <span className="mode-card-icon" aria-hidden="true">
+              🛰️
+            </span>
+            <span className="mode-card-copy">
+              <span className="mode-card-label">All spacecraft</span>
+              <span className="mode-card-desc">
+                Probes from the Sun to Voyager 1
+                {hardMode ? " plus historic missions" : ""}
+              </span>
+            </span>
+            <span className="mode-card-arrow" aria-hidden="true">
+              →
+            </span>
+          </button>
+          <div className="menu-sub-section">
+            <p className="menu-sub-heading">Pick destinations</p>
+            <div className="mode-planet-chips" role="group" aria-label="Destinations">
+              {SPACECRAFT_GROUPS.map((group) => {
+                const on = selected.has(group.id);
+                return (
+                  <button
+                    key={group.id}
+                    type="button"
+                    className={`mode-planet-chip${on ? " mode-planet-chip-on" : ""}`}
+                    aria-pressed={on}
+                    aria-label={group.label}
+                    onClick={() => toggleGroup(group.id)}
+                  >
+                    {group.label}
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              type="button"
+              className="mode-play menu-sub-play-btn"
+              disabled={selected.size === 0}
+              onClick={playSelected}
+            >
+              {selected.size === 0
+                ? "Play selected"
+                : `Play selected (${craftCount} ${craftCount === 1 ? "probe" : "probes"})`}
+            </button>
+          </div>
+          <button
+            type="button"
+            className={`mode-option-toggle${hardMode ? " mode-option-toggle-on" : ""}`}
+            aria-pressed={hardMode}
+            onClick={() => setHardMode((current) => !current)}
+          >
+            Include historic missions
+          </button>
+        </section>
+      </div>
+    </main>
+  );
+}
+
 function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
-  const { mode, hardMode, parentIds, types } = config;
+  const { mode, hardMode, parentIds, types, spacecraftGroups } = config;
   const [objects, setObjects] = useState(() =>
     randomizeOrbitalPositions(catalog, Math.random, layoutProfileForMode(mode)),
   );
   const [quiz, setQuiz] = useState<QuizState>(() =>
-    startQuiz(mode, Math.random, Date.now(), { hardMode, parentIds, types }),
+    startQuiz(mode, Math.random, Date.now(), {
+      hardMode,
+      parentIds,
+      types,
+      spacecraftGroups,
+    }),
   );
   const [now, setNow] = useState(() => Date.now());
   const resultsRef = useRef<HTMLDivElement>(null);
@@ -562,7 +704,14 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
     setObjects(
       randomizeOrbitalPositions(catalog, Math.random, layoutProfileForMode(mode)),
     );
-    setQuiz(startQuiz(mode, Math.random, Date.now(), { hardMode, parentIds, types }));
+    setQuiz(
+      startQuiz(mode, Math.random, Date.now(), {
+        hardMode,
+        parentIds,
+        types,
+        spacecraftGroups,
+      }),
+    );
   };
 
   useEffect(() => {
@@ -615,10 +764,10 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
         foundIds,
         elapsedMs,
         score: quiz.score,
-        fullSet: parentIds === undefined,
+        fullSet: parentIds === undefined && spacecraftGroups === undefined,
       }),
     );
-  }, [done, elapsedMs, mode, parentIds, types, quiz.foundIds, quiz.marks, quiz.score]);
+  }, [done, elapsedMs, mode, parentIds, types, spacecraftGroups, quiz.foundIds, quiz.marks, quiz.score]);
 
   useEffect(() => {
     if (!done) {
@@ -659,6 +808,7 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
         hardMode={hardMode}
         parentIds={parentIds}
         types={types}
+        spacecraftGroups={spacecraftGroups}
         foundIds={quiz.foundIds}
         marks={quiz.marks}
         flashId={quiz.wrongFlashId}
@@ -789,11 +939,18 @@ export default function App() {
           onHome={() => setScreen("home")}
           onPlay={(config) => setScreen(config)}
         />
+      ) : screen === "spacecraft-setup" ? (
+        <SpacecraftSetup
+          onBack={() => setScreen("menu")}
+          onHome={() => setScreen("home")}
+          onPlay={(config) => setScreen(config)}
+        />
       ) : screen === "menu" ? (
         <Menu
           onPlay={(config) => setScreen(config)}
           onMoonsSetup={() => setScreen("moons-setup")}
           onCelestialSetup={() => setScreen("celestial-setup")}
+          onSpacecraftSetup={() => setScreen("spacecraft-setup")}
           onHome={() => setScreen("home")}
         />
       ) : (

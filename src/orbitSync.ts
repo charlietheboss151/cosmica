@@ -1,4 +1,4 @@
-import type { SolarObject } from "./catalog";
+import { isLocalOrbiter, type SolarObject } from "./catalog";
 import {
   applyOrbitPhase,
   layoutAll,
@@ -26,7 +26,7 @@ export function syncOrbitDom(
     }
   }
   for (const object of phased) {
-    if (object.type !== "moon") {
+    if (!isLocalOrbiter(object)) {
       continue;
     }
     const circle = moonOrbitElements.get(object.id);

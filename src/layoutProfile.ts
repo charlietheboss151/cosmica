@@ -3,7 +3,7 @@ import type { GameMode } from "./catalog";
 export type LayoutProfile = "compact" | "proportional";
 
 export function layoutProfileForMode(mode: GameMode): LayoutProfile {
-  return mode === "celestial" ? "proportional" : "compact";
+  return mode === "celestial" || mode === "spacecraft" ? "proportional" : "compact";
 }
 
 /** Scales moon/local orbit radii to match tighter heliocentric spacing. */

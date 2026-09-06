@@ -354,7 +354,7 @@ h1 {
 
 .mode-bodies {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px 18px;
   align-items: start;
   padding: 8px 0 4px;
@@ -381,8 +381,8 @@ h1 {
 
 .mode-body-art {
   display: block;
-  width: min(148px, 28vw);
-  height: min(148px, 28vw);
+  width: min(132px, 22vw);
+  height: min(132px, 22vw);
   border-radius: 50%;
   object-fit: cover;
   filter: drop-shadow(0 14px 28px #00000099);
@@ -401,6 +401,11 @@ h1 {
 .mode-body-celestial .mode-body-art {
   animation-duration: 7s;
   animation-delay: -2.8s;
+}
+
+.mode-body-spacecraft .mode-body-art {
+  animation-duration: 5.8s;
+  animation-delay: -0.8s;
 }
 
 .mode-body:hover .mode-body-art,
@@ -438,9 +443,21 @@ h1 {
   color: #8eb4ff;
 }
 
+@media (max-width: 900px) {
+  .mode-bodies {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .mode-body-art {
+    width: min(148px, 36vw);
+    height: min(148px, 36vw);
+  }
+}
+
 @media (max-width: 760px) {
   .mode-bodies {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
   }
 
@@ -1278,6 +1295,11 @@ h1 {
 
 .body-lit.body-moon .moon-backing,
 .body-lit.body-moon .moon-fill {
+  opacity: 1;
+}
+
+.body-lit.body-spacecraft .spacecraft-art {
+  filter: drop-shadow(0 0 8px #ffe08a66);
   opacity: 1;
 }
 

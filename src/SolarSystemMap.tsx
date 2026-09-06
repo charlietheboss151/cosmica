@@ -31,11 +31,13 @@ import {
   isDecorativeMoon,
   isHeliocentric,
   isLitInMode,
+  isLocalOrbiter,
   isShownLit,
   type CelestialKind,
   type GameMode,
   type ModeOptions,
   type SolarObject,
+  type SpacecraftGroup,
 } from "./catalog";
 import {
   applyOrbitPhase,
@@ -147,6 +149,7 @@ type Props = {
   hardMode?: boolean;
   parentIds?: string[];
   types?: CelestialKind[];
+  spacecraftGroups?: SpacecraftGroup[];
   foundIds?: string[];
   marks?: Record<string, TryMark>;
   flashId?: string | null;
@@ -165,6 +168,7 @@ export default function SolarSystemMap({
   hardMode = false,
   parentIds,
   types,
+  spacecraftGroups,
   foundIds = [],
   marks = {},
   flashId = null,
@@ -215,7 +219,7 @@ export default function SolarSystemMap({
     mode === "moons" && framedMoonId
       ? objects.find((object) => object.id === framedMoonId)?.parentId ?? undefined
       : undefined;
-  const modeOptions = { hardMode, parentIds, focusParentId, types };
+  const modeOptions = { hardMode, parentIds, focusParentId, types, spacecraftGroups };
   const layoutProfile = layoutProfileForMode(mode);
   const orbitElapsed = orbitElapsedMs(orbiting, orbitStartMs, orbitFreezeMs);
   const displayObjects = objectsAtOrbitTime(objects, orbitElapsed);
@@ -314,7 +318,7 @@ export default function SolarSystemMap({
       objects,
       orbitElapsedMs(orbiting, orbitStartMs, orbitFreezeMs),
     );
-    const options = { hardMode, parentIds, focusParentId, types };
+    const options = { hardMode, parentIds, focusParentId, types, spacecraftGroups };
 
     if (mode === "moons" && revealId) {
       const target = moonRevealCamera(
@@ -369,7 +373,10 @@ export default function SolarSystemMap({
     }
     setCamera(
       fitCamera(
-        cameraFitRadius(objects, layoutProfile, mode, parentIds),
+        cameraFitRadius(objects, layoutProfile, mode, parentIds, {
+          hardMode,
+          spacecraftGroups,
+        }),
         size.width,
         size.height,
       ),
@@ -381,6 +388,7 @@ export default function SolarSystemMap({
     mode,
     parentIds,
     types,
+    spacecraftGroups,
     hardMode,
     focusParentId,
     revealId,
@@ -395,14 +403,16 @@ export default function SolarSystemMap({
     (object) =>
       isHeliocentric(object) &&
       object.au > 0 &&
-      isLitInMode(object, mode, modeOptions),
+      (isLitInMode(object, mode, modeOptions) ||
+        (mode === "spacecraft" && object.type === "planet")),
   );
   const moonOrbits = displayObjects.filter(
     (object) =>
-      object.type === "moon" &&
-      mode !== "planets" &&
-      mode !== "celestial" &&
-      isLitInMode(object, mode, modeOptions),
+      isLocalOrbiter(object) &&
+      isLitInMode(object, mode, modeOptions) &&
+      (object.type === "moon"
+        ? mode !== "planets" && mode !== "celestial" && mode !== "spacecraft"
+        : true),
   );
   const regions = displayObjects.filter(
     (object) =>

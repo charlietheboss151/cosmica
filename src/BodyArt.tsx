@@ -2,6 +2,7 @@ import { useId } from "react";
 import { BODY_ART } from "./bodyArtAssets";
 import { CelestialCartoon } from "./CelestialCartoon";
 import { celestialStyleFor } from "./celestialStyles";
+import { SpacecraftArt } from "./SpacecraftArt";
 import type { ObjectType } from "./catalog";
 
 type Props = {
@@ -43,6 +44,9 @@ function saturnRingFrontPath(
 
 export function BodyArt({ id, radius, color, type = "planet" }: Props) {
   const clipId = `clip-${id}-${useId().replace(/:/g, "")}`;
+  if (type === "spacecraft") {
+    return <SpacecraftArt id={id} radius={radius} color={color} />;
+  }
   const celestial = celestialStyleFor(id, type);
   if (celestial) {
     return <CelestialCartoon id={id} radius={radius} style={celestial} />;

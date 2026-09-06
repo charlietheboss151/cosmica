@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.26.0] - 2026-09-06
+
+### Added
+- Spacecraft mode: find famous probes and satellites on the map, including ISS, Hubble, JWST, Juno, New Horizons, and Voyager 1 and 2. A setup screen lets you play all of them, pick destinations, or include historic missions.
+
+### Changed
+- Quick Play can start a Spacecraft round.
+
 ## [0.25.0] - 2026-09-06
 
 ### Changed

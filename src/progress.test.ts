@@ -90,4 +90,14 @@ describe("player progress", () => {
       [],
     );
   });
+
+  it("fills in spacecraft progress when loading an older save", () => {
+    const parsed = parseProgress({
+      xp: 3,
+      found: { planets: ["earth"], moons: [], celestial: [] },
+      bestMs: { planets: 12_000, moons: null, celestial: null },
+    });
+    expect(parsed.found.spacecraft).toEqual([]);
+    expect(parsed.bestMs.spacecraft).toBeNull();
+  });
 });

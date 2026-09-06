@@ -1,3 +1,11 @@
+import { EXTRA_CATALOG } from "./extraCatalog";
+import {
+  SPACECRAFT_CATALOG,
+  type SpacecraftGroup,
+} from "./spacecraftCatalog";
+
+export type { SpacecraftGroup };
+
 export type ObjectType =
   | "star"
   | "planet"
@@ -5,8 +13,9 @@ export type ObjectType =
   | "dwarf-planet"
   | "asteroid"
   | "comet"
-  | "region";
-export type GameMode = "planets" | "moons" | "celestial";
+  | "region"
+  | "spacecraft";
+export type GameMode = "planets" | "moons" | "celestial" | "spacecraft";
 export type CelestialKind = "dwarf-planet" | "asteroid" | "comet" | "region";
 
 export type ModeOptions = {
@@ -17,6 +26,8 @@ export type ModeOptions = {
   focusParentId?: string;
   /** When set in Celestial bodies mode, only these kinds are lit. */
   types?: CelestialKind[];
+  /** When set in Spacecraft mode, only these destination groups are lit. */
+  spacecraftGroups?: SpacecraftGroup[];
 };
 
 export type SolarObject = {
@@ -31,9 +42,16 @@ export type SolarObject = {
   displaySize: number;
   color: string;
   hardOnly: boolean;
+  spacecraftGroup?: SpacecraftGroup;
 };
 
-import { EXTRA_CATALOG } from "./extraCatalog";
+export const SPACECRAFT_GROUPS: { id: SpacecraftGroup; label: string }[] = [
+  { id: "inner", label: "Inner Solar System" },
+  { id: "earth", label: "Earth" },
+  { id: "mars", label: "Mars" },
+  { id: "giants", label: "Giant planets" },
+  { id: "outer", label: "Outer & interstellar" },
+];
 
 function body(
   partial: Omit<SolarObject, "localOrbit" | "innerAu" | "hardOnly"> & {
@@ -421,6 +439,13 @@ export const catalog: SolarObject[] = [
       localOrbit: entry.localOrbit ?? 0,
     }),
   ),
+  ...SPACECRAFT_CATALOG.map((entry) =>
+    body({
+      ...entry,
+      innerAu: 0,
+      localOrbit: entry.localOrbit ?? 0,
+    }),
+  ),
 ];
 
 export function isHeliocentric(object: SolarObject): boolean {
@@ -429,8 +454,14 @@ export function isHeliocentric(object: SolarObject): boolean {
     object.type === "planet" ||
     object.type === "dwarf-planet" ||
     object.type === "asteroid" ||
-    object.type === "comet"
+    object.type === "comet" ||
+    (object.type === "spacecraft" && object.parentId === "sun")
   );
+}
+
+/** Moons and planet-orbiting probes share a local orbit around a parent. */
+export function isLocalOrbiter(object: SolarObject): boolean {
+  return object.type === "moon" || (object.type === "spacecraft" && !isHeliocentric(object));
 }
 
 /** Moons in Planets mode are tiny scenery, not quiz targets. */
@@ -441,7 +472,10 @@ export const MOONS_MODE_SCREEN_MIN = 14;
 export const MOONS_MODE_MIN_WORLD = 8;
 
 export function isDecorativeMoon(object: SolarObject, mode: GameMode): boolean {
-  return (mode === "planets" || mode === "celestial") && object.type === "moon";
+  return (
+    (mode === "planets" || mode === "celestial" || mode === "spacecraft") &&
+    object.type === "moon"
+  );
 }
 
 /** Asteroid Belt and Kuiper Belt stay off the Celestial bodies quiz. */
@@ -469,6 +503,11 @@ export function displayRadius(
       object.type === "comet")
   ) {
     return object.displaySize + 3;
+  }
+  if (mode === "spacecraft" && object.type === "spacecraft") {
+    const screenPx = Math.max(object.displaySize + 4, 14);
+    const zoomed = screenPx / Math.max(zoom, 0.18);
+    return Math.max(zoomed, MOONS_MODE_MIN_WORLD);
   }
   return object.displaySize;
 }
@@ -525,6 +564,15 @@ export function isLitInMode(
     }
     return true;
   }
+  if (mode === "spacecraft") {
+    if (object.type !== "spacecraft") {
+      return false;
+    }
+    if (options.spacecraftGroups?.length) {
+      return options.spacecraftGroups.includes(object.spacecraftGroup ?? "outer");
+    }
+    return true;
+  }
   return false;
 }
 
@@ -563,6 +611,13 @@ export function celestialOf(
   options: ModeOptions = { hardMode: false },
 ): SolarObject[] {
   return playableInMode("celestial", { ...options, types: [kind] });
+}
+
+export function spacecraftOf(
+  group: SpacecraftGroup,
+  options: ModeOptions = { hardMode: false },
+): SolarObject[] {
+  return playableInMode("spacecraft", { ...options, spacecraftGroups: [group] });
 }
 
 export function objectById(id: string): SolarObject | undefined {

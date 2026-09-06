@@ -31,8 +31,8 @@ export type ProgressStore = {
 export function emptyProgress(): ProgressState {
   return {
     xp: 0,
-    found: { planets: [], moons: [], celestial: [] },
-    bestMs: { planets: null, moons: null, celestial: null },
+    found: { planets: [], moons: [], celestial: [], spacecraft: [] },
+    bestMs: { planets: null, moons: null, celestial: null, spacecraft: null },
   };
 }
 
@@ -44,7 +44,12 @@ function defaultStore(): ProgressStore {
 }
 
 function isMode(value: string): value is GameMode {
-  return value === "planets" || value === "moons" || value === "celestial";
+  return (
+    value === "planets" ||
+    value === "moons" ||
+    value === "celestial" ||
+    value === "spacecraft"
+  );
 }
 
 export function parseProgress(raw: unknown): ProgressState {

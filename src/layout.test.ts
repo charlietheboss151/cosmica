@@ -157,6 +157,31 @@ describe("compressed visual layout", () => {
     expect(fit).toBeLessThan(visualOrbit(saturn.au, "proportional"));
     expect(fit).toBeGreaterThan(visualOrbit(4, "proportional"));
   });
+
+  it("places Voyager 1 farther from the Sun than Neptune", () => {
+    const neptune = catalog.find((object) => object.id === "neptune")!;
+    const voyager = catalog.find((object) => object.id === "voyager-1")!;
+    const n = layoutObject(neptune, catalog, "proportional");
+    const v = layoutObject(voyager, catalog, "proportional");
+    expect(Math.hypot(v.x, v.y)).toBeGreaterThan(Math.hypot(n.x, n.y));
+  });
+
+  it("places ISS around Earth instead of on a solar orbit", () => {
+    const earth = catalog.find((object) => object.id === "earth")!;
+    const iss = catalog.find((object) => object.id === "iss")!;
+    const e = layoutObject(earth, catalog, "proportional");
+    const s = layoutObject(iss, catalog, "proportional");
+    const separation = Math.hypot(s.x - e.x, s.y - e.y);
+    expect(separation).toBeGreaterThan(earth.displaySize);
+    expect(separation).toBeLessThan(earth.displaySize + 80);
+  });
+
+  it("frames Spacecraft mode out to Voyager 1", () => {
+    const voyager = catalog.find((object) => object.id === "voyager-1")!;
+    const fit = cameraFitRadius(catalog, "proportional", "spacecraft");
+    const at = layoutObject(voyager, catalog, "proportional");
+    expect(fit).toBeGreaterThan(Math.hypot(at.x, at.y));
+  });
 });
 
 describe("randomizeOrbitalPositions", () => {

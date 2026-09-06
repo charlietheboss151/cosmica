@@ -235,6 +235,43 @@ describe("solar system catalog", () => {
     const sun = catalog.find((object) => object.id === "sun")!;
     expect(isShownLit(sun, "moons")).toBe(true);
     expect(isShownLit(sun, "celestial")).toBe(true);
+    expect(isShownLit(sun, "spacecraft")).toBe(true);
     expect(isLitInMode(sun, "moons")).toBe(false);
+    expect(isLitInMode(sun, "spacecraft")).toBe(false);
+  });
+
+  it("keeps catalog ids unique", () => {
+    const ids = catalog.map((object) => object.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it("lights famous probes in Spacecraft mode, including Voyager 1", () => {
+    const voyager = catalog.find((object) => object.id === "voyager-1")!;
+    const iss = catalog.find((object) => object.id === "iss")!;
+    const pioneer = catalog.find((object) => object.id === "pioneer-10")!;
+    const earth = catalog.find((object) => object.id === "earth")!;
+    expect(voyager.type).toBe("spacecraft");
+    expect(voyager.au).toBeGreaterThan(100);
+    expect(isLitInMode(voyager, "spacecraft")).toBe(true);
+    expect(isLitInMode(iss, "spacecraft")).toBe(true);
+    expect(isLitInMode(earth, "spacecraft")).toBe(false);
+    expect(isLitInMode(pioneer, "spacecraft")).toBe(false);
+    expect(isLitInMode(pioneer, "spacecraft", { hardMode: true })).toBe(true);
+    expect(playableInMode("spacecraft").every((object) => object.type === "spacecraft")).toBe(
+      true,
+    );
+  });
+
+  it("can light only one spacecraft destination group", () => {
+    const earthOnly = { hardMode: false, spacecraftGroups: ["earth" as const] };
+    expect(isLitInMode(catalog.find((object) => object.id === "iss")!, "spacecraft", earthOnly)).toBe(
+      true,
+    );
+    expect(
+      isLitInMode(catalog.find((object) => object.id === "voyager-1")!, "spacecraft", earthOnly),
+    ).toBe(false);
+    expect(playableInMode("spacecraft", earthOnly).every((object) => object.spacecraftGroup === "earth")).toBe(
+      true,
+    );
   });
 });
