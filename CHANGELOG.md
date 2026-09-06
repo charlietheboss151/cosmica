@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.27.1] - 2026-09-06
+
+### Fixed
+- Background comets travel along the line they point, instead of all sliding the same way.
+
 ## [0.27.0] - 2026-09-06
 
 ### Added
