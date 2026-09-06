@@ -81,7 +81,7 @@ export const BODY_ART: Record<string, string> = {
   "wild-2": body("wild-2"),
   "shoemaker-levy-9": body("shoemaker-levy-9"),
   ...Object.fromEntries(
-    SPACECRAFT_CATALOG.filter((craft) => craft.id !== "solar-orbiter" && craft.id !== "hope").map((craft) => [
+    SPACECRAFT_CATALOG.map((craft) => [
       craft.id,
       body(craft.id),
     ]),

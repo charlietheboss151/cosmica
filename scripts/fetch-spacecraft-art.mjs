@@ -43,11 +43,9 @@ const SPACECRAFT_FILES = {
     "MAVEN spacecraft model.png",
   ],
   hope: [
-    "Hope spacecraft.png",
-    "Al-Amal spacecraft.png",
-    "Emirates Mars Mission spacecraft.png",
     "Emirates Mars Mission mockup at IAC 2021 01 (cropped).jpg",
     "Emirates Mars Mission mockup at IAC 2021 01.jpg",
+    "Emirates Mars Mission mockup at IAC 2021 02 (cropped).jpg",
   ],
   "mars-odyssey": [
     "Mars Odyssey spacecraft model.png",
@@ -106,6 +104,8 @@ const API_DELAY_MS = 4000;
 
 /** Direct NASA image-library URLs used when Commons is missing or rate-limits. */
 const NASA_URLS = {
+  "solar-orbiter":
+    "https://svs.gsfc.nasa.gov/vis/a010000/a013500/a013533/ESA_Solo_16.png",
   "mars-odyssey":
     "https://images-assets.nasa.gov/image/PIA04244/PIA04244~medium.jpg",
   juno: "https://images-assets.nasa.gov/image/PIA16869/PIA16869~medium.jpg",

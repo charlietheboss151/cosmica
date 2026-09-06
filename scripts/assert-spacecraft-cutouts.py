@@ -10,8 +10,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 BODIES = ROOT / "public" / "bodies"
 
-# These use cartoon art; their photos are a sun or a museum hall.
-SKIP = {"solar-orbiter", "hope"}
+SKIP: set[str] = set()
 
 
 def main() -> int:

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.29.2] - 2026-09-06
+
+### Fixed
+
+- Hope and Solar Orbiter use cut-out spacecraft photos on the map, like the other probes.
+
 ## [0.29.1] - 2026-09-06
 
 ### Fixed

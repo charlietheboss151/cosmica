@@ -16,10 +16,11 @@ DARK_LUMA = 22
 SCENE_RATIO = 0.28
 MIN_OPAQUE = 8_000
 
-FORCE_REMBG: set[str] = set()
+FORCE_REMBG = {"hope"}
 PRE_CROP: dict[str, tuple[float, float, float, float]] = {}
 
 _session = None
+_hope_session = None
 
 
 def session():
@@ -29,8 +30,28 @@ def session():
     return _session
 
 
-def rembg_cutout(im: Image.Image) -> Image.Image:
-    return remove(im.convert("RGBA"), session=session()).convert("RGBA")
+def hope_session():
+    global _hope_session
+    if _hope_session is None:
+        _hope_session = new_session("isnet-general-use")
+    return _hope_session
+
+
+def rembg_cutout(im: Image.Image, craft_id: str = "") -> Image.Image:
+    chosen = hope_session() if craft_id == "hope" else session()
+    return remove(im.convert("RGBA"), session=chosen).convert("RGBA")
+
+
+def already_cutout(im: Image.Image) -> bool:
+    arr = np.array(im.convert("RGBA"))
+    height, width = arr.shape[:2]
+    corners = [
+        int(arr[2, 2, 3]),
+        int(arr[2, width - 3, 3]),
+        int(arr[height - 3, 2, 3]),
+        int(arr[height - 3, width - 3, 3]),
+    ]
+    return sum(1 for alpha in corners if alpha <= 16) >= 3
 
 
 def luma(pixel: np.ndarray) -> int:
@@ -288,7 +309,12 @@ def process_file(source: Path, dest: Path) -> None:
                     int(height * box[3]),
                 )
             )
-        cut = isolate_subject(rembg_cutout(frame)) if craft_id in FORCE_REMBG else pick_cutout(frame)
+        if already_cutout(frame):
+            cut = frame
+        elif craft_id in FORCE_REMBG:
+            cut = rembg_cutout(frame, craft_id)
+        else:
+            cut = pick_cutout(frame)
         fit_in_square(cut).save(dest)
 
 

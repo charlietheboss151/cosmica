@@ -77,7 +77,7 @@ Cartoon asteroid sprite: `asteroid-rock.png` from [OpenClipart #323535](https://
 | Spacecraft | Source |
 | --- | --- |
 | Parker Solar Probe | Solar Probe Plus spacecraft on approach to the sun.jpg |
-| Solar Orbiter | Solar Orbiter ESA20813950.jpg |
+| Solar Orbiter | NASA SVS ESA_Solo_16.png |
 | BepiColombo | BepiColombo spacecraft model.png |
 | Akatsuki | Akatsuki CG01.png |
 | ISS | ISS-56 International Space Station fly-around (07).jpg |
