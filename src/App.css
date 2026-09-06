@@ -1179,7 +1179,7 @@ h1 {
 
 .try-ring {
   pointer-events: none;
-  stroke-width: 3;
+  stroke-width: 4;
   vector-effect: non-scaling-stroke;
 }
 

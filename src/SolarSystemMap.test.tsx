@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { CAMERA_GLIDE_MS } from "./camera";
 import { catalog, MOONS_MODE_MIN_WORLD } from "./catalog";
 import { layoutObject } from "./layout";
-import SolarSystemMap from "./SolarSystemMap";
+import SolarSystemMap, { tryRingRadius } from "./SolarSystemMap";
 
 describe("SolarSystemMap interaction", () => {
   beforeEach(() => {
@@ -138,6 +138,35 @@ describe("SolarSystemMap interaction", () => {
     });
     const width = Number(image()!.getAttribute("width"));
     expect(width).toBeGreaterThanOrEqual(MOONS_MODE_MIN_WORLD * 2);
+  });
+
+  it("keeps try rings outside planet sticker art at max zoom", () => {
+    const earth = catalog.find((object) => object.id === "earth")!;
+    const radius = earth.displaySize;
+    const stickerExtent = radius * 1.12;
+    expect(tryRingRadius("earth", radius, 8)).toBeGreaterThan(stickerExtent);
+    expect(tryRingRadius("saturn", radius, 8)).toBeGreaterThan(radius * 2.16);
+  });
+
+  it("paints a found try ring above the body art", () => {
+    const { container } = render(
+      <SolarSystemMap
+        objects={catalog}
+        mode="planets"
+        marks={{ earth: "green" }}
+        foundIds={["earth"]}
+        onSelect={vi.fn()}
+      />,
+    );
+    const earth = container.querySelector('[aria-label="Earth"]');
+    expect(earth).not.toBeNull();
+    const art = earth!.querySelector('[data-testid="art-earth"]');
+    const ring = earth!.querySelector(".try-ring-green");
+    expect(art).not.toBeNull();
+    expect(ring).not.toBeNull();
+    expect(
+      Boolean(art && ring && art.compareDocumentPosition(ring) & Node.DOCUMENT_POSITION_FOLLOWING),
+    ).toBe(true);
   });
 
   it("does not snap orbiting moons back to rest after a miss re-render", () => {

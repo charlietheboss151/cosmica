@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.26.3] - 2026-09-06
+
+### Fixed
+- Correct/wrong rings stay visible when zoomed in, instead of disappearing under the planet sticker.
+
 ## [0.26.2] - 2026-09-06
 
 ### Changed
