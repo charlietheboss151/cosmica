@@ -210,6 +210,29 @@ describe("SolarSystemMap interaction", () => {
     expect(world()!.getAttribute("transform")).toBe(before);
   });
 
+  it("does not move the camera when the next moon is around another planet", () => {
+    const onSelect = vi.fn();
+    const { container, rerender } = render(
+      <SolarSystemMap
+        objects={catalog}
+        mode="moons"
+        focusId="europa"
+        onSelect={onSelect}
+      />,
+    );
+    const world = () => container.querySelector(".map-svg > g");
+    const before = world()!.getAttribute("transform");
+    rerender(
+      <SolarSystemMap
+        objects={catalog}
+        mode="moons"
+        focusId="titan"
+        onSelect={onSelect}
+      />,
+    );
+    expect(world()!.getAttribute("transform")).toBe(before);
+  });
+
   it("glides to a missed moon instead of jumping to the next planet", () => {
     const rafQueue: FrameRequestCallback[] = [];
     vi.spyOn(performance, "now").mockReturnValue(0);
@@ -268,6 +291,16 @@ describe("SolarSystemMap interaction", () => {
     const distEuropa = Math.hypot(at.x - europa.x, at.y - europa.y);
     const distTitan = Math.hypot(at.x - titan.x, at.y - titan.y);
     expect(distEuropa).toBeLessThan(distTitan);
+
+    rerender(
+      <SolarSystemMap
+        objects={catalog}
+        mode="moons"
+        focusId="titan"
+        onSelect={onSelect}
+      />,
+    );
+    expect(world()!.getAttribute("transform")).toBe(after);
 
     vi.unstubAllGlobals();
     vi.restoreAllMocks();

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.24.1] - 2026-09-06
+
+### Fixed
+- Finding a moon no longer jumps the camera to the next moon’s planet. The view only glides in when a moon is missed, to show where it was.
+
 ## [0.24.0] - 2026-09-05
 
 ### Added

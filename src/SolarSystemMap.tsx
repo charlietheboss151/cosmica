@@ -150,7 +150,7 @@ type Props = {
   flashId?: string | null;
   orbitStartMs?: number | null;
   orbitFreezeMs?: number | null;
-  /** In Moons mode, pans and zooms to the parent of this moon. */
+  /** In Moons mode, used for the initial parent framing only. */
   focusId?: string | null;
   /** Missed moon to glide toward so the player can see where it was. */
   revealId?: string | null;
@@ -312,9 +312,9 @@ export default function SolarSystemMap({
       orbitElapsedMs(orbiting, orbitStartMs, orbitFreezeMs),
     );
     const options = { hardMode, parentIds, focusParentId };
-    let target: Camera;
+
     if (mode === "moons" && revealId) {
-      target = moonRevealCamera(
+      const target = moonRevealCamera(
         atTime,
         revealId,
         layoutProfile,
@@ -322,45 +322,55 @@ export default function SolarSystemMap({
         size.height,
         options,
       );
-    } else if (mode === "moons" && focusParentId) {
-      target = fitCameraOnMoonParent(
-        atTime,
-        focusParentId,
-        layoutProfile,
-        size.width,
-        size.height,
-        options,
+      if (!fittedRef.current || reduceMotion) {
+        fittedRef.current = true;
+        stopGlide();
+        setCamera(target);
+        return;
+      }
+      if (camerasNear(cameraRef.current, target)) {
+        return;
+      }
+      stopGlide();
+      const from = cameraRef.current;
+      const started = performance.now();
+      const tick = (now: number) => {
+        const t = Math.min(1, (now - started) / CAMERA_GLIDE_MS);
+        setCamera(lerpCamera(from, target, easeInOutCubic(t)));
+        if (t < 1) {
+          glideRaf.current = requestAnimationFrame(tick);
+          return;
+        }
+        glideRaf.current = null;
+      };
+      glideRaf.current = requestAnimationFrame(tick);
+      return stopGlide;
+    }
+
+    if (fittedRef.current) {
+      return;
+    }
+    fittedRef.current = true;
+    if (mode === "moons" && focusParentId) {
+      setCamera(
+        fitCameraOnMoonParent(
+          atTime,
+          focusParentId,
+          layoutProfile,
+          size.width,
+          size.height,
+          options,
+        ),
       );
-    } else {
-      target = fitCamera(
+      return;
+    }
+    setCamera(
+      fitCamera(
         cameraFitRadius(objects, layoutProfile, mode, parentIds),
         size.width,
         size.height,
-      );
-    }
-    if (!fittedRef.current || reduceMotion) {
-      fittedRef.current = true;
-      stopGlide();
-      setCamera(target);
-      return;
-    }
-    if (camerasNear(cameraRef.current, target)) {
-      return;
-    }
-    stopGlide();
-    const from = cameraRef.current;
-    const started = performance.now();
-    const tick = (now: number) => {
-      const t = Math.min(1, (now - started) / CAMERA_GLIDE_MS);
-      setCamera(lerpCamera(from, target, easeInOutCubic(t)));
-      if (t < 1) {
-        glideRaf.current = requestAnimationFrame(tick);
-        return;
-      }
-      glideRaf.current = null;
-    };
-    glideRaf.current = requestAnimationFrame(tick);
-    return stopGlide;
+      ),
+    );
   }, [
     objects,
     size,
