@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.30.0] - 2026-09-06
+
+### Changed
+
+- Spacecraft mode always includes historic missions (Pioneer, Cassini, Galileo, and others). The Include historic missions toggle is gone.
+
 ## [0.29.2] - 2026-09-06
 
 ### Fixed

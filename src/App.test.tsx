@@ -387,10 +387,7 @@ describe("Cosmica prototype", () => {
       "aria-disabled",
       "true",
     );
-    expect(screen.getByRole("button", { name: "Pioneer 10" })).toHaveAttribute(
-      "aria-disabled",
-      "true",
-    );
+    expect(screen.getByRole("button", { name: "Pioneer 10" })).toBeEnabled();
   });
 
   it("lets players quiz only outer spacecraft", async () => {

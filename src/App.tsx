@@ -569,12 +569,11 @@ function SpacecraftSetup({
   onPlay: (config: PlayConfig) => void;
   onHome: () => void;
 }) {
-  const [hardMode, setHardMode] = useState(false);
   const [selected, setSelected] = useState<Set<SpacecraftGroup>>(() => new Set());
 
   const selectedIds = [...selected];
   const craftCount = selectedIds.reduce(
-    (total, group) => total + spacecraftOf(group, { hardMode }).length,
+    (total, group) => total + spacecraftOf(group).length,
     0,
   );
 
@@ -591,7 +590,7 @@ function SpacecraftSetup({
   };
 
   const playAll = () => {
-    onPlay({ mode: "spacecraft", hardMode, spacecraftGroups: undefined });
+    onPlay({ mode: "spacecraft", hardMode: false, spacecraftGroups: undefined });
   };
 
   const playSelected = () => {
@@ -600,7 +599,7 @@ function SpacecraftSetup({
     }
     const spacecraftGroups =
       selectedIds.length < SPACECRAFT_GROUPS.length ? selectedIds : undefined;
-    onPlay({ mode: "spacecraft", hardMode, spacecraftGroups });
+    onPlay({ mode: "spacecraft", hardMode: false, spacecraftGroups });
   };
 
   return (
@@ -633,7 +632,6 @@ function SpacecraftSetup({
               <span className="mode-card-label">All spacecraft</span>
               <span className="mode-card-desc">
                 Probes from the Sun to Voyager 1
-                {hardMode ? " plus historic missions" : ""}
               </span>
             </span>
             <span className="mode-card-arrow" aria-hidden="true">
@@ -670,14 +668,6 @@ function SpacecraftSetup({
                 : `Play selected (${craftCount} ${craftCount === 1 ? "probe" : "probes"})`}
             </button>
           </div>
-          <button
-            type="button"
-            className={`mode-option-toggle${hardMode ? " mode-option-toggle-on" : ""}`}
-            aria-pressed={hardMode}
-            onClick={() => setHardMode((current) => !current)}
-          >
-            Include historic missions
-          </button>
         </section>
       </div>
     </main>

@@ -11,7 +11,6 @@ export type SpacecraftEntry = {
   displaySize: number;
   color: string;
   spacecraftGroup: SpacecraftGroup;
-  hardOnly?: boolean;
 };
 
 function craft(partial: SpacecraftEntry): SpacecraftEntry {
@@ -117,7 +116,6 @@ export const SPACECRAFT_CATALOG: SpacecraftEntry[] = [
     displaySize: 10,
     color: "#a0b0c8",
     spacecraftGroup: "earth",
-    hardOnly: true,
   }),
   craft({
     id: "mro",
@@ -166,7 +164,6 @@ export const SPACECRAFT_CATALOG: SpacecraftEntry[] = [
     displaySize: 10,
     color: "#c06040",
     spacecraftGroup: "mars",
-    hardOnly: true,
   }),
   craft({
     id: "mars-express",
@@ -179,7 +176,6 @@ export const SPACECRAFT_CATALOG: SpacecraftEntry[] = [
     displaySize: 10,
     color: "#b05038",
     spacecraftGroup: "mars",
-    hardOnly: true,
   }),
   craft({
     id: "tianwen-1",
@@ -192,7 +188,6 @@ export const SPACECRAFT_CATALOG: SpacecraftEntry[] = [
     displaySize: 10,
     color: "#e87850",
     spacecraftGroup: "mars",
-    hardOnly: true,
   }),
   craft({
     id: "juno",
@@ -239,7 +234,6 @@ export const SPACECRAFT_CATALOG: SpacecraftEntry[] = [
     displaySize: 10,
     color: "#d0b070",
     spacecraftGroup: "giants",
-    hardOnly: true,
   }),
   craft({
     id: "cassini",
@@ -252,7 +246,6 @@ export const SPACECRAFT_CATALOG: SpacecraftEntry[] = [
     displaySize: 11,
     color: "#f0d48a",
     spacecraftGroup: "giants",
-    hardOnly: true,
   }),
   craft({
     id: "new-horizons",
@@ -297,7 +290,6 @@ export const SPACECRAFT_CATALOG: SpacecraftEntry[] = [
     displaySize: 11,
     color: "#d0a050",
     spacecraftGroup: "outer",
-    hardOnly: true,
   }),
   craft({
     id: "pioneer-11",
@@ -309,7 +301,6 @@ export const SPACECRAFT_CATALOG: SpacecraftEntry[] = [
     displaySize: 11,
     color: "#c89848",
     spacecraftGroup: "outer",
-    hardOnly: true,
   }),
   craft({
     id: "ulysses",
@@ -321,7 +312,6 @@ export const SPACECRAFT_CATALOG: SpacecraftEntry[] = [
     displaySize: 10,
     color: "#a8b8c8",
     spacecraftGroup: "outer",
-    hardOnly: true,
   }),
   craft({
     id: "lucy",
@@ -333,7 +323,6 @@ export const SPACECRAFT_CATALOG: SpacecraftEntry[] = [
     displaySize: 10,
     color: "#e0c898",
     spacecraftGroup: "outer",
-    hardOnly: true,
   }),
   craft({
     id: "psyche-probe",
@@ -345,6 +334,5 @@ export const SPACECRAFT_CATALOG: SpacecraftEntry[] = [
     displaySize: 10,
     color: "#d8b878",
     spacecraftGroup: "outer",
-    hardOnly: true,
   }),
 ];
