@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.26.7] - 2026-09-06
+
+### Changed
+- Amalthea uses NASA’s potato-shaped rubble-pile model instead of the blurry Galileo still.
+
 ## [0.26.6] - 2026-09-06
 
 ### Changed

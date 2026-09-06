@@ -29,7 +29,7 @@ Planet sticker art is original to Cosmica. Moon and celestial-body photos are pu
 | Hydra | Hydra true color map.png |
 | Kerberos | Kerberos (moon).jpg |
 | Styx | Styx (moon).jpg |
-| Amalthea | Jupiter's moon Amalthea photographed by Galileo.jpg |
+| Amalthea | NASA PIA07248 (left panel, rust-graded crop) |
 | Hyperion | Hyperion false color.jpg |
 | Phoebe | Phoebe closeup cassini NASA.jpg |
 | Puck | Puck, moon of Uranus (1986).png |
@@ -78,5 +78,6 @@ Regenerate PNGs with:
 
 ```bash
 node scripts/fetch-moon-art.mjs
+python scripts/process-amalthea.py
 node scripts/fetch-celestial-art.mjs
 ```

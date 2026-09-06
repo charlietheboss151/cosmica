@@ -31,7 +31,7 @@ const MOON_FILES = {
   hydra: "Hydra true color map.png",
   kerberos: "Kerberos (moon).jpg",
   styx: "Styx (moon).jpg",
-  amalthea: "Amalthea, Galileo, 2000 01. 04., eingefärbt.png",
+  // Amalthea is built from NASA PIA07248 by scripts/process-amalthea.py.
   hyperion: "Hyperion false color.jpg",
   phoebe: "Phoebe closeup cassini NASA.jpg",
   puck: "Puck, moon of Uranus (1986).png",
@@ -120,10 +120,34 @@ function toPng(id, inputBuffer) {
 mkdirSync(OUT_DIR, { recursive: true });
 
 const failures = [];
+const force = process.argv.includes("--force");
+const amaltheaOut = join(OUT_DIR, "amalthea.png");
+let skipAmalthea = false;
+if (!force) {
+  try {
+    accessSync(amaltheaOut);
+    skipAmalthea = true;
+    process.stdout.write("Skipping amalthea, already exists\n");
+  } catch {
+    skipAmalthea = false;
+  }
+}
+if (!skipAmalthea) {
+  try {
+    process.stdout.write("Fetching amalthea (NASA PIA07248)... ");
+    execFileSync("python", [join(dirname(fileURLToPath(import.meta.url)), "process-amalthea.py")], {
+      stdio: "pipe",
+    });
+    process.stdout.write("ok\n");
+  } catch (error) {
+    failures.push(`amalthea: ${error.message}`);
+    process.stdout.write(`failed (${error.message})\n`);
+  }
+}
 
 for (const [id, filename] of Object.entries(MOON_FILES)) {
   const outPath = join(OUT_DIR, `${id}.png`);
-  if (!process.argv.includes("--force")) {
+  if (!force) {
     try {
       accessSync(outPath);
       process.stdout.write(`Skipping ${id}, already exists\n`);
@@ -148,4 +172,4 @@ if (failures.length > 0) {
   console.warn("Some images failed:\n" + failures.join("\n"));
   process.exitCode = 1;
 }
-console.log(`Processed ${Object.keys(MOON_FILES).length} moon images in ${OUT_DIR}`);
+console.log(`Processed ${Object.keys(MOON_FILES).length + 1} moon images in ${OUT_DIR}`);
