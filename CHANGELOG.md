@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.26.1] - 2026-09-06
+
+### Fixed
+- Home-screen planets no longer show a square box around the sticker art.
+
 ## [0.26.0] - 2026-09-06
 
 ### Added

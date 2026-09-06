@@ -48,9 +48,9 @@
   opacity: 0.92;
 }
 
-.orbit-backdrop-home .orbit-backdrop-svg {
-  width: min(150vw, 1120px);
-  height: min(150vw, 1120px);
+.orbit-backdrop-svg image {
+  outline: none;
+  overflow: hidden;
 }
 
 .home-content {

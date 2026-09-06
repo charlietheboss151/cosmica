@@ -122,6 +122,37 @@ function spin(seconds: number, speed: number): string {
   return `${seconds * speed}s`;
 }
 
+function StickerImage({
+  href,
+  size,
+  clipId,
+  className,
+}: {
+  href: string;
+  size: number;
+  clipId: string;
+  className?: string;
+}) {
+  const radius = size / 2;
+  return (
+    <>
+      <clipPath id={clipId}>
+        <circle r={radius} />
+      </clipPath>
+      <image
+        href={href}
+        className={className}
+        clipPath={`url(#${clipId})`}
+        x={-radius}
+        y={-radius}
+        width={size}
+        height={size}
+        preserveAspectRatio="xMidYMid slice"
+      />
+    </>
+  );
+}
+
 function PlanetBody({
   planet,
   speed,
@@ -140,14 +171,12 @@ function PlanetBody({
         repeatCount="indefinite"
       />
       <g transform={`translate(${planet.r} 0)`}>
-        <image
+        <StickerImage
           href={planet.src}
-          x={-planet.size / 2}
-          y={-planet.size / 2}
-          width={planet.size}
-          height={planet.size}
+          size={planet.size}
+          clipId={`orbit-clip-${planet.id}`}
         />
-        {planet.moons?.map((moon) => (
+        {planet.moons?.map((moon, index) => (
           <g key={moon.src}>
             <animateTransform
               attributeName="transform"
@@ -158,13 +187,11 @@ function PlanetBody({
               repeatCount="indefinite"
             />
             <g transform={`translate(${moon.localR} 0)`}>
-              <image
+              <StickerImage
                 href={moon.src}
+                size={moon.size}
+                clipId={`orbit-clip-${planet.id}-moon-${index}`}
                 className="orbit-backdrop-moon"
-                x={-moon.size / 2}
-                y={-moon.size / 2}
-                width={moon.size}
-                height={moon.size}
               />
             </g>
           </g>
@@ -177,9 +204,11 @@ function PlanetBody({
 function DrifterBody({
   body,
   speed,
+  clipId,
 }: {
   body: (typeof DRIFTERS)[number];
   speed: number;
+  clipId: string;
 }) {
   return (
     <g transform={`translate(${body.x} ${body.y})`}>
@@ -192,13 +221,11 @@ function DrifterBody({
           dur={spin(body.duration, speed)}
           repeatCount="indefinite"
         />
-        <image
+        <StickerImage
           href={body.src}
+          size={body.size}
+          clipId={clipId}
           className="orbit-backdrop-drift"
-          x={-body.size / 2}
-          y={-body.size / 2}
-          width={body.size}
-          height={body.size}
         />
       </g>
     </g>
@@ -219,11 +246,12 @@ export default function OrbitBackdrop({ speed = 1, className = "" }: Props) {
             fill="none"
           />
         ))}
-        {DRIFTERS.map((body) => (
+        {DRIFTERS.map((body, index) => (
           <DrifterBody
             key={`${body.src}-${body.x}-${body.y}`}
             body={body}
             speed={speed}
+            clipId={`orbit-clip-drift-${index}`}
           />
         ))}
         <g className="orbit-backdrop-sun">
@@ -235,7 +263,7 @@ export default function OrbitBackdrop({ speed = 1, className = "" }: Props) {
             dur={`${120 * speed}s`}
             repeatCount="indefinite"
           />
-          <image href={bodySrc("sun.png")} x={-36} y={-36} width={72} height={72} />
+          <StickerImage href={bodySrc("sun.png")} size={72} clipId="orbit-clip-sun" />
         </g>
         {PLANETS.map((planet) => (
           <PlanetBody key={planet.id} planet={planet} speed={speed} />
