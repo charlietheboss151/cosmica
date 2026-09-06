@@ -172,7 +172,7 @@ type Props = {
   flashId?: string | null;
   orbitStartMs?: number | null;
   orbitFreezeMs?: number | null;
-  /** In Moons mode, used for the initial parent framing only. */
+  /** Kept for callers; Moons camera only follows revealId. */
   focusId?: string | null;
   /** Missed moon to glide toward so the player can see where it was. */
   revealId?: string | null;
@@ -192,7 +192,6 @@ export default function SolarSystemMap({
   flashId = null,
   orbitStartMs = null,
   orbitFreezeMs = null,
-  focusId = null,
   revealId = null,
   onSelect,
 }: Props) {
@@ -233,10 +232,9 @@ export default function SolarSystemMap({
   };
 
   const orbiting = orbitStartMs !== null && !reduceMotion;
-  const framedMoonId = revealId ?? focusId;
   const focusParentId =
-    mode === "moons" && framedMoonId
-      ? objects.find((object) => object.id === framedMoonId)?.parentId ?? undefined
+    mode === "moons" && revealId
+      ? objects.find((object) => object.id === revealId)?.parentId ?? undefined
       : undefined;
   const modeOptions = { hardMode, parentIds, focusParentId, types, spacecraftGroups };
   const layoutProfile = layoutProfileForMode(mode);
@@ -377,19 +375,6 @@ export default function SolarSystemMap({
       return;
     }
     fittedRef.current = true;
-    if (mode === "moons" && focusParentId) {
-      setCamera(
-        fitCameraOnMoonParent(
-          atTime,
-          focusParentId,
-          layoutProfile,
-          size.width,
-          size.height,
-          options,
-        ),
-      );
-      return;
-    }
     setCamera(
       fitCamera(
         cameraFitRadius(objects, layoutProfile, mode, parentIds, {

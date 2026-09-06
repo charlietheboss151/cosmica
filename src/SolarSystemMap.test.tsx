@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { CAMERA_GLIDE_MS } from "./camera";
 import { catalog, MOONS_MODE_MIN_WORLD } from "./catalog";
-import { layoutObject } from "./layout";
+import { fitCameraOnMoonParent, layoutObject } from "./layout";
 import SolarSystemMap, { tryRingRadius } from "./SolarSystemMap";
 
 describe("SolarSystemMap interaction", () => {
@@ -253,6 +253,28 @@ describe("SolarSystemMap interaction", () => {
       />,
     );
     expect(world()!.getAttribute("transform")).toBe(before);
+  });
+
+  it("starts Moons mode on the full map instead of the first moon's planet", () => {
+    const onSelect = vi.fn();
+    const { container } = render(
+      <SolarSystemMap
+        objects={catalog}
+        mode="moons"
+        focusId="europa"
+        onSelect={onSelect}
+      />,
+    );
+    const transform = container.querySelector(".map-svg > g")!.getAttribute("transform") ?? "";
+    const scale = Number(/scale\(([^)]+)\)/.exec(transform)?.[1]);
+    const parentZoom = fitCameraOnMoonParent(
+      catalog,
+      "jupiter",
+      "compact",
+      800,
+      600,
+    ).zoom;
+    expect(scale).toBeLessThan(parentZoom * 0.5);
   });
 
   it("does not move the camera when the next moon is around another planet", () => {

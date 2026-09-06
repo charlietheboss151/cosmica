@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.26.8] - 2026-09-06
+
+### Fixed
+- Moons mode starts on the full map instead of zooming to the first moon before you guess.
+
 ## [0.26.7] - 2026-09-06
 
 ### Changed
