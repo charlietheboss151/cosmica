@@ -200,6 +200,7 @@ export default function SolarSystemMap({
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [camera, setCamera] = useState<Camera>(createCamera);
   const [reduceMotion, setReduceMotion] = useState(prefersReducedMotion);
+  const [hoverId, setHoverId] = useState<string | null>(null);
   const drag = useRef<{
     x: number;
     y: number;
@@ -438,9 +439,21 @@ export default function SolarSystemMap({
       (mode !== "celestial" || isLitInMode(object, mode, modeOptions)),
   );
   const bodies = [...displayObjects.filter((object) => object.type !== "region")].sort(
-    (a, b) =>
-      Number(isShownLit(a, mode, modeOptions)) -
-      Number(isShownLit(b, mode, modeOptions)),
+    (a, b) => {
+      const lit =
+        Number(isShownLit(a, mode, modeOptions)) -
+        Number(isShownLit(b, mode, modeOptions));
+      if (lit !== 0) {
+        return lit;
+      }
+      if (a.id === hoverId) {
+        return 1;
+      }
+      if (b.id === hoverId) {
+        return -1;
+      }
+      return 0;
+    },
   );
 
   const renderRegionVisual = (object: SolarObject) => {
@@ -567,6 +580,20 @@ export default function SolarSystemMap({
         aria-disabled={decorMoon || isSun ? undefined : quizTarget ? undefined : true}
         tabIndex={decorMoon || isSun ? undefined : quizTarget ? 0 : -1}
         data-body-id={passive || isSun || !quizTarget ? undefined : object.id}
+        onPointerEnter={
+          passive || isSun
+            ? undefined
+            : () => {
+                setHoverId(object.id);
+              }
+        }
+        onPointerLeave={
+          passive || isSun
+            ? undefined
+            : () => {
+                setHoverId((current) => (current === object.id ? null : current));
+              }
+        }
         onClick={
           passive || isSun
             ? undefined

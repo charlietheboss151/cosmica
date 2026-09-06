@@ -169,6 +169,22 @@ describe("SolarSystemMap interaction", () => {
     ).toBe(true);
   });
 
+  it("brings a hovered moon in front of overlapping moons", () => {
+    const { container } = render(
+      <SolarSystemMap objects={catalog} mode="moons" onSelect={vi.fn()} />,
+    );
+    const io = container.querySelector('[aria-label="Io"]');
+    const europa = container.querySelector('[aria-label="Europa"]');
+    expect(io).not.toBeNull();
+    expect(europa).not.toBeNull();
+    fireEvent.pointerEnter(io!);
+    const ioAfter = container.querySelector('[aria-label="Io"]')!;
+    const europaAfter = container.querySelector('[aria-label="Europa"]')!;
+    expect(
+      europaAfter.compareDocumentPosition(ioAfter) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
   it("does not snap orbiting moons back to rest after a miss re-render", () => {
     const start = 2_000_000;
     vi.spyOn(Date, "now").mockReturnValue(start + 90_000);
