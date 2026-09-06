@@ -10,8 +10,8 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 BODIES = ROOT / "public" / "bodies"
 
-# Solar Orbiter uses cartoon art; its photo is a sun, not a cut-out probe.
-SKIP = {"solar-orbiter"}
+# These use cartoon art; their photos are a sun or a museum hall.
+SKIP = {"solar-orbiter", "hope"}
 
 
 def main() -> int:

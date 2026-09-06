@@ -153,7 +153,7 @@ describe("cartoon body art", () => {
   it("has photos for every spacecraft in the catalog", () => {
     expect(SPACECRAFT_ART_IDS.length).toBeGreaterThan(20);
     for (const id of SPACECRAFT_ART_IDS) {
-      if (id === "solar-orbiter") {
+      if (id === "solar-orbiter" || id === "hope") {
         expect(BODY_ART[id]).toBeUndefined();
         continue;
       }
@@ -180,6 +180,16 @@ describe("cartoon body art", () => {
     );
     expect(container.querySelector("image")).toBeNull();
     expect(container.querySelector('[data-testid="art-solar-orbiter"]')).not.toBeNull();
+  });
+
+  it("draws Hope as a probe, not a museum hall photo", () => {
+    const { container } = render(
+      <svg>
+        <BodyArt id="hope" radius={16} color="#f0c070" type="spacecraft" />
+      </svg>,
+    );
+    expect(container.querySelector("image")).toBeNull();
+    expect(container.querySelector('[data-testid="art-hope"]')).not.toBeNull();
   });
 
   it("draws spacecraft from photos, not planet stickers or cartoon probes", () => {

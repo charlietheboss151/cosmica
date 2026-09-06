@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.29.1] - 2026-09-06
+
+### Fixed
+
+- Galileo, New Horizons, and Psyche use clean spacecraft models instead of planet or starfield photos. Hope uses a drawn probe because the only public photo is a museum hall.
+
 ## [0.29.0] - 2026-09-06
 
 ### Changed

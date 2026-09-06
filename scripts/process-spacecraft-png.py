@@ -16,6 +16,9 @@ DARK_LUMA = 22
 SCENE_RATIO = 0.28
 MIN_OPAQUE = 8_000
 
+FORCE_REMBG: set[str] = set()
+PRE_CROP: dict[str, tuple[float, float, float, float]] = {}
+
 _session = None
 
 
@@ -75,6 +78,42 @@ def corners_look_white(im: Image.Image) -> bool:
     height, width = arr.shape[:2]
     samples = [arr[2, 2], arr[2, width - 3], arr[height - 3, 2], arr[height - 3, width - 3]]
     return all(int(p[0]) > 230 and int(p[1]) > 230 and int(p[2]) > 230 for p in samples)
+
+
+def knockout_edge_blue(im: Image.Image) -> Image.Image:
+    arr = np.array(im.convert("RGBA"))
+    height, width = arr.shape[:2]
+    seen = np.zeros((height, width), dtype=np.uint8)
+    queue: deque[tuple[int, int]] = deque()
+
+    def is_display(y: int, x: int) -> bool:
+        red, green, blue = (int(v) for v in arr[y, x][:3])
+        return blue > 90 and blue > red + 25 and blue > green + 10
+
+    def seed(y: int, x: int) -> None:
+        if is_display(y, x):
+            queue.append((y, x))
+
+    for x in range(width):
+        seed(0, x)
+        seed(height - 1, x)
+    for y in range(height):
+        seed(y, 0)
+        seed(y, width - 1)
+
+    while queue:
+        y, x = queue.popleft()
+        if seen[y, x]:
+            continue
+        if not is_display(y, x):
+            continue
+        seen[y, x] = 1
+        arr[y, x, 3] = 0
+        for dy, dx in ((0, 1), (0, -1), (1, 0), (-1, 0)):
+            ny, nx = y + dy, x + dx
+            if 0 <= ny < height and 0 <= nx < width and not seen[ny, nx]:
+                queue.append((ny, nx))
+    return Image.fromarray(arr)
 
 
 def knockout_dark_space(im: Image.Image, luma_max: int = DARK_LUMA) -> Image.Image:
@@ -217,7 +256,7 @@ def isolate_subject(im: Image.Image) -> Image.Image:
 
 def pick_cutout(im: Image.Image) -> Image.Image:
     if corners_look_white(im):
-        white = isolate_subject(knockout_near_white(im))
+        white = isolate_subject(knockout_edge_blue(knockout_near_white(im)))
         if opaque_count(white) >= MIN_OPAQUE:
             return white
     space = isolate_subject(knockout_dark_space(im))
@@ -235,8 +274,22 @@ def pick_cutout(im: Image.Image) -> Image.Image:
 
 
 def process_file(source: Path, dest: Path) -> None:
+    craft_id = dest.stem
     with Image.open(source) as image:
-        fit_in_square(pick_cutout(image)).save(dest)
+        frame = image.convert("RGBA")
+        box = PRE_CROP.get(craft_id)
+        if box:
+            width, height = frame.size
+            frame = frame.crop(
+                (
+                    int(width * box[0]),
+                    int(height * box[1]),
+                    int(width * box[2]),
+                    int(height * box[3]),
+                )
+            )
+        cut = isolate_subject(rembg_cutout(frame)) if craft_id in FORCE_REMBG else pick_cutout(frame)
+        fit_in_square(cut).save(dest)
 
 
 def main() -> int:

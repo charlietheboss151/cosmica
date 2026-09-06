@@ -93,16 +93,16 @@ Cartoon asteroid sprite: `asteroid-rock.png` from [OpenClipart #323535](https://
 | Juno | NASA PIA16869 |
 | JUICE | Juice launch kit cover close-up.png |
 | Europa Clipper | Europa Clipper spacecraft model.png |
-| Galileo | NASA PIA18176 |
+| Galileo | Galileo spacecraft model.png |
 | Cassini | NASA PIA04233 |
-| New Horizons | NASA’s New Horizons spacecraft (NH final).jpg |
+| New Horizons | New Horizons spacecraft model 2.png |
 | Voyager 1 | Voyager spacecraft.jpg |
 | Voyager 2 | Voyager spacecraft.jpg |
 | Pioneer 10 | Pioneer 10-11 spacecraft.jpg |
 | Pioneer 11 | Pioneer 10 or 11 in outer solar system.jpg |
 | Ulysses | Ulysses spacecraft model.png |
 | Lucy | Lucy spacecraft model.png |
-| Psyche | NASA PIA21499 |
+| Psyche | Psyche spacecraft model.png |
 
 Regenerate PNGs with:
 

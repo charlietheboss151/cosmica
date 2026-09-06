@@ -43,6 +43,9 @@ const SPACECRAFT_FILES = {
     "MAVEN spacecraft model.png",
   ],
   hope: [
+    "Hope spacecraft.png",
+    "Al-Amal spacecraft.png",
+    "Emirates Mars Mission spacecraft.png",
     "Emirates Mars Mission mockup at IAC 2021 01 (cropped).jpg",
     "Emirates Mars Mission mockup at IAC 2021 01.jpg",
   ],
@@ -62,8 +65,8 @@ const SPACECRAFT_FILES = {
     "The Clipper Spacecraft Above Europa - Ver 2-A (15585466881).jpg",
   ],
   "galileo-spacecraft": [
-    "Artwork Galileo-Io-Jupiter.JPG",
     "Galileo spacecraft model.png",
+    "Artwork Galileo-Io-Jupiter.JPG",
   ],
   cassini: [
     "Cassini Over Enceladus (29863511980).png",
@@ -71,9 +74,10 @@ const SPACECRAFT_FILES = {
     "Cassini spacecraft model.png",
   ],
   "new-horizons": [
+    "New Horizons spacecraft model 2.png",
+    "New Horizons spacecraft model 1.png",
     "NASA’s New Horizons spacecraft (NH final).jpg",
     "New Horizons Spacecraft (ann24023a).jpg",
-    "New Horizons spacecraft model 1.png",
   ],
   "voyager-1": ["Voyager spacecraft model.png", "Voyager spacecraft.jpg"],
   "voyager-2": ["Voyager spacecraft model.png", "Voyager spacecraft.jpg"],
@@ -89,8 +93,8 @@ const SPACECRAFT_FILES = {
   ulysses: ["Ulysses spacecraft model.png", "Ulysses spacecraft.jpg"],
   lucy: ["Lucy spacecraft model.png", "Lucy-PatroclusMenoetius-art.png"],
   "psyche-probe": [
-    "PIA21499 - Artist's Concept of Psyche Spacecraft with Five-Panel Array.jpg",
     "Psyche spacecraft model.png",
+    "PIA21499 - Artist's Concept of Psyche Spacecraft with Five-Panel Array.jpg",
   ],
 };
 
@@ -105,11 +109,7 @@ const NASA_URLS = {
   "mars-odyssey":
     "https://images-assets.nasa.gov/image/PIA04244/PIA04244~medium.jpg",
   juno: "https://images-assets.nasa.gov/image/PIA16869/PIA16869~medium.jpg",
-  "galileo-spacecraft":
-    "https://images-assets.nasa.gov/image/PIA18176/PIA18176~medium.jpg",
   cassini: "https://images-assets.nasa.gov/image/PIA04233/PIA04233~orig.jpg",
-  "psyche-probe":
-    "https://images-assets.nasa.gov/image/PIA21499/PIA21499~medium.jpg",
 };
 
 const NASA_FALLBACKS = {
