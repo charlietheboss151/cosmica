@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.27.2] - 2026-09-06
+
+### Changed
+- The Spacecraft mission picker uses the same emoji-sticker look as Earth, the Moon, and the comet.
+
 ## [0.27.1] - 2026-09-06
 
 ### Fixed
