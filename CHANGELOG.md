@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.28.1] - 2026-09-06
+
+### Fixed
+- Spacecraft mode packs the outer probes so Voyager still sits past Neptune without a huge empty map.
+
 ## [0.28.0] - 2026-09-06
 
 ### Added

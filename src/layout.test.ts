@@ -161,26 +161,38 @@ describe("compressed visual layout", () => {
   it("places Voyager 1 farther from the Sun than Neptune", () => {
     const neptune = catalog.find((object) => object.id === "neptune")!;
     const voyager = catalog.find((object) => object.id === "voyager-1")!;
-    const n = layoutObject(neptune, catalog, "proportional");
-    const v = layoutObject(voyager, catalog, "proportional");
+    const n = layoutObject(neptune, catalog, "spacecraft");
+    const v = layoutObject(voyager, catalog, "spacecraft");
     expect(Math.hypot(v.x, v.y)).toBeGreaterThan(Math.hypot(n.x, n.y));
   });
 
   it("places ISS around Earth instead of on a solar orbit", () => {
     const earth = catalog.find((object) => object.id === "earth")!;
     const iss = catalog.find((object) => object.id === "iss")!;
-    const e = layoutObject(earth, catalog, "proportional");
-    const s = layoutObject(iss, catalog, "proportional");
+    const e = layoutObject(earth, catalog, "spacecraft");
+    const s = layoutObject(iss, catalog, "spacecraft");
     const separation = Math.hypot(s.x - e.x, s.y - e.y);
     expect(separation).toBeGreaterThan(earth.displaySize);
     expect(separation).toBeLessThan(earth.displaySize + 80);
   });
 
-  it("frames Spacecraft mode out to Voyager 1", () => {
+  it("frames Spacecraft mode so Voyager 1 fits without a huge empty halo", () => {
     const voyager = catalog.find((object) => object.id === "voyager-1")!;
-    const fit = cameraFitRadius(catalog, "proportional", "spacecraft");
-    const at = layoutObject(voyager, catalog, "proportional");
+    const neptune = catalog.find((object) => object.id === "neptune")!;
+    const fit = cameraFitRadius(catalog, "spacecraft", "spacecraft");
+    const at = layoutObject(voyager, catalog, "spacecraft");
+    const n = layoutObject(neptune, catalog, "spacecraft");
     expect(fit).toBeGreaterThan(Math.hypot(at.x, at.y));
+    expect(fit).toBeLessThan(Math.hypot(n.x, n.y) * 2);
+  });
+
+  it("packs Voyager much closer than celestial AU spacing", () => {
+    const voyager = catalog.find((object) => object.id === "voyager-1")!;
+    const packed = layoutObject(voyager, catalog, "spacecraft");
+    const stretched = layoutObject(voyager, catalog, "proportional");
+    expect(Math.hypot(packed.x, packed.y) * 2).toBeLessThan(
+      Math.hypot(stretched.x, stretched.y),
+    );
   });
 });
 

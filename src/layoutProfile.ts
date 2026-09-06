@@ -1,9 +1,15 @@
 import type { GameMode } from "./catalog";
 
-export type LayoutProfile = "compact" | "proportional";
+export type LayoutProfile = "compact" | "proportional" | "spacecraft";
 
 export function layoutProfileForMode(mode: GameMode): LayoutProfile {
-  return mode === "celestial" || mode === "spacecraft" ? "proportional" : "compact";
+  if (mode === "celestial") {
+    return "proportional";
+  }
+  if (mode === "spacecraft") {
+    return "spacecraft";
+  }
+  return "compact";
 }
 
 /** Scales moon/local orbit radii to match tighter heliocentric spacing. */
@@ -16,6 +22,14 @@ const PROPORTIONAL_LOG_SCALE = 240;
 
 const COMPACT_BASE = 52;
 const COMPACT_AU_SCALE = 100;
+
+/** Compact through Saturn, then log so Voyager still sits past Neptune. */
+const SPACECRAFT_LINEAR_AU = 10;
+const SPACECRAFT_LOG_SCALE = 180;
+
+function compactOrbit(au: number): number {
+  return COMPACT_BASE + Math.pow(au, 0.5) * COMPACT_AU_SCALE;
+}
 
 export function visualOrbit(
   au: number,
@@ -32,7 +46,16 @@ export function visualOrbit(
       PROPORTIONAL_BASE + PROPORTIONAL_OUTER_AU * PROPORTIONAL_AU_SCALE;
     return innerEdge + Math.log10(au / PROPORTIONAL_OUTER_AU) * PROPORTIONAL_LOG_SCALE;
   }
-  return COMPACT_BASE + Math.pow(au, 0.5) * COMPACT_AU_SCALE;
+  if (profile === "spacecraft") {
+    if (au <= SPACECRAFT_LINEAR_AU) {
+      return compactOrbit(au);
+    }
+    return (
+      compactOrbit(SPACECRAFT_LINEAR_AU) +
+      Math.log10(au / SPACECRAFT_LINEAR_AU) * SPACECRAFT_LOG_SCALE
+    );
+  }
+  return compactOrbit(au);
 }
 
 export function visualLocalOrbit(localOrbit: number): number {
