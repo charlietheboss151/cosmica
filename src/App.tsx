@@ -195,7 +195,10 @@ function Menu({
 
   const quickPlay = () => {
     const mode = QUICK_MODES[Math.floor(Math.random() * QUICK_MODES.length)]!;
-    onPlay({ mode, hardMode: mode === "moons" });
+    onPlay({
+      mode,
+      hardMode: mode === "moons" || mode === "celestial",
+    });
   };
 
   return (
@@ -448,12 +451,12 @@ function CelestialSetup({
   onPlay: (config: PlayConfig) => void;
   onHome: () => void;
 }) {
-  const [hardMode, setHardMode] = useState(false);
   const [selected, setSelected] = useState<Set<CelestialKind>>(() => new Set());
+  const allBodies = { hardMode: true };
 
   const selectedIds = [...selected];
   const bodyCount = selectedIds.reduce(
-    (total, kind) => total + celestialOf(kind, { hardMode }).length,
+    (total, kind) => total + celestialOf(kind, allBodies).length,
     0,
   );
 
@@ -470,7 +473,11 @@ function CelestialSetup({
   };
 
   const playAll = () => {
-    onPlay({ mode: "celestial", hardMode, types: undefined });
+    onPlay({ mode: "celestial", hardMode: true, types: undefined });
+  };
+
+  const playCommon = () => {
+    onPlay({ mode: "celestial", hardMode: false, types: undefined });
   };
 
   const playSelected = () => {
@@ -479,7 +486,7 @@ function CelestialSetup({
     }
     const types =
       selectedIds.length < CELESTIAL_KINDS.length ? selectedIds : undefined;
-    onPlay({ mode: "celestial", hardMode, types });
+    onPlay({ mode: "celestial", hardMode: true, types });
   };
 
   return (
@@ -496,7 +503,7 @@ function CelestialSetup({
           </div>
           <img className="menu-logo menu-logo-small" src={LOGO_SRC} alt="" width={96} height={96} />
           <h2 className="menu-sub-title">Celestial bodies</h2>
-          <p className="menu-sub-lede">Play everything, pick a type, or mix a few.</p>
+          <p className="menu-sub-lede">Play everything, the common set, or pick a type.</p>
         </header>
         <section className="menu-sub-play" aria-label="Celestial bodies options">
           <button
@@ -511,8 +518,27 @@ function CelestialSetup({
             <span className="mode-card-copy">
               <span className="mode-card-label">All celestial bodies</span>
               <span className="mode-card-desc">
-                Dwarf planets, asteroids, comets, and regions
-                {hardMode ? " plus hard objects" : ""}
+                Every dwarf planet, asteroid, comet, and region, including Sedna,
+                Quaoar, and other hard objects
+              </span>
+            </span>
+            <span className="mode-card-arrow" aria-hidden="true">
+              →
+            </span>
+          </button>
+          <button
+            type="button"
+            className="mode-card"
+            aria-label="Common bodies"
+            onClick={playCommon}
+          >
+            <span className="mode-card-icon" aria-hidden="true">
+              🪐
+            </span>
+            <span className="mode-card-copy">
+              <span className="mode-card-label">Common bodies</span>
+              <span className="mode-card-desc">
+                Pluto, Ceres, Vesta, Halley&apos;s Comet, and other familiar objects
               </span>
             </span>
             <span className="mode-card-arrow" aria-hidden="true">
@@ -549,14 +575,6 @@ function CelestialSetup({
                 : `Play selected (${bodyCount} ${bodyCount === 1 ? "body" : "bodies"})`}
             </button>
           </div>
-          <button
-            type="button"
-            className={`mode-option-toggle${hardMode ? " mode-option-toggle-on" : ""}`}
-            aria-pressed={hardMode}
-            onClick={() => setHardMode((current) => !current)}
-          >
-            Include hard objects
-          </button>
         </section>
       </div>
     </main>

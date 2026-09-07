@@ -13,6 +13,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `npm run lint` fails when oxlint reports warnings.
 - The full Vitest suite uses a 15s timeout and fewer parallel workers so heavy map tests are less likely to flake under load.
 
+## [0.31.0] - 2026-09-06
+
+### Added
+
+- Celestial bodies setup has a **Common bodies** mode for the familiar set (Pluto, Ceres, Vesta, Halley, and others).
+
+### Changed
+
+- **All celestial bodies** always includes hard objects. Type mixes do too.
+
+### Removed
+
+- The Include hard objects toggle on Celestial bodies setup.
+
 ## [0.30.8] - 2026-09-06
 
 ### Fixed

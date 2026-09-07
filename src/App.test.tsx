@@ -90,10 +90,12 @@ describe("Cosmica prototype", { timeout: 20_000 }, () => {
     await user.click(screen.getByRole("button", { name: "Celestial bodies" }));
     expect(screen.getByRole("heading", { name: "Celestial bodies" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "All celestial bodies" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Common bodies" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Comets" })).toHaveAttribute(
       "aria-pressed",
       "false",
     );
+    expect(screen.queryByRole("button", { name: "Include hard objects" })).not.toBeInTheDocument();
     expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
   });
 
@@ -113,15 +115,32 @@ describe("Cosmica prototype", { timeout: 20_000 }, () => {
     );
   });
 
-  it("wires hard objects into a Celestial bodies round", async () => {
+  it("includes hard objects in All celestial bodies", async () => {
     const user = await openMenu();
     await user.click(screen.getByRole("button", { name: "Celestial bodies" }));
-    await user.click(screen.getByRole("button", { name: "Include hard objects" }));
     await user.click(screen.getByRole("button", { name: "All celestial bodies" }));
     const score = screen.getByTestId("score").textContent ?? "";
     const total = Number(score.split("/")[1]?.trim());
-    const base = playableInMode("celestial").length;
-    expect(total).toBeGreaterThan(base);
+    const common = playableInMode("celestial").length;
+    expect(total).toBeGreaterThan(common);
+    expect(total).toBe(playableInMode("celestial", { hardMode: true }).length);
+  });
+
+  it("starts Common bodies without hard-only objects", async () => {
+    const user = await openMenu();
+    await user.click(screen.getByRole("button", { name: "Celestial bodies" }));
+    await user.click(screen.getByRole("button", { name: "Common bodies" }));
+    const score = screen.getByTestId("score").textContent ?? "";
+    const total = Number(score.split("/")[1]?.trim());
+    expect(total).toBe(playableInMode("celestial").length);
+    expect(screen.getByRole("button", { name: "Pluto" })).not.toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+    expect(screen.getByRole("button", { name: "Sedna" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
   });
 
   it("opens a Moons setup screen from the menu", async () => {
