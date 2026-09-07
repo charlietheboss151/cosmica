@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- TypeScript compiles the app with `strict` and `noUncheckedIndexedAccess`.
+
 ## [0.30.3] - 2026-09-06
 
 ### Changed

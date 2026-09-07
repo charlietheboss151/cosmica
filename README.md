@@ -30,7 +30,7 @@ The **home page** shows the Cosmica logo, the tagline **Explore the Solar System
 
 ## How it is built
 
-Vite + React + TypeScript. Celestial bodies live in a data catalog so more objects can be added without rewriting the map.
+Vite + React + TypeScript (`strict` and `noUncheckedIndexedAccess`). Celestial bodies live in a data catalog so more objects can be added without rewriting the map.
 
 ```bash
 npm run dev      # local dev server

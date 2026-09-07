@@ -28,4 +28,10 @@ describe("repo hygiene", () => {
     expect(svg).not.toMatch(/#863bff/);
     expect(existsSync(path.join(root, "public/apple-touch-icon.png"))).toBe(true);
   });
+
+  it("compiles the app with full TypeScript strictness", () => {
+    const config = readFileSync(path.join(root, "tsconfig.app.json"), "utf8");
+    expect(config).toMatch(/"strict":\s*true/);
+    expect(config).toMatch(/"noUncheckedIndexedAccess":\s*true/);
+  });
 });
