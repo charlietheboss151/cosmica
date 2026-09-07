@@ -117,6 +117,8 @@ const PLAYABLE_MODES: {
   },
 ];
 
+const ALL_PLANET_MOONS = { hardMode: true };
+
 const CELESTIAL_KINDS: { id: CelestialKind; label: string }[] = [
   { id: "dwarf-planet", label: "Dwarf planets" },
   { id: "asteroid", label: "Asteroids" },
@@ -306,8 +308,8 @@ function MoonsSetup({
   onHome: () => void;
 }) {
   const [selected, setSelected] = useState<Set<string>>(() => new Set());
-  const allMoons = { hardMode: true };
-  const parentOptions = useMemo(() => parentsWithMoons(allMoons), []);
+  const allMoons = ALL_PLANET_MOONS;
+  const parentOptions = useMemo(() => parentsWithMoons(allMoons), [allMoons]);
 
   const selectedIds = [...selected];
   const moonCount = selectedIds.reduce(

@@ -200,6 +200,32 @@ export function easeInOutCubic(t: number): number {
   return k < 0.5 ? 4 * k * k * k : 1 - (-2 * k + 2) ** 3 / 2;
 }
 
+export function startCameraGlide(
+  from: Camera,
+  to: Camera,
+  onFrame: (camera: Camera) => void,
+  rafRef: { current: number | null },
+  now: () => number = () => performance.now(),
+): () => void {
+  const started = now();
+  const tick = (time: number) => {
+    const t = Math.min(1, (time - started) / CAMERA_GLIDE_MS);
+    onFrame(lerpCamera(from, to, easeInOutCubic(t)));
+    if (t < 1) {
+      rafRef.current = requestAnimationFrame(tick);
+      return;
+    }
+    rafRef.current = null;
+  };
+  rafRef.current = requestAnimationFrame(tick);
+  return () => {
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+  };
+}
+
 export function lerpCamera(from: Camera, to: Camera, t: number): Camera {
   const k = Math.min(1, Math.max(0, t));
   return {

@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - TypeScript compiles the app with `strict` and `noUncheckedIndexedAccess`.
+- `npm run lint` fails when oxlint reports warnings.
 
 ### Removed
 

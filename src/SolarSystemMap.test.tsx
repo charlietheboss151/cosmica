@@ -4,7 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { CAMERA_GLIDE_MS } from "./camera";
 import { catalog, MOONS_MODE_MIN_WORLD } from "./catalog";
 import { fitCameraOnMoonParent, layoutObject } from "./layout";
-import SolarSystemMap, { tryRingRadius } from "./SolarSystemMap";
+import SolarSystemMap from "./SolarSystemMap";
+import { tryRingRadius } from "./tryRing";
 
 describe("SolarSystemMap interaction", () => {
   beforeEach(() => {

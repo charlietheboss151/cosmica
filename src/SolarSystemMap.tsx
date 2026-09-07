@@ -9,14 +9,12 @@ import {
 import {
   cameraTransform,
   camerasNear,
-  CAMERA_GLIDE_MS,
   createCamera,
   createPanVelocity,
-  easeInOutCubic,
   fitCamera,
   isKeyboardPanKey,
   keyboardPanFrame,
-  lerpCamera,
+  startCameraGlide,
   panCamera,
   pinchDistance,
   screenPxToWorld,
@@ -59,26 +57,11 @@ import {
 } from "./layout";
 import type { TryMark } from "./game";
 import { syncOrbitDom } from "./orbitSync";
+import { tryRingRadius } from "./tryRing";
 
 const KEYBOARD_ZOOM_IN = 1.12;
 const KEYBOARD_ZOOM_OUT = 1 / 1.12;
 const PAN_START_PX = 8;
-const TRY_RING_GAP_PX = 6;
-
-/** Sticker art is larger than the layout radius; rings must sit outside it. */
-function artOverflowScale(id: string): number {
-  if (id === "saturn") {
-    return 2.2;
-  }
-  if (id === "sun") {
-    return 1.34;
-  }
-  return 1.16;
-}
-
-export function tryRingRadius(id: string, radius: number, zoom: number): number {
-  return radius * artOverflowScale(id) + screenPxToWorld(TRY_RING_GAP_PX, zoom);
-}
 
 function isPrimaryPointer(event: PointerEvent<SVGSVGElement>): boolean {
   return event.pointerType !== "mouse" || event.button === 0;
@@ -216,9 +199,7 @@ export default function SolarSystemMap({
   const panRaf = useRef<number | null>(null);
   const lastPanTs = useRef<number | null>(null);
   const reduceMotionRef = useRef(reduceMotion);
-  reduceMotionRef.current = reduceMotion;
   const cameraRef = useRef(camera);
-  cameraRef.current = camera;
   const fittedRef = useRef(false);
   const glideRaf = useRef<number | null>(null);
 
@@ -272,6 +253,14 @@ export default function SolarSystemMap({
       lastPanTs.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    reduceMotionRef.current = reduceMotion;
+  }, [reduceMotion]);
+
+  useEffect(() => {
+    cameraRef.current = camera;
+  }, [camera]);
 
   useEffect(() => {
     if (!orbiting || orbitStartMs === null) {
@@ -354,19 +343,7 @@ export default function SolarSystemMap({
         return;
       }
       stopGlide();
-      const from = cameraRef.current;
-      const started = performance.now();
-      const tick = (now: number) => {
-        const t = Math.min(1, (now - started) / CAMERA_GLIDE_MS);
-        setCamera(lerpCamera(from, target, easeInOutCubic(t)));
-        if (t < 1) {
-          glideRaf.current = requestAnimationFrame(tick);
-          return;
-        }
-        glideRaf.current = null;
-      };
-      glideRaf.current = requestAnimationFrame(tick);
-      return stopGlide;
+      return startCameraGlide(cameraRef.current, target, setCamera, glideRaf);
     }
 
     if (fittedRef.current) {

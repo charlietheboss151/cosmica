@@ -17,4 +17,11 @@ describe("CI workflow", () => {
     expect(yaml).toMatch(/ubuntu-latest/);
     expect(yaml).toMatch(/node-version:\s*["']?22/);
   });
+
+  it("fails lint when oxlint reports warnings", () => {
+    const pkg = JSON.parse(readFileSync(path.join(root, "package.json"), "utf8")) as {
+      scripts: { lint: string };
+    };
+    expect(pkg.scripts.lint).toMatch(/--deny-warnings/);
+  });
 });

@@ -37,7 +37,7 @@ npm run dev      # local dev server
 npm test         # Vitest
 npm run build    # typecheck and write production files to dist/
 npm run preview  # serve the dist/ build locally
-npm run lint     # oxlint
+npm run lint     # oxlint (fails on warnings)
 npm run deploy   # publish to charlietheboss.com/cosmica/ (see deploy/README.md)
 ```
 
