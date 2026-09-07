@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `npm run lint` fails when oxlint reports warnings.
 - The full Vitest suite uses a 15s timeout and fewer parallel workers so heavy map tests are less likely to flake under load.
 
+## [0.32.1] - 2026-09-06
+
+### Changed
+
+- A wrong click stays ringed in red until the next body, so you can see which objects you already tried.
+
 ## [0.32.0] - 2026-09-06
 
 ### Added

@@ -259,8 +259,8 @@ describe("Cosmica prototype", { timeout: 20_000 }, () => {
     const decoy = target === "Venus" ? "Mars" : "Venus";
     await user.click(screen.getByRole("button", { name: decoy }));
     expect(screen.getByTestId("feedback")).toHaveTextContent(decoy);
-    expect(document.querySelector(".try-ring-flash")).not.toBeNull();
-    expect(document.querySelector(".try-ring-red")).toBeNull();
+    expect(document.querySelector(".try-ring-red")).not.toBeNull();
+    expect(document.querySelector(".try-ring-flash")).toBeNull();
     expect(screen.getByRole("button", { name: decoy })).toHaveAttribute(
       "aria-disabled",
       "true",
@@ -319,6 +319,7 @@ describe("Cosmica prototype", { timeout: 20_000 }, () => {
       vi.advanceTimersByTime(FEEDBACK_CLEAR_MS);
     });
     expect(screen.queryByTestId("feedback")).not.toBeInTheDocument();
+    expect(document.querySelector(".try-ring-red")).not.toBeNull();
   });
 
   it("starts All planet moons with obscure moons in play", async () => {

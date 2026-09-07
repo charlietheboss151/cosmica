@@ -198,7 +198,7 @@ describe("Seterra-style quiz", () => {
     expect(MAX_GUESSES_PER_BODY).toBe(3);
   });
 
-  it("flashes the wrong body without leaving a red ring", () => {
+  it("keeps a wrong body marked so it stays red until the next prompt", () => {
     const quiz = startQuiz("planets", alwaysFirst, 0);
     const target = quiz.currentId!;
     const wrong = target === "venus" ? "mars" : "venus";
@@ -207,6 +207,9 @@ describe("Seterra-style quiz", () => {
     expect(after.marks[wrong]).toBeUndefined();
     expect(after.marks[target]).toBeUndefined();
     expect(after.missedIds).toEqual([wrong]);
+    const next = applyClick(after, target, 2);
+    expect(next.missedIds).toEqual([]);
+    expect(next.marks[wrong]).toBeUndefined();
   });
 
   it("ignores a second click on the same wrong body", () => {

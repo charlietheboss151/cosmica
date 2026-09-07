@@ -427,7 +427,7 @@ export default function SolarSystemMap({
       return (
         <g
           key={`${object.id}-visual`}
-          className={`body-region-visual ${shownLit ? "body-lit" : "body-dim"}`}
+          className={`body-region-visual ${shownLit ? "body-lit" : "body-dim"}${missedIds.includes(object.id) ? " body-missed" : ""}`}
           aria-hidden="true"
         >
           <AsteroidBeltArt inner={inner} outer={outer} label={object.name} />
@@ -443,7 +443,7 @@ export default function SolarSystemMap({
     return (
       <g
         key={`${object.id}-visual`}
-        className={`body-region-visual ${shownLit ? "body-lit" : "body-dim"}`}
+        className={`body-region-visual ${shownLit ? "body-lit" : "body-dim"}${missedIds.includes(object.id) ? " body-missed" : ""}`}
         aria-hidden="true"
       >
         <circle
@@ -608,8 +608,14 @@ export default function SolarSystemMap({
             r={tryRingRadius(object.id, radius, camera.zoom)}
             fill="none"
           />
+        ) : missedIds.includes(object.id) ? (
+          <circle
+            className="try-ring try-ring-red"
+            r={tryRingRadius(object.id, radius, camera.zoom)}
+            fill="none"
+          />
         ) : null}
-        {flashId === object.id ? (
+        {flashId === object.id && !missedIds.includes(object.id) ? (
           <circle
             className="try-ring try-ring-flash"
             r={tryRingRadius(object.id, radius, camera.zoom)}

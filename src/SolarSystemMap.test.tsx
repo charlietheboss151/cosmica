@@ -148,6 +148,20 @@ describe("SolarSystemMap interaction", { timeout: 20_000 }, () => {
     expect(tryRingRadius("saturn", radius, 8)).toBeGreaterThan(radius * 2.16);
   });
 
+  it("paints a red ring on a wrong guess for the current body", () => {
+    const { container } = render(
+      <SolarSystemMap
+        objects={catalog}
+        mode="planets"
+        missedIds={["mars"]}
+        onSelect={vi.fn()}
+      />,
+    );
+    const mars = container.querySelector('[aria-label="Mars"]');
+    expect(mars?.querySelector(".try-ring-red")).not.toBeNull();
+    expect(container.querySelector('[aria-label="Earth"]')?.querySelector(".try-ring-red")).toBeNull();
+  });
+
   it("paints a found try ring above the body art", () => {
     const { container } = render(
       <SolarSystemMap
