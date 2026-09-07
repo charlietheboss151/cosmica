@@ -55,7 +55,7 @@ const MODE_STICKERS: Record<GameMode, string> = {
   planets: publicUrl("bodies/earth.png"),
   moons: publicUrl("bodies/moon-sticker.png"),
   celestial: publicUrl("bodies/comet-sticker.png"),
-  spacecraft: publicUrl("bodies/spacecraft-sticker.svg"),
+  spacecraft: publicUrl("bodies/spacecraft-sticker.png"),
 };
 
 function ModeBodyArt({ mode }: { mode: GameMode }) {

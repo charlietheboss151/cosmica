@@ -53,7 +53,7 @@ describe("Cosmica prototype", () => {
     ).toHaveAttribute("src", publicUrl("bodies/comet-sticker.png"));
     expect(screen.getByRole("button", { name: "Spacecraft" }).querySelector("img")).toHaveAttribute(
       "src",
-      publicUrl("bodies/spacecraft-sticker.svg"),
+      publicUrl("bodies/spacecraft-sticker.png"),
     );
     expect(screen.queryByRole("button", { name: /Spacecraft, coming soon/i })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Who am I\?, coming soon/i })).toBeDisabled();

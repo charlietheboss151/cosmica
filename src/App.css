@@ -406,6 +406,7 @@ h1 {
 .mode-body-spacecraft .mode-body-art {
   animation-duration: 5.8s;
   animation-delay: -0.8s;
+  object-fit: contain;
 }
 
 .mode-body:hover .mode-body-art,

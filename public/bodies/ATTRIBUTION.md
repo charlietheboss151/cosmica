@@ -1,6 +1,6 @@
 # Body art sources
 
-Planet sticker art is original to Cosmica. Moon, celestial-body, and spacecraft photos are public-domain NASA / ESA / JPL mission images (and a few museum or agency models) fetched from Wikimedia Commons and the NASA image library.
+Planet sticker art is original to Cosmica. The Spacecraft mode badge is original Cosmica art. Moon, celestial-body, and spacecraft photos are public-domain NASA / ESA / JPL mission images (and a few museum or agency models) fetched from Wikimedia Commons and the NASA image library.
 
 | Moon | Wikimedia file |
 | --- | --- |
