@@ -119,7 +119,6 @@ describe("SolarSystemMap interaction", () => {
       <SolarSystemMap
         objects={catalog}
         mode="moons"
-        focusId="europa"
         onSelect={onSelect}
       />,
     );
@@ -193,7 +192,6 @@ describe("SolarSystemMap interaction", () => {
       <SolarSystemMap
         objects={catalog}
         mode="moons"
-        focusId="europa"
         orbitStartMs={start}
         onSelect={onSelect}
       />,
@@ -211,7 +209,6 @@ describe("SolarSystemMap interaction", () => {
       <SolarSystemMap
         objects={catalog}
         mode="moons"
-        focusId="europa"
         flashId="io"
         orbitStartMs={start}
         onSelect={onSelect}
@@ -227,7 +224,6 @@ describe("SolarSystemMap interaction", () => {
       <SolarSystemMap
         objects={catalog}
         mode="moons"
-        focusId="europa"
         onSelect={onSelect}
       />,
     );
@@ -237,7 +233,6 @@ describe("SolarSystemMap interaction", () => {
       <SolarSystemMap
         objects={catalog}
         mode="moons"
-        focusId="europa"
         flashId="io"
         onSelect={onSelect}
       />,
@@ -248,7 +243,6 @@ describe("SolarSystemMap interaction", () => {
       <SolarSystemMap
         objects={catalog}
         mode="moons"
-        focusId="io"
         onSelect={onSelect}
       />,
     );
@@ -261,7 +255,6 @@ describe("SolarSystemMap interaction", () => {
       <SolarSystemMap
         objects={catalog}
         mode="moons"
-        focusId="europa"
         onSelect={onSelect}
       />,
     );
@@ -283,7 +276,6 @@ describe("SolarSystemMap interaction", () => {
       <SolarSystemMap
         objects={catalog}
         mode="moons"
-        focusId="europa"
         onSelect={onSelect}
       />,
     );
@@ -293,7 +285,6 @@ describe("SolarSystemMap interaction", () => {
       <SolarSystemMap
         objects={catalog}
         mode="moons"
-        focusId="titan"
         onSelect={onSelect}
       />,
     );
@@ -314,7 +305,6 @@ describe("SolarSystemMap interaction", () => {
       <SolarSystemMap
         objects={catalog}
         mode="moons"
-        focusId="europa"
         onSelect={onSelect}
       />,
     );
@@ -335,7 +325,6 @@ describe("SolarSystemMap interaction", () => {
       <SolarSystemMap
         objects={catalog}
         mode="moons"
-        focusId="titan"
         revealId="europa"
         onSelect={onSelect}
       />,
@@ -363,7 +352,6 @@ describe("SolarSystemMap interaction", () => {
       <SolarSystemMap
         objects={catalog}
         mode="moons"
-        focusId="titan"
         onSelect={onSelect}
       />,
     );

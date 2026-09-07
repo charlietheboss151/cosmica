@@ -172,8 +172,6 @@ type Props = {
   flashId?: string | null;
   orbitStartMs?: number | null;
   orbitFreezeMs?: number | null;
-  /** Kept for callers; Moons camera only follows revealId. */
-  focusId?: string | null;
   /** Missed moon to glide toward so the player can see where it was. */
   revealId?: string | null;
   onSelect: (id: string) => void;
