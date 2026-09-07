@@ -1780,12 +1780,33 @@ h1 {
   z-index: 1;
 }
 
+.play-stage {
+  position: absolute;
+  inset: 0;
+}
+
+.play-stage-inert {
+  pointer-events: none;
+}
+
+.results-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.results-scrim {
+  position: absolute;
+  inset: 0;
+  background: #05070d99;
+}
+
 .results {
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  z-index: 2;
+  z-index: 3;
   width: min(400px, calc(100% - 32px));
   padding: 28px 24px;
   border-radius: 16px;

@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `npm run lint` fails when oxlint reports warnings.
 - The full Vitest suite uses a 15s timeout and fewer parallel workers so heavy map tests are less likely to flake under load.
 
+## [0.30.8] - 2026-09-06
+
+### Fixed
+
+- The results screen is a real modal: the map and HUD behind it are inert, and Escape returns to the menu.
+
 ## [0.30.7] - 2026-09-06
 
 ### Changed

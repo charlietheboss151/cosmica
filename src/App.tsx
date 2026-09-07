@@ -793,6 +793,11 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
     ];
     focusable[0]?.focus();
     const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onMenu();
+        return;
+      }
       if (event.key !== "Tab" || focusable.length === 0) {
         return;
       }
@@ -806,12 +811,13 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
         first.focus();
       }
     };
-    root.addEventListener("keydown", onKeyDown);
-    return () => root.removeEventListener("keydown", onKeyDown);
-  }, [done]);
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [done, onMenu]);
 
   return (
     <div className="play">
+      <div className={`play-stage${done ? " play-stage-inert" : ""}`} inert={done || undefined}>
       <div className="starfield" aria-hidden="true" />
       <SolarSystemMap
         objects={objects}
@@ -865,7 +871,13 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
               : objectById(quiz.wrongFlashId ?? "")?.name ?? "Wrong"}
         </p>
       ) : null}
+      <p className="hint">
+        3 guesses per body · tap the named body · pinch or drag to look around
+      </p>
+      </div>
       {done ? (
+        <div className="results-layer">
+        <div className="results-scrim" aria-hidden="true" />
         <div
           className="results"
           role="dialog"
@@ -920,10 +932,8 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
             </button>
           </div>
         </div>
+        </div>
       ) : null}
-      <p className="hint">
-        3 guesses per body · tap the named body · pinch or drag to look around
-      </p>
     </div>
   );
 }

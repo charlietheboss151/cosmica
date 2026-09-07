@@ -351,6 +351,23 @@ describe("Cosmica prototype", { timeout: 20_000 }, () => {
     expect(screen.getByTestId("find-prompt").textContent).toMatch(/^Click on /);
   });
 
+  it("keeps results in a real modal: inert map and Escape back to the menu", async () => {
+    const user = await openMenu();
+    await user.click(screen.getByRole("button", { name: "Planets" }));
+    for (let placed = 0; placed < 8; placed += 1) {
+      const prompt = screen.getByTestId("find-prompt").textContent ?? "";
+      const name = prompt.replace("Click on ", "");
+      await user.click(screen.getByRole("button", { name }));
+    }
+    const dialog = screen.getByRole("dialog", { name: "Round complete" });
+    expect(document.querySelector(".play-stage")).toHaveAttribute("inert");
+    expect(document.querySelector(".map-svg")?.closest("[inert]")).not.toBeNull();
+    expect(dialog.contains(document.activeElement)).toBe(true);
+    await user.keyboard("{Escape}");
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "What will you explore?" })).toBeInTheDocument();
+  });
+
   it("counts every wrong click as Incorrect, not only full misses", async () => {
     const user = await openMenu();
     await user.click(screen.getByRole("button", { name: "Planets" }));
