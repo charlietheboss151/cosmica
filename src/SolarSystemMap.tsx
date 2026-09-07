@@ -157,6 +157,8 @@ type Props = {
   orbitFreezeMs?: number | null;
   /** Missed moon to glide toward so the player can see where it was. */
   revealId?: string | null;
+  /** Only this quiz body is a Tab stop; other lit bodies stay clickable. */
+  currentId?: string | null;
   onSelect: (id: string) => void;
 };
 
@@ -174,6 +176,7 @@ export default function SolarSystemMap({
   orbitStartMs = null,
   orbitFreezeMs = null,
   revealId = null,
+  currentId = null,
   onSelect,
 }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -485,7 +488,7 @@ export default function SolarSystemMap({
         className={`body body-region body-region-hit ${shownLit ? "body-lit" : "body-dim"}`}
         role="button"
         aria-label={object.name}
-        tabIndex={0}
+        tabIndex={object.id === currentId ? 0 : -1}
         data-body-id={object.id}
         onClick={() => {
           if (!ignoreSelect.current) {
@@ -538,7 +541,9 @@ export default function SolarSystemMap({
         aria-label={decorMoon ? undefined : object.name}
         aria-hidden={decorMoon ? true : undefined}
         aria-disabled={decorMoon || isSun ? undefined : quizTarget ? undefined : true}
-        tabIndex={decorMoon || isSun ? undefined : quizTarget ? 0 : -1}
+        tabIndex={
+          decorMoon || isSun ? undefined : quizTarget && object.id === currentId ? 0 : -1
+        }
         data-body-id={passive || isSun || !quizTarget ? undefined : object.id}
         onPointerEnter={
           passive || isSun

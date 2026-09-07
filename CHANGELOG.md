@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - TypeScript compiles the app with `strict` and `noUncheckedIndexedAccess`.
 - `npm run lint` fails when oxlint reports warnings.
 
+## [0.30.4] - 2026-09-06
+
+### Changed
+
+- Tab only stops on the body the prompt asks for, plus the HUD and map. Large Moons, Celestial, and Spacecraft rounds no longer take dozens of Tab presses.
+
 ### Removed
 
 - Unused `focusId` prop on the map. Moons camera already follows `revealId` after a miss.

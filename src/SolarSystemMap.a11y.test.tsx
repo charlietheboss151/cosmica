@@ -39,6 +39,24 @@ describe("SolarSystemMap accessibility", () => {
     });
   }
 
+  it("puts only the current quiz body in the Tab order", () => {
+    const { container } = render(
+      <SolarSystemMap
+        objects={catalog}
+        mode="planets"
+        currentId="earth"
+        onSelect={vi.fn()}
+      />,
+    );
+    const earth = container.querySelector('[aria-label="Earth"]');
+    const mars = container.querySelector('[aria-label="Mars"]');
+    const mercury = container.querySelector('[aria-label="Mercury"]');
+    expect(earth).toHaveAttribute("tabindex", "0");
+    expect(mars).toHaveAttribute("tabindex", "-1");
+    expect(mercury).toHaveAttribute("tabindex", "-1");
+    expect(container.querySelectorAll('[role="button"][tabindex="0"]')).toHaveLength(1);
+  });
+
   it("lets arrow keys pan and plus/minus zoom when the map is focused", () => {
     const { container } = render(
       <SolarSystemMap objects={catalog} mode="planets" onSelect={vi.fn()} />,

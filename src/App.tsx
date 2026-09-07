@@ -815,6 +815,7 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
             ? quiz.lastResolvedId
             : null
         }
+        currentId={quiz.currentId}
         onSelect={choose}
       />
       <header className="hud">
