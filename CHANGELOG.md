@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - TypeScript compiles the app with `strict` and `noUncheckedIndexedAccess`.
 - `npm run lint` fails when oxlint reports warnings.
 
+## [0.30.6] - 2026-09-06
+
+### Fixed
+
+- The HUD clock no longer re-renders the solar system map five times a second.
+
 ## [0.30.5] - 2026-09-06
 
 ### Changed

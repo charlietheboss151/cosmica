@@ -676,6 +676,24 @@ function SpacecraftSetup({
   );
 }
 
+function HudTimer({
+  startedAt,
+  finishedAt,
+}: {
+  startedAt: number;
+  finishedAt: number | null;
+}) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (finishedAt !== null) {
+      return;
+    }
+    const tick = window.setInterval(() => setNow(Date.now()), 200);
+    return () => window.clearInterval(tick);
+  }, [finishedAt]);
+  return <p data-testid="timer">{formatElapsed((finishedAt ?? now) - startedAt)}</p>;
+}
+
 function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
   const { mode, hardMode, parentIds, types, spacecraftGroups } = config;
   const [objects, setObjects] = useState(() =>
@@ -689,7 +707,6 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
       spacecraftGroups,
     }),
   );
-  const [now, setNow] = useState(() => Date.now());
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const recorded = useRef(false);
@@ -732,20 +749,12 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
     return () => window.clearTimeout(timer);
   }, [quiz.lastResult]);
 
-  useEffect(() => {
-    if (quiz.finishedAt !== null) {
-      return;
-    }
-    const tick = window.setInterval(() => setNow(Date.now()), 200);
-    return () => window.clearInterval(tick);
-  }, [quiz.finishedAt]);
-
   const choose = (id: string) => {
     setQuiz((current) => applyClick(current, id));
   };
 
-  const elapsedMs = (quiz.finishedAt ?? now) - quiz.startedAt;
   const done = quiz.finishedAt !== null;
+  const elapsedMs = done ? (quiz.finishedAt ?? quiz.startedAt) - quiz.startedAt : 0;
 
   useEffect(() => {
     if (!done || recorded.current) {
@@ -762,7 +771,7 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
         fullSet: parentIds === undefined && spacecraftGroups === undefined,
       }),
     );
-  }, [done, elapsedMs, mode, parentIds, types, spacecraftGroups, quiz.foundIds, quiz.marks, quiz.score, quiz.correct, quiz.incorrect]);
+  }, [done, mode, parentIds, types, spacecraftGroups, quiz.foundIds, quiz.marks, quiz.score, quiz.correct, quiz.incorrect]);
 
   useEffect(() => {
     if (!done) {
@@ -829,7 +838,7 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
           <p data-testid="score" aria-live="polite">
             {formatScoreLine(quiz.score, quiz.total)}
           </p>
-          <p data-testid="timer">{formatElapsed(elapsedMs)}</p>
+          <HudTimer startedAt={quiz.startedAt} finishedAt={quiz.finishedAt} />
           <p data-testid="guesses-left">
             {MAX_GUESSES_PER_BODY - quiz.triesOnCurrent} left
           </p>
