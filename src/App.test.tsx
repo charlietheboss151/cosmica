@@ -42,7 +42,7 @@ describe("Cosmica prototype", { timeout: 20_000 }, () => {
     expect(screen.getByRole("button", { name: "Planets" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Planets" }).querySelector("img")).toHaveAttribute(
       "src",
-      publicUrl("bodies/earth.png"),
+      publicUrl("bodies/earth-sticker.png"),
     );
     expect(screen.getByRole("button", { name: "Moons" }).querySelector("img")).toHaveAttribute(
       "src",

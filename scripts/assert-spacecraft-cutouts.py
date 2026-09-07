@@ -12,6 +12,8 @@ BODIES = ROOT / "public" / "bodies"
 
 SKIP: set[str] = set()
 
+MODE_STICKERS = ("earth-sticker", "moon-sticker", "comet-sticker", "spacecraft-sticker")
+
 
 def main() -> int:
     ids = [
@@ -66,6 +68,19 @@ def main() -> int:
         print("\n".join(failed), file=sys.stderr)
         return 1
     print(f"checked {len(ids) - len(SKIP)} spacecraft cutouts")
+    for stem in MODE_STICKERS:
+        image = Image.open(BODIES / f"{stem}.png").convert("RGBA")
+        width, height = image.size
+        corners = [
+            image.getpixel((2, 2))[3],
+            image.getpixel((width - 3, 2))[3],
+            image.getpixel((2, height - 3))[3],
+            image.getpixel((width - 3, height - 3))[3],
+        ]
+        if any(alpha > 16 for alpha in corners):
+            print(f"{stem}: opaque corners {corners}", file=sys.stderr)
+            return 1
+    print(f"checked {len(MODE_STICKERS)} mode stickers")
     return 0
 
 

@@ -53,7 +53,7 @@ const MODE_ICONS: Record<GameMode, string> = {
 };
 
 const MODE_STICKERS: Record<GameMode, string> = {
-  planets: publicUrl("bodies/earth.png"),
+  planets: publicUrl("bodies/earth-sticker.png"),
   moons: publicUrl("bodies/moon-sticker.png"),
   celestial: publicUrl("bodies/comet-sticker.png"),
   spacecraft: publicUrl("bodies/spacecraft-sticker.png"),
