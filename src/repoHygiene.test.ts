@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
@@ -18,5 +18,14 @@ describe("repo hygiene", () => {
     for (const relative of absent) {
       expect(existsSync(path.join(root, relative)), relative).toBe(false);
     }
+  });
+
+  it("uses a dedicated favicon instead of the full Cosmica logo", () => {
+    const html = readFileSync(path.join(root, "index.html"), "utf8");
+    expect(html).toMatch(/rel="icon"[^>]+href="\/favicon\.svg"/);
+    expect(html).not.toMatch(/rel="icon"[^>]+cosmica-logo\.png/);
+    const svg = readFileSync(path.join(root, "public/favicon.svg"), "utf8");
+    expect(svg).not.toMatch(/#863bff/);
+    expect(existsSync(path.join(root, "public/apple-touch-icon.png"))).toBe(true);
   });
 });

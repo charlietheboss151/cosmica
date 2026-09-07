@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.30.3] - 2026-09-06
+
+### Changed
+
+- The browser tab uses a small solar-system mark instead of a shrunk Cosmica logo. The unused Vite lightning favicon is gone.
+
 ## [0.30.2] - 2026-09-06
 
 ### Fixed
