@@ -424,6 +424,7 @@ describe("Cosmica prototype", { timeout: 20_000 }, () => {
     await user.click(screen.getByRole("button", { name: "Spacecraft" }));
     expect(screen.getByRole("heading", { name: "Spacecraft" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "All spacecraft" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Common spacecraft" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Outer & interstellar" })).toHaveAttribute(
       "aria-pressed",
       "false",
@@ -442,6 +443,24 @@ describe("Cosmica prototype", { timeout: 20_000 }, () => {
       "true",
     );
     expect(screen.getByRole("button", { name: "Pioneer 10" })).toBeEnabled();
+  });
+
+  it("starts Common spacecraft without historic missions", async () => {
+    const user = await openMenu();
+    await user.click(screen.getByRole("button", { name: "Spacecraft" }));
+    await user.click(screen.getByRole("button", { name: "Common spacecraft" }));
+    const score = screen.getByTestId("score").textContent ?? "";
+    const total = Number(score.split("/")[1]?.trim());
+    expect(total).toBe(playableInMode("spacecraft").length);
+    expect(total).toBeLessThan(playableInMode("spacecraft", { hardMode: true }).length);
+    expect(screen.getByRole("button", { name: "Voyager 1" })).not.toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+    expect(screen.getByRole("button", { name: "Pioneer 10" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
   });
 
   it("lets players quiz only outer spacecraft", async () => {

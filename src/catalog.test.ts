@@ -255,7 +255,8 @@ describe("solar system catalog", () => {
     expect(isLitInMode(voyager, "spacecraft")).toBe(true);
     expect(isLitInMode(iss, "spacecraft")).toBe(true);
     expect(isLitInMode(earth, "spacecraft")).toBe(false);
-    expect(isLitInMode(pioneer, "spacecraft")).toBe(true);
+    expect(isLitInMode(pioneer, "spacecraft")).toBe(false);
+    expect(isLitInMode(pioneer, "spacecraft", { hardMode: true })).toBe(true);
     expect(playableInMode("spacecraft").every((object) => object.type === "spacecraft")).toBe(
       true,
     );

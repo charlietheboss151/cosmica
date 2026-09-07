@@ -197,7 +197,7 @@ function Menu({
     const mode = QUICK_MODES[Math.floor(Math.random() * QUICK_MODES.length)]!;
     onPlay({
       mode,
-      hardMode: mode === "moons" || mode === "celestial",
+      hardMode: mode === "moons" || mode === "celestial" || mode === "spacecraft",
     });
   };
 
@@ -591,10 +591,11 @@ function SpacecraftSetup({
   onHome: () => void;
 }) {
   const [selected, setSelected] = useState<Set<SpacecraftGroup>>(() => new Set());
+  const allCraft = { hardMode: true };
 
   const selectedIds = [...selected];
   const craftCount = selectedIds.reduce(
-    (total, group) => total + spacecraftOf(group).length,
+    (total, group) => total + spacecraftOf(group, allCraft).length,
     0,
   );
 
@@ -611,6 +612,10 @@ function SpacecraftSetup({
   };
 
   const playAll = () => {
+    onPlay({ mode: "spacecraft", hardMode: true, spacecraftGroups: undefined });
+  };
+
+  const playCommon = () => {
     onPlay({ mode: "spacecraft", hardMode: false, spacecraftGroups: undefined });
   };
 
@@ -620,7 +625,7 @@ function SpacecraftSetup({
     }
     const spacecraftGroups =
       selectedIds.length < SPACECRAFT_GROUPS.length ? selectedIds : undefined;
-    onPlay({ mode: "spacecraft", hardMode: false, spacecraftGroups });
+    onPlay({ mode: "spacecraft", hardMode: true, spacecraftGroups });
   };
 
   return (
@@ -637,7 +642,7 @@ function SpacecraftSetup({
           </div>
           <img className="menu-logo menu-logo-small" src={LOGO_SRC} alt="" width={96} height={96} />
           <h2 className="menu-sub-title">Spacecraft</h2>
-          <p className="menu-sub-lede">Play everything, pick a destination, or mix a few.</p>
+          <p className="menu-sub-lede">Play everything, the common set, or pick a destination.</p>
         </header>
         <section className="menu-sub-play" aria-label="Spacecraft options">
           <button
@@ -652,7 +657,27 @@ function SpacecraftSetup({
             <span className="mode-card-copy">
               <span className="mode-card-label">All spacecraft</span>
               <span className="mode-card-desc">
-                Probes from the Sun to Voyager 1
+                Every probe from the Sun to Voyager 1, including Pioneer, Cassini,
+                Galileo, and other historic missions
+              </span>
+            </span>
+            <span className="mode-card-arrow" aria-hidden="true">
+              →
+            </span>
+          </button>
+          <button
+            type="button"
+            className="mode-card"
+            aria-label="Common spacecraft"
+            onClick={playCommon}
+          >
+            <span className="mode-card-icon" aria-hidden="true">
+              🚀
+            </span>
+            <span className="mode-card-copy">
+              <span className="mode-card-label">Common spacecraft</span>
+              <span className="mode-card-desc">
+                ISS, Hubble, Voyager, and other familiar probes
               </span>
             </span>
             <span className="mode-card-arrow" aria-hidden="true">

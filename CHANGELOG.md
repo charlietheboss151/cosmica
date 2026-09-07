@@ -13,6 +13,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `npm run lint` fails when oxlint reports warnings.
 - The full Vitest suite uses a 15s timeout and fewer parallel workers so heavy map tests are less likely to flake under load.
 
+## [0.32.0] - 2026-09-06
+
+### Added
+
+- Spacecraft setup has a **Common spacecraft** mode for the familiar set (ISS, Hubble, Voyager, and others).
+
+### Changed
+
+- **All spacecraft** and destination mixes always include historic missions. Common spacecraft no longer locks BEST.
+
 ## [0.31.0] - 2026-09-06
 
 ### Added

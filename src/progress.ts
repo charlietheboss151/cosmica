@@ -125,7 +125,7 @@ export function isFullSetRound(options: {
   if (options.parentIds !== undefined || options.types !== undefined || options.spacecraftGroups !== undefined) {
     return false;
   }
-  if (options.mode === "moons" || options.mode === "celestial") {
+  if (options.mode === "moons" || options.mode === "celestial" || options.mode === "spacecraft") {
     return options.hardMode;
   }
   return true;

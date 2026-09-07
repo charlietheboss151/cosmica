@@ -69,11 +69,12 @@ describe("player progress", () => {
 
   it("counts only the largest catalog as a full-set BEST", () => {
     expect(isFullSetRound({ mode: "planets", hardMode: false })).toBe(true);
-    expect(isFullSetRound({ mode: "spacecraft", hardMode: false })).toBe(true);
+    expect(isFullSetRound({ mode: "spacecraft", hardMode: true })).toBe(true);
     expect(isFullSetRound({ mode: "moons", hardMode: true })).toBe(true);
     expect(isFullSetRound({ mode: "celestial", hardMode: true })).toBe(true);
     expect(isFullSetRound({ mode: "moons", hardMode: false })).toBe(false);
     expect(isFullSetRound({ mode: "celestial", hardMode: false })).toBe(false);
+    expect(isFullSetRound({ mode: "spacecraft", hardMode: false })).toBe(false);
     expect(
       isFullSetRound({ mode: "moons", hardMode: true, parentIds: ["jupiter"] }),
     ).toBe(false);
