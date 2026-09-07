@@ -874,7 +874,11 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
             </li>
             <li>
               <span>Incorrect</span>
-              <strong data-testid="results-incorrect">{quiz.incorrect}</strong>
+              <strong data-testid="results-incorrect">{quiz.mistakes}</strong>
+            </li>
+            <li>
+              <span>Missed</span>
+              <strong data-testid="results-missed">{quiz.incorrect}</strong>
             </li>
             <li>
               <span>Accuracy</span>

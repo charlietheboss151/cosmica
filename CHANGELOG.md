@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - TypeScript compiles the app with `strict` and `noUncheckedIndexedAccess`.
 - `npm run lint` fails when oxlint reports warnings.
 
+## [0.30.5] - 2026-09-06
+
+### Changed
+
+- Results **Incorrect** is every wrong click. **Missed** is bodies you never found after three tries.
+
 ## [0.30.4] - 2026-09-06
 
 ### Changed

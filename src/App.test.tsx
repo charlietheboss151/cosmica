@@ -342,12 +342,30 @@ describe("Cosmica prototype", () => {
     expect(screen.getByTestId("results-found")).toHaveTextContent("8 / 8");
     expect(screen.getByTestId("results-correct")).toHaveTextContent("8");
     expect(screen.getByTestId("results-incorrect")).toHaveTextContent("0");
+    expect(screen.getByTestId("results-missed")).toHaveTextContent("0");
     expect(screen.getByTestId("results-accuracy")).toHaveTextContent("100%");
     expect(screen.getByTestId("results-streak")).toHaveTextContent("8");
     await user.click(screen.getByRole("button", { name: "Play again" }));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(screen.getByTestId("score")).toHaveTextContent("0 / 8");
     expect(screen.getByTestId("find-prompt").textContent).toMatch(/^Click on /);
+  });
+
+  it("counts every wrong click as Incorrect, not only full misses", async () => {
+    const user = await openMenu();
+    await user.click(screen.getByRole("button", { name: "Planets" }));
+    const firstPrompt = screen.getByTestId("find-prompt").textContent ?? "";
+    const first = firstPrompt.replace("Click on ", "");
+    const decoy = first === "Venus" ? "Mars" : "Venus";
+    await user.click(screen.getByRole("button", { name: decoy }));
+    for (let placed = 0; placed < 8; placed += 1) {
+      const prompt = screen.getByTestId("find-prompt").textContent ?? "";
+      const name = prompt.replace("Click on ", "");
+      await user.click(screen.getByRole("button", { name }));
+    }
+    expect(screen.getByTestId("results-correct")).toHaveTextContent("8");
+    expect(screen.getByTestId("results-incorrect")).toHaveTextContent("1");
+    expect(screen.getByTestId("results-missed")).toHaveTextContent("0");
   });
 
   it("records finds, XP, and a best score on the menu after a round", async () => {
