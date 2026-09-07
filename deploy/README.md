@@ -18,7 +18,7 @@ You do **not** need a Mac. Pick one path:
 
    Copy everything, including the `-----BEGIN … KEY-----` / `-----END … KEY-----` lines, and paste into the secret.
 
-4. **Actions** → **Deploy Cosmica** → **Run workflow** (or push to `main`).
+4. **Actions** → **Deploy Cosmica** → **Run workflow**. Pushes to `main` do not deploy.
 
 Live site: **https://charlietheboss.com/cosmica/**
 

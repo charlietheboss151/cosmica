@@ -41,13 +41,13 @@ npm run lint     # oxlint
 npm run deploy   # publish to charlietheboss.com/cosmica/ (see deploy/README.md)
 ```
 
-GitHub Actions runs `npm ci`, lint, test, and build on pushes to `main` and on pull requests (`.github/workflows/ci.yml`). Deploy to production runs separately on push to `main` (`.github/workflows/deploy.yml`).
+GitHub Actions runs `npm ci`, lint, test, and build on pushes to `main` and on pull requests (`.github/workflows/ci.yml`). Production deploy is local (`npm run deploy`); the **Deploy Cosmica** workflow is manual only and needs a `DEPLOY_SSH_KEY` secret.
 
 ## Deploy
 
 Production URL: **https://charlietheboss.com/cosmica/**
 
-**From Windows (no Mac needed):** add the `DEPLOY_SSH_KEY` GitHub secret in the repo settings, then run the **Deploy Cosmica** workflow. See [`deploy/GITHUB-ACTIONS.md`](deploy/GITHUB-ACTIONS.md) and [`deploy/README.md`](deploy/README.md).
+**From Windows (no Mac needed):** run `npm run deploy` with Git Bash or WSL. Optional: add the `DEPLOY_SSH_KEY` GitHub secret and run the **Deploy Cosmica** workflow by hand. See [`deploy/GITHUB-ACTIONS.md`](deploy/GITHUB-ACTIONS.md) and [`deploy/README.md`](deploy/README.md).
 
 Local deploy (Git Bash or WSL on Windows):
 

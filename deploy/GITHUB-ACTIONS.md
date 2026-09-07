@@ -20,7 +20,7 @@ Use either:
 
 - **Cosmica deploy key** — private half of `deploy/cosmica-deploy.pub` (see `deploy/README.md` to authorize on the server).
 
-Then either push to `main` (auto-deploy) or **Actions → Deploy Cosmica → Run workflow**.
+Then **Actions → Deploy Cosmica → Run workflow**. Pushes to `main` do not deploy.
 
 Live URL: **https://charlietheboss.com/cosmica/**
 
