@@ -127,29 +127,41 @@ function StickerImage({
   size,
   clipId,
   className,
+  clip = true,
 }: {
   href: string;
   size: number;
   clipId: string;
   className?: string;
+  /** Saturn already has transparent corners and rings that a circle would crop. */
+  clip?: boolean;
 }) {
   const radius = size / 2;
+  const image = (
+    <image
+      href={href}
+      className={[className, clip ? undefined : "orbit-backdrop-uncut"]
+        .filter(Boolean)
+        .join(" ")}
+      x={-radius}
+      y={-radius}
+      width={size}
+      height={size}
+      preserveAspectRatio="xMidYMid slice"
+    />
+  );
+  if (!clip) {
+    return image;
+  }
   return (
-    <>
-      <clipPath id={clipId}>
-        <circle r={radius} />
-      </clipPath>
-      <image
-        href={href}
-        className={className}
-        clipPath={`url(#${clipId})`}
-        x={-radius}
-        y={-radius}
-        width={size}
-        height={size}
-        preserveAspectRatio="xMidYMid slice"
-      />
-    </>
+    <g>
+      <defs>
+        <clipPath id={clipId}>
+          <circle r={radius} />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${clipId})`}>{image}</g>
+    </g>
   );
 }
 
@@ -175,6 +187,7 @@ function PlanetBody({
           href={planet.src}
           size={planet.size}
           clipId={`orbit-clip-${planet.id}`}
+          clip={planet.id !== "saturn"}
         />
         {planet.moons?.map((moon, index) => (
           <g key={moon.src}>
@@ -263,7 +276,11 @@ export default function OrbitBackdrop({ speed = 1, className = "" }: Props) {
             dur={`${120 * speed}s`}
             repeatCount="indefinite"
           />
-          <StickerImage href={bodySrc("sun.png")} size={72} clipId="orbit-clip-sun" />
+          <StickerImage
+            href={bodySrc("sun.png")}
+            size={72}
+            clipId="orbit-clip-sun"
+          />
         </g>
         {PLANETS.map((planet) => (
           <PlanetBody key={planet.id} planet={planet} speed={speed} />

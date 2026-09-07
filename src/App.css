@@ -51,6 +51,12 @@
 .orbit-backdrop-svg image {
   outline: none;
   overflow: hidden;
+  /* Clip on the <image> itself is ignored in some browsers; CSS circle is backup. */
+  clip-path: circle(50%);
+}
+
+.orbit-backdrop-svg image.orbit-backdrop-uncut {
+  clip-path: none;
 }
 
 .home-content {
