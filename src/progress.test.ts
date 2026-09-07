@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   applyRound,
   emptyProgress,
+  isFullSetRound,
   formatBest,
   loadProgress,
   parseProgress,
@@ -64,6 +65,28 @@ describe("player progress", () => {
       fullSet: true,
     });
     expect(slower.bestPercent.planets).toBe(100);
+  });
+
+  it("counts only the largest catalog as a full-set BEST", () => {
+    expect(isFullSetRound({ mode: "planets", hardMode: false })).toBe(true);
+    expect(isFullSetRound({ mode: "spacecraft", hardMode: false })).toBe(true);
+    expect(isFullSetRound({ mode: "moons", hardMode: true })).toBe(true);
+    expect(isFullSetRound({ mode: "celestial", hardMode: true })).toBe(true);
+    expect(isFullSetRound({ mode: "moons", hardMode: false })).toBe(false);
+    expect(isFullSetRound({ mode: "celestial", hardMode: false })).toBe(false);
+    expect(
+      isFullSetRound({ mode: "moons", hardMode: true, parentIds: ["jupiter"] }),
+    ).toBe(false);
+    expect(
+      isFullSetRound({ mode: "celestial", hardMode: true, types: ["comet"] }),
+    ).toBe(false);
+    expect(
+      isFullSetRound({
+        mode: "spacecraft",
+        hardMode: false,
+        spacecraftGroups: ["earth"],
+      }),
+    ).toBe(false);
   });
 
   it("does not use a subset round as the mode best", () => {

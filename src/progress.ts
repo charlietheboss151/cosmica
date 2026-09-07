@@ -1,4 +1,9 @@
-import { playableInMode, type GameMode } from "./catalog";
+import {
+  playableInMode,
+  type CelestialKind,
+  type GameMode,
+  type SpacecraftGroup,
+} from "./catalog";
 
 export const PROGRESS_KEY = "cosmica-progress-v1";
 export const XP_PER_LEVEL = 40;
@@ -107,6 +112,23 @@ export function saveProgress(
   store: ProgressStore = defaultStore(),
 ): void {
   store.setItem(PROGRESS_KEY, JSON.stringify(progress));
+}
+
+/** BEST only comes from the largest catalog for that mode, not an easier “full” list. */
+export function isFullSetRound(options: {
+  mode: GameMode;
+  hardMode: boolean;
+  parentIds?: string[];
+  types?: CelestialKind[];
+  spacecraftGroups?: SpacecraftGroup[];
+}): boolean {
+  if (options.parentIds !== undefined || options.types !== undefined || options.spacecraftGroups !== undefined) {
+    return false;
+  }
+  if (options.mode === "moons" || options.mode === "celestial") {
+    return options.hardMode;
+  }
+  return true;
 }
 
 export function applyRound(

@@ -25,6 +25,7 @@ import { randomizeOrbitalPositions, layoutProfileForMode } from "./layout";
 import {
   applyRound,
   formatBest,
+  isFullSetRound,
   loadProgress,
   modeDenom,
   rankFromXp,
@@ -768,10 +769,16 @@ function Play({ config, onMenu }: { config: PlayConfig; onMenu: () => void }) {
         foundIds,
         percent: accuracyPercent(quiz.score, quiz.correct, quiz.incorrect),
         score: quiz.score,
-        fullSet: parentIds === undefined && spacecraftGroups === undefined,
+        fullSet: isFullSetRound({
+          mode,
+          hardMode,
+          parentIds,
+          types,
+          spacecraftGroups,
+        }),
       }),
     );
-  }, [done, mode, parentIds, types, spacecraftGroups, quiz.foundIds, quiz.marks, quiz.score, quiz.correct, quiz.incorrect]);
+  }, [done, mode, hardMode, parentIds, types, spacecraftGroups, quiz.foundIds, quiz.marks, quiz.score, quiz.correct, quiz.incorrect]);
 
   useEffect(() => {
     if (!done) {

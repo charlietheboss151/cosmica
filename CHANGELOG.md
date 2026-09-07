@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - TypeScript compiles the app with `strict` and `noUncheckedIndexedAccess`.
 - `npm run lint` fails when oxlint reports warnings.
 
+## [0.30.7] - 2026-09-06
+
+### Changed
+
+- Mode BEST only updates from the largest catalog (all moons, celestial with hard objects, all spacecraft). Well-known moons and easy celestial rounds no longer lock BEST.
+
 ## [0.30.6] - 2026-09-06
 
 ### Fixed
