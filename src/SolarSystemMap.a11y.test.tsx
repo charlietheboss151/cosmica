@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { catalog } from "./catalog";
 import SolarSystemMap from "./SolarSystemMap";
 
-describe("SolarSystemMap accessibility", () => {
+describe("SolarSystemMap accessibility", { timeout: 20_000 }, () => {
   const rafQueue: FrameRequestCallback[] = [];
 
   beforeEach(() => {

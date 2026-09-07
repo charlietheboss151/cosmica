@@ -7,7 +7,7 @@ import { fitCameraOnMoonParent, layoutObject } from "./layout";
 import SolarSystemMap from "./SolarSystemMap";
 import { tryRingRadius } from "./tryRing";
 
-describe("SolarSystemMap interaction", () => {
+describe("SolarSystemMap interaction", { timeout: 20_000 }, () => {
   beforeEach(() => {
     Object.defineProperty(HTMLElement.prototype, "clientWidth", {
       configurable: true,

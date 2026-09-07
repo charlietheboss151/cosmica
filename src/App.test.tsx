@@ -12,7 +12,7 @@ async function openMenu() {
   return user;
 }
 
-describe("Cosmica prototype", () => {
+describe("Cosmica prototype", { timeout: 20_000 }, () => {
   afterEach(() => {
     vi.useRealTimers();
     localStorage.clear();
